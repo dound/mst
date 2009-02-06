@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
+from mstutil import random_tmp_filename
 from optparse import OptionParser
-import random, os, sys
+import os, sys
 
 def benchmark(input_graph, out, do_log):
     print "measuring performance on '%s' saving to '%s' (log=%s)" % (input_graph, out, str(do_log))
@@ -40,7 +41,7 @@ def main():
     if options.output_file:
         out = options.output_file
     elif options.check:
-        out = "/tmp/dgu-" + random_filename(10)
+        out = random_tmp_filename(10)
         out_is_tmp = True
     else:
         out = "/dev/null"
@@ -70,9 +71,6 @@ def main():
     # remaining runs, if any
     for _ in range(options.num_runs-1):
         benchmark(input_graph, "/dev/null", not options.dont_log)
-
-def random_filename(len):
-    return "".join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789") for i in range(len)])
 
 if __name__ == "__main__":
     sys.exit(main())
