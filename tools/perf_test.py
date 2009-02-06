@@ -7,6 +7,15 @@ import os, sys
 def benchmark(mst_binary, input_graph, out, do_log):
     print "measuring performance of '%s' on '%s' saving to '%s' (log=%s)" % (mst_binary, input_graph, out, str(do_log))
 
+def determine_weight(mst_binary, input_graph, out, do_log):
+    print "measuring performance of '%s' on '%s' saving to '%s' (log=%s)" % (mst_binary, input_graph, out, str(do_log))
+
+def test_mst(type, mst_binary, input_graph, out, do_log):
+    if type == "perf":
+        benchmark(mst_binary, input_graph, out, do_log)
+    else:
+        determine_time(mst_binary, input_graph, out, do_log)
+
 __files_to_cleanup = []
 def cleanup_and_exit(code=0):
     for fn in __files_to_cleanup:
@@ -15,7 +24,11 @@ def cleanup_and_exit(code=0):
 
 def main():
     desc  = "Measures the performance of an MST."
-    usage = "usage: %prog [options] INPUT_GRAPH\n" + desc
+    extra = """TYPE can be one of the following:
+  perf - performance benchmark (CPU time)
+  weight - MST weight computation"""
+        
+    usage = "usage: %prog [options]\n" + desc + '\n\n' + extra
     parser = OptionParser(usage)
     parser.add_option("-r", "--rev",
                       help="SHA1 of the git revision to build the mst binary from [default: use the currently built binary and do not log]"),
@@ -28,11 +41,22 @@ def main():
     parser.add_option("-n", "--num-runs",
                       metavar="NUM", type="int", default=1,
                       help="number of runs to execute")
+    parser.add_option("-t", "--type",
+                      default="perf",
+                      help="what kind of test to do [default: %default]")
     parser.add_option("-x", "--dont-log",
                       action="store_true", default=False,
                       help="do not log the result")
 
     (options, args) = parser.parse_args()
+
+    # validate the test type
+    if options.type == "p":
+        options.type = "perf"
+    elif options.type == "w":
+        options.type = "weight"
+    elif options.test != "perf" and options.test != "weight":
+        parser.error("-t must be either 'perf' or 'weight'")
     if len(args) < 1:
         parser.error("not enough arguments: INPUT_GRAPH is required")
     elif len(args) > 1:
@@ -64,7 +88,7 @@ def main():
         out = "/dev/null"
 
     # do the first run (and check the output if requested)
-    benchmark(mst_binary, input_graph, out, not options.dont_log)
+    test_mst(options.type, mst_binary, input_graph, out, not options.dont_log)
     if options.check is not None:
         correct_out = options.check
         if options.dont_log:
@@ -83,7 +107,7 @@ def main():
 
     # remaining runs, if any
     for _ in range(options.num_runs-1):
-        benchmark(mst_binary, input_graph, "/dev/null", not options.dont_log)
+        test_mst(options.type, mst_binary, input_graph, "/dev/null", not options.dont_log)
 
     cleanup_and_exit()
 
