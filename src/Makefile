@@ -20,8 +20,15 @@ MATH_OPTS = -ffast-math -fno-math-errno -ffinite-math-only -fno-trapping-math -f
 BUILD_TYPE_FLAGS = -O3 -fwhole-program -mtune=nocana $(MATH_OPTS) -fprefetch-loop-arrays
 endif
 
+# compiler choices
+GCC_IN_PATH = g++  # 4.1.3 on myth
+GCC_4_3_3   = /afs/ir.stanford.edu/users/d/g/dgu/bin/gcc-4.3.3/bin/g++
+GCC_4_4     = /afs/ir.stanford.edu/users/d/g/dgu/bin/gcc-4.4/bin/g++
+ICC         = /afs/ir.stanford.edu/users/d/g/dgu/bin/intel/Compiler/11.0/074/bin/intel64/icc
+DEFAULT_CC  = $(GCC_IN_PATH)
+
 # compiler and its directives
-CC     = g++
+CC     = $(DEFAULT_CC)
 LIBS   = 
 CFLAGS = -c -Wall $(BUILD_TYPE_FLAGS)
 
