@@ -1,0 +1,48 @@
+\documentclass[twocolumn,10pt]{article}
+
+\usepackage[margin=1.0in]{geometry}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{breakurl}
+\usepackage{color}
+\usepackage{subfigure}
+\usepackage{xspace}
+
+\title{CS161 Project Report}
+%\author{Paper \# 311}
+\author{David Underhill}
+
+\sloppy
+\clubpenalty	2000
+\widowpenalty	2000
+
+
+\begin{document}
+
+\definecolor{todocolor}{rgb}{0.8,0.2,0.2}
+\newcommand{\note}[1]{\textsf{\color{todocolor} #1}}
+\definecolor{dgucolor}{rgb}{0.1,0.8,0.2}
+\newcommand{\dgu}[1]{\textsf{\color{dgucolor} #1}}
+
+\newenvironment{packed_desc}{
+\begin{description}
+  \setlength{\topsep}{0pt}
+  \setlength{\leftmargin}{0em}
+  \setlength{\itemsep}{2pt plus 1pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}
+  \vspace{-0.1in plus 0.1in}
+}{\vspace{-0.1in plus 0.1in}
+\end{description}
+}
+
+\maketitle
+
+\input{intro}
+
+\footnotesize
+\bibliographystyle{abbrv}
+\bibliography{report}
+
+\end{document}
