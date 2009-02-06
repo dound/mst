@@ -2,9 +2,11 @@
 set -o errexit
 set -o nounset
 
+# Purpose: get a copy of an arbitrary Makefile target from any git revision
 # usage: SRC_FN DST_FN [REV]
-# if REV is provided, then that revision will be checked out and its copy of SRC_FN will built
-# DST_FN should be outside the repo if REV is provided
+#   * if REV is provided, then that rev's version of SRC_FN will be built
+#   * if REV is omitted, then the current state is used
+#   * DST_FN should be outside the repo
 
 # validate args
 me=$0
