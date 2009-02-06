@@ -30,17 +30,17 @@ def main():
         
     usage = "usage: %prog [options]\n" + desc + '\n\n' + extra
     parser = OptionParser(usage)
-    parser.add_option("-r", "--rev",
-                      help="SHA1 of the git revision to build the mst binary from [default: use the currently built binary and do not log]"),
-    parser.add_option("-o", "--output-file",
-                      metavar="FILE",
-                      help="where to save the output MST (stdout prints to stdout) [default: do not save output]")
     parser.add_option("-c", "--check",
                       metavar="CORRECT_OUTPUT_FILE",
                       help="check output using check_output.py (only for the first run; exits if the check fails)")
     parser.add_option("-n", "--num-runs",
-                      metavar="NUM", type="int", default=1,
+                      metavar="N", type="int", default=1,
                       help="number of runs to execute")
+    parser.add_option("-o", "--output-file",
+                      metavar="FILE",
+                      help="where to save the output MST (stdout prints to stdout) [default: do not save output]")
+    parser.add_option("-r", "--rev",
+                      help="SHA1 of the git revision to build the mst binary from [default: use existing binary and do not log]"),
     parser.add_option("-t", "--type",
                       default="perf",
                       help="what kind of test to do [default: %default]")
