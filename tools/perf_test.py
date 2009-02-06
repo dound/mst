@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from optparse import OptionParser
-import os, sys
+import random, os, sys
 
 def benchmark(input_graph, out, do_log):
     print "measuring performance on '%s' saving to '%s' (log=%s)" % (input_graph, out, str(do_log))
@@ -62,7 +62,7 @@ def main():
         benchmark(input_graph, "/dev/null", not options.dont_log)
 
 def random_filename(len):
-    "".join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789") for i in range(len)])
+    return "".join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789") for i in range(len)])
 
 if __name__ == "__main__":
     sys.exit(main())
