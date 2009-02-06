@@ -33,6 +33,12 @@ def main():
     parser.add_option("-c", "--check",
                       metavar="CORRECT_OUTPUT_FILE",
                       help="check output using check_output.py (only for the first run; exits if the check fails)")
+    parser.add_option("-g", "--generate-input",
+                      metavar="GEN_ARGS",
+                      help="generate and use as input a graph from ./generate_input.py GEN_ARGS")
+    parser.add_option("-i", "--input-file",
+                      metavar="FILE",
+                      help="FILE which describes the graph to use as input")
     parser.add_option("-n", "--num-runs",
                       metavar="N", type="int", default=1,
                       help="number of runs to execute")
@@ -49,6 +55,8 @@ def main():
                       help="do not log the result")
 
     (options, args) = parser.parse_args()
+    if len(args) > 0:
+        parser.error("too many arguments: none expected")
 
     # validate the test type
     if options.type == "p":
@@ -57,12 +65,24 @@ def main():
         options.type = "weight"
     elif options.test != "perf" and options.test != "weight":
         parser.error("-t must be either 'perf' or 'weight'")
-    if len(args) < 1:
-        parser.error("not enough arguments: INPUT_GRAPH is required")
-    elif len(args) > 1:
-        parser.error("too many arguments: only expected INPUT_GRAPH")
 
-    input_graph = args[0]
+    # get the input file
+    if options.generate_input is not None and options.input_file is not None:
+        parser.error("-g and -i are mutually exclusive")
+    elif options.input_file is not None:
+        input_graph = options.input_file
+    elif options.generate_input is not None:
+        # generate the input file
+        input_graph = random_tmp_filename(10)
+        __files_to_cleanup.append(input_graph)
+        cmd = './generate_input %s > %s' % (options.generate_input, input_graph)
+        ret = os.system(cmd)
+        if ret != 0:
+            print 'error: aborting test (input generation failed)'
+            cleanup_and_exit(ret)
+    else:
+        parser.error("at least one of -g and -i must be used to specify the input graph")
+
     if options.num_runs < 1:
         parser.error("-n must be at least 1")
 
