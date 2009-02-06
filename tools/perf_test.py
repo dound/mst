@@ -7,6 +7,12 @@ import os, sys
 def benchmark(mst_binary, input_graph, out, do_log):
     print "measuring performance of '%s' on '%s' saving to '%s' (log=%s)" % (mst_binary, input_graph, out, str(do_log))
 
+__files_to_cleanup = []
+def cleanup_and_exit(code=0):
+    for fn in __files_to_cleanup:
+        os.system('rm -f ' + fn)
+    sys.exit(code)
+
 def main():
     desc  = "Measures the performance of an MST."
     usage = "usage: %prog [options] INPUT_GRAPH\n" + desc
@@ -38,6 +44,7 @@ def main():
 
     # get the mst binary we want to test with
     mst_binary = random_tmp_filename(10)
+    __files_to_cleanup.append(mst_binary)
     if options.rev is None:
         options.dont_log = True  # no logging allowed on binaries which aren't checked in to the repo
         options.rev = ""         # tells the script to just use the current revision
@@ -45,15 +52,14 @@ def main():
     ret = os.system(cmd)
     if ret != 0:
         print 'error: unable to copy and build the mst binary'
-        sys.exit(ret)
+        cleanup_and_exit(ret)
 
     # prepare the output file
-    out_is_tmp = False
     if options.output_file:
         out = options.output_file
     elif options.check:
         out = random_tmp_filename(10)
-        out_is_tmp = True
+        __files_to_cleanup.append(out_is_tmp)
     else:
         out = "/dev/null"
 
@@ -70,21 +76,16 @@ def main():
     else:
         ret = 0
 
-    # cleanup any temporary output file
-    if out_is_tmp:
-        os.system('rm -f ' + out)
-
     # exit if checking failed
     if ret != 0:
         print "error: check failed (bailing out)"
-        sys.exit(ret)
+        cleanup_and_exit(ret)
 
     # remaining runs, if any
     for _ in range(options.num_runs-1):
         benchmark(mst_binary, input_graph, "/dev/null", not options.dont_log)
 
-    # cleanup
-    os.system('rm -f ' + mst_binary)
+    cleanup_and_exit()
 
 if __name__ == "__main__":
     sys.exit(main())
