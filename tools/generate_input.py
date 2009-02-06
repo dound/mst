@@ -12,7 +12,7 @@ def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos
                                                                              num_dims, min_pos, max_pos)
 
 def main():
-    usage = "usage: %prog [options] NUM_VERTICES"
+    usage = "usage: %prog [options] NUM_VERTICES\nGenerates a connected graph with no self-loops or parallel edges."
     parser = OptionParser(usage)
     parser.add_option("-n", "--num-edges",
                       help="number of edges to put in the graph [default: complete graph]")
@@ -22,9 +22,6 @@ def main():
     parser.add_option("-v", "--vertex-pos-range",
                       metavar="DIM,MIN,MAX",
                       help="dimensionality of vertex positions and the range of each dimension [not used by default; mutually exclusive with -e]")
-    parser.add_option("-c", "--connectivity",
-                      default=1, type="int", metavar="CC",
-                      help="create CC connected components")
     parser.add_option("-s", "--style",
                       help="how to place edges [default: random with no self-loops or parallel edges]")
 
@@ -33,7 +30,6 @@ def main():
         parser.error("missing NUM_VERTICES")
     elif len(args) > 1:
         parser.error("too many arguments")
-
 
     try:
         num_verts = int(args[0])
@@ -50,11 +46,6 @@ def main():
                 parser.error("-n may not be larger than NUM_VERTICES squared")
     except TypeError:
         parser.error("-n must either be an integer or 'complete'")
-
-    if options.connectivity < 1:
-        parser.error("option -c must be at least 1")
-    elif options.connectivity > 1:
-        parser.error("option -c is not supported for values greater than 1")
 
     if options.style is not None:
         parser.error("option -s is not yet supported")
