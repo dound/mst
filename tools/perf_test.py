@@ -36,13 +36,15 @@ def main():
         parser.error("-n must be at least 1")
 
     # prepare the output file
+    out_is_tmp = False
     if options.output_file:
         out = options.output_file
     elif options.check:
-        out = ".tmp." + random_filename(100)
+        out = "/tmp/dgu-" + random_filename(10)
+        out_is_tmp = True
     else:
         out = "/dev/null"
-        
+
     # do the first run (and check the output if requested)
     benchmark(input_graph, out, not options.dont_log)
     if options.check is not None:
@@ -53,9 +55,17 @@ def main():
             log_opt = ""
         cmd = "./check_output.py -i %s %s %s %s" % (input_graph, log_opt, correct_out, out)
         ret = os.system(cmd)
-        if ret != 0:
-            print "error: check failed (bailing out)"
-            sys.exit(ret)
+    else:
+        ret = 0
+
+    # cleanup any temporary output file
+    if out_is_tmp:
+        os.system('rm -f ' + out)
+
+    # exit if checking failed
+    if ret != 0:
+        print "error: check failed (bailing out)"
+        sys.exit(ret)
 
     # remaining runs, if any
     for _ in range(options.num_runs-1):
