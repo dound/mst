@@ -14,7 +14,7 @@ def is_mst_binary_accessible():
 
 def random_tmp_filename(len):
     """Returns a random filename in the /tmp folder prefixed with 'dgu-'."""
-    return "/tmp/dgu-".join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789") for i in range(len)])
+    return "/tmp/dgu-" + random_filename(len)
 
 def random_filename(len):
     """Returns a random string of the specified length composed of letters and/or numbers."""
