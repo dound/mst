@@ -18,7 +18,7 @@ def main():
                       help="where to save the output MST (stdout prints to stdout) [default: do not save output]")
     parser.add_option("-c", "--check",
                       metavar="CORRECT_OUTPUT_FILE",
-                      help="check the output using the check_output.py script (done only for the first run; exits if the check fails)")
+                      help="check output using check_output.py (only for the first run; exits if the check fails)")
     parser.add_option("-n", "--num-runs",
                       metavar="NUM", type="int", default=1,
                       help="number of runs to execute")
