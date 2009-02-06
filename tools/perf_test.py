@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 
-from mstutil import random_tmp_filename
+from mstutil import get_path_to_mst_binary, is_mst_binary_accessible, random_tmp_filename
 from optparse import OptionParser
 import os, sys
 
-def benchmark(input_graph, out, do_log):
-    print "measuring performance on '%s' saving to '%s' (log=%s)" % (input_graph, out, str(do_log))
+def benchmark(mst_binary, input_graph, out, do_log):
+    print "measuring performance of '%s' on '%s' saving to '%s' (log=%s)" % (mst_binary, input_graph, out, str(do_log))
 
 def main():
     desc  = "Measures the performance of an MST."
     usage = "usage: %prog [options] INPUT_GRAPH\n" + desc
     parser = OptionParser(usage)
     parser.add_option("-r", "--rev",
-                      help="SHA1 of the git revision to build the mst binary from [default: use the currently built binary]"),
+                      help="SHA1 of the git revision to build the mst binary from [default: use the currently built binary and do not log]"),
     parser.add_option("-o", "--output-file",
                       metavar="FILE",
                       help="where to save the output MST (stdout prints to stdout) [default: do not save output]")
@@ -36,6 +36,17 @@ def main():
     if options.num_runs < 1:
         parser.error("-n must be at least 1")
 
+    # get the mst binary we want to test with
+    mst_binary = random_tmp_filename(10)
+    if options.rev is None:
+        options.dont_log = True  # no logging allowed on binaries which aren't checked in to the repo
+        options.rev = ""         # tells the script to just use the current revision
+    cmd = './copy_and_build_from_rev.sh %s %s %s' % (get_path_to_mst_binary(), mst_binary, options.rev)
+    ret = os.system(cmd)
+    if ret != 0:
+        print 'error: unable to copy and build the mst binary'
+        sys.exit(ret)
+
     # prepare the output file
     out_is_tmp = False
     if options.output_file:
@@ -47,7 +58,7 @@ def main():
         out = "/dev/null"
 
     # do the first run (and check the output if requested)
-    benchmark(input_graph, out, not options.dont_log)
+    benchmark(mst_binary, input_graph, out, not options.dont_log)
     if options.check is not None:
         correct_out = options.check
         if options.dont_log:
@@ -70,7 +81,10 @@ def main():
 
     # remaining runs, if any
     for _ in range(options.num_runs-1):
-        benchmark(input_graph, "/dev/null", not options.dont_log)
+        benchmark(mst_binary, input_graph, "/dev/null", not options.dont_log)
+
+    # cleanup
+    os.system('rm -f ' + mst_binary)
 
 if __name__ == "__main__":
     sys.exit(main())
