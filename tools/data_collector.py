@@ -89,6 +89,7 @@ Searches for missing results and uses run_test.py to collect it."""
             parser.error('-v requires either -d or -e be specified too')
 
         inputs = [(wtype, options.num_vertices)]
+        revs = [None] # not revision-specific (assuming our alg is correct)
         get_results = (lambda _ : get_weight_results(wtype))
         collect_missing_data = collect_missing_weight_data
     elif options.dimensionality > 0 or options.edge:
@@ -111,18 +112,18 @@ Searches for missing results and uses run_test.py to collect it."""
         get_results = lambda rev : get_performance_results(rev)
         collect_missing_data = collect_missing_performance_data
 
-    # prepare the inputs for non-weight data collection schemes
+    # prepare the inputs and revisions for non-weight data collection schemes
     if options.num_vertices == 0:
         if options.input_graph is not None:
             inputs = [options.input_graph]
         else:
             inputs = get_tracked_inputs()
 
-    # prepare the revisions to collect data for
-    if options.rev is not None:
-        revs = [options.rev]
-    else:
-        revs = get_tracked_revs()
+        # prepare the revisions to collect data for
+        if options.rev is not None:
+            revs = [options.rev]
+        else:
+            revs = get_tracked_revs()
 
     # collect the data
     root_len = len(get_path_to_project_root())
@@ -133,7 +134,17 @@ Searches for missing results and uses run_test.py to collect it."""
             data = get_results(rev)
         except IOError, strerror:
             missing_none = False
-            print 'warning: revision %s skipped: %s' % (rev, strerror)
+            if rev is None:
+                print 'warning: skipped data collection: %s' % strerror
+            else:
+                print 'warning: %s skipped: %s' % (rev, strerror)
+            continue
+        except FileFormatError, strerror:
+            missing_none = False
+            if rev is None:
+                print 'warning: invalid file: %s' % strerror
+            else:
+                print 'warning: %s has an invalid file: %s' % (rev, strerror)
             continue
 
         for i in inputs:
@@ -147,7 +158,10 @@ Searches for missing results and uses run_test.py to collect it."""
                     missing_none = False
                     msg = 'failed to collect'
                 if msg is not None:
-                    print '%s: %s\trev=%s\trunsLeft=%u' % (msg, str(i)[root_len:], rev, n)
+                    if rev is None:
+                        print '%s: runsLeft=%u' % (msg, n)
+                    else:
+                        print '%s: %s\trev=%s\trunsLeft=%u' % (msg, str(i)[root_len:], rev, n)
 
     if missing_none:
         print 'No performance data is missing!'
