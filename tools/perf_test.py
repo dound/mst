@@ -37,19 +37,19 @@ def __generate_input_graph(argstr):
     return input_graph
 
 def main():
-    desc  = "Measures the performance of an MST."
-    extra = """TYPE can be one of the following:
+    usage = """usage: %prog [options]
+Tests the performance of the MST implementation or uses it to find the weight of an MST.
+
+TYPE can be one of the following:
   perf - performance benchmark (CPU time)
   weight - MST weight computation"""
-        
-    usage = "usage: %prog [options]\n" + desc + '\n\n' + extra
     parser = OptionParser(usage)
     parser.add_option("-c", "--check",
                       metavar="CORRECT_OUTPUT_FILE",
                       help="check output using check_output.py (only for the first run; exits if the check fails)")
     parser.add_option("-g", "--generate-input",
                       metavar="GEN_ARGS",
-                      help="generate and use as input a graph from ./generate_input.py GEN_ARGS (generates a new graph for each run)")
+                      help="generate and use as input a graph from ./generate_input.py GEN_ARGS (one for each run)")
     parser.add_option("-i", "--input-file",
                       metavar="FILE",
                       help="FILE which describes the graph to use as input")
