@@ -121,8 +121,15 @@ Searches for missing results and uses run_test.py to collect it."""
     # collect the data
     root_len = len(get_path_to_project_root())
     missing_none = True
+    errno = None
     for rev in revs:
-        data = get_results(rev)
+        try:
+            data = get_results(rev)
+        except IOError, strerror:
+            missing_none = False
+            print 'warning: revision %s skipped: %s' % (rev, strerror)
+            continue
+
         for i in inputs:
             n = get_num_runs_missing_for_data(data, i, options.num_runs)
             if n > 0:
