@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from mstutil import get_path_to_mst_binary, quiet_remove, random_tmp_filename
+from mstutil import get_path_to_mst_binary, get_path_to_tools_root, quiet_remove, random_tmp_filename
 from optparse import OptionParser
 import os, sys
 
