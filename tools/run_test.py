@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from mstutil import get_path_to_mst_binary, random_tmp_filename
+from mstutil import get_path_to_mst_binary, quiet_remove, random_tmp_filename
 from optparse import OptionParser
 import os, sys
 
@@ -20,9 +20,9 @@ __input_graph_to_cleanup = None
 __files_to_cleanup = []
 def __cleanup_and_exit(code=0):
     for fn in __files_to_cleanup:
-        os.system('rm -f ' + fn)
+        quiet_remove(fn)
     if __input_graph_to_cleanup is not None:
-        os.system('rm -f ' + __input_graph_to_cleanup)
+        quiet_remove(__input_graph_to_cleanup)
     sys.exit(code)
 
 def __generate_input_graph(argstr):
@@ -153,7 +153,7 @@ computation only):
     # remaining runs, if any
     for _ in range(options.num_runs-1):
         if gen_input_args is not None:
-            os.system('rm -f ' + __input_graph_to_cleanup)
+            quiet_remove(__input_graph_to_cleanup)
             input_graph = __generate_input_graph(gen_input_args)
         test_mst(is_test_perf, mst_binary, input_graph, "/dev/null", not options.dont_log)
 
