@@ -1,15 +1,17 @@
 #!/bin/bash
 
 # wrapper script to meet the requirements for part 2 of the CS161 project
-# usage: <# of nodes> <# of graphs to generate> <graphs type>
-#   <graphs type> values:
-#     1 => weight of a random complete graph with random uniformly distributed edge lengths [0,1]
-#     2 => weight of a random complete graph with vertex locations randomly uniformly distributed [0,1] in 2 dimensions
-#     3 => like 2 except 3-d (cube)
-#     4 => like 2 except 4-d (hypercube)
+usage="usage: <# of nodes> <# of graphs to generate> <graphs type>\n
+  <graphs type> values:\n
+\t  1 => weight of a random complete graph with random uniformly distributed\n
+\t\t     edge lengths [0,1]\n
+\t  2 => weight of a random complete graph with vertex locations randomly\n
+\t\t     uniformly distributed [0,1] in 2 dimensions\n
+\t  3 => like 2 except 3-d (cube)\n
+\t  4 => like 2 except 4-d (hypercube)"
 
 if [ $# -ne 3 ]; then
-    echo "usage: <# of nodes> <# of graphs to generate> <graphs type>"
+    echo -e $usage
     if [ $# -ne 0 ]; then
         echo "error: requires exactly three arguments"
     fi
