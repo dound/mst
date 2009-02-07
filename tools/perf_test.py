@@ -8,7 +8,7 @@ def benchmark(mst_binary, input_graph, out, do_log):
     print "measuring performance of '%s' on '%s' saving to '%s' (log=%s)" % (mst_binary, input_graph, out, str(do_log))
 
 def determine_weight(mst_binary, input_graph, out, do_log):
-    print "measuring performance of '%s' on '%s' saving to '%s' (log=%s)" % (mst_binary, input_graph, out, str(do_log))
+    print "using '%s' to determine MST weight of '%s' saving to '%s' (log=%s)" % (mst_binary, input_graph, out, str(do_log))
 
 def test_mst(test_type, mst_binary, input_graph, out, do_log):
     if test_type == "perf":
@@ -27,9 +27,10 @@ def __cleanup_and_exit(code=0):
 
 def __generate_input_graph(argstr):
     """Generate a graph from the specified string of arguments and return the file it is saved in."""
+    global __input_graph_to_cleanup
     input_graph = random_tmp_filename(10)
     __input_graph_to_cleanup = input_graph
-    cmd = './generate_input %s > %s' % (argstr, input_graph)
+    cmd = './generate_input.py %s > %s' % (argstr, input_graph)
     ret = os.system(cmd)
     if ret != 0:
         print 'error: aborting test (input generation failed)'
