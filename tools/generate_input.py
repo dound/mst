@@ -6,6 +6,7 @@ import sys
 def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, precision):
     print "gen_random_edge_lengths: m=%d n=%d min=%.1f max=%.1f prec=%d" % (num_verts, num_edges, 
                                                                             min_edge_len, max_edge_len, precision)
+    # min_edge_len is EXCLUSIVE (e.g., it may be 0.0)
 
 def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos, precision):
     print "gen_random_vertex_positions: m=%d n=%d d=%d min=%.1f max=%.1f prec=%d" % (num_verts, num_edges, 
@@ -21,10 +22,10 @@ def main():
                       help="number of decimal points to specify for edge weights [default: %default]")
     parser.add_option("-e", "--edge-weight-range",
                       metavar="MIN,MAX", 
-                      help="range of edge weights [default: >=0.1]")
+                      help="range of edge weights (min exclusive, max inclusive) [default: >=0.1]")
     parser.add_option("-v", "--vertex-pos-range",
                       metavar="DIM,MIN,MAX",
-                      help="dimensionality of vertex positions and the range of each dimension [not used by default; mutually exclusive with -e]")
+                      help="dimensionality of vertex positions and the range of each dimension (min inclusive, max inclusive) [not used by default; mutually exclusive with -e]")
     parser.add_option("-s", "--style",
                       help="how to place edges [default: random with no self-loops or parallel edges]")
 
@@ -83,8 +84,8 @@ def main():
         except ValueError:
             parser.error("option -e requires its arguments to be in the form float,float")
 
-        if min_pos <= 0.1:
-            parser.error("option -e requires minimum edge length to be >= 0.1")
+        if min_pos < 0.0:
+            parser.error("option -e requires minimum edge length (exclusive) to be >= 0.0")
         if min_pos > max_pos:
             parser.error("option -e requires the minimum edge length < maximum edge length")
     else:
