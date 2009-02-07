@@ -8,7 +8,12 @@ import os, sys, types
 def get_num_runs_missing_for_data(data, input_val, num_desired_runs):
     """Returns the number of values left to be collected."""
     if type(input_val) is types.StringType:
+        # get just the filename
         input_val = os.path.basename(input_val)
+    else:
+        # get just the number of vertices from the tuple
+        input_val = str(input_val[1])
+
     if data.has_key(input_val):
         return max(0, num_desired_runs - len(data[input_val]))
     else:
