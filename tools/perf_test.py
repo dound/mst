@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from mstutil import get_path_to_mst_binary, is_mst_binary_accessible, random_tmp_filename
+from mstutil import get_path_to_mst_binary, random_tmp_filename
 from optparse import OptionParser
 import os, sys
 
@@ -10,11 +10,11 @@ def benchmark(mst_binary, input_graph, out, do_log):
 def determine_weight(mst_binary, input_graph, out, do_log):
     print "measuring performance of '%s' on '%s' saving to '%s' (log=%s)" % (mst_binary, input_graph, out, str(do_log))
 
-def test_mst(type, mst_binary, input_graph, out, do_log):
-    if type == "perf":
+def test_mst(test_type, mst_binary, input_graph, out, do_log):
+    if test_type == "perf":
         benchmark(mst_binary, input_graph, out, do_log)
     else:
-        determine_time(mst_binary, input_graph, out, do_log)
+        determine_weight(mst_binary, input_graph, out, do_log)
 
 __input_graph_to_cleanup = None
 __files_to_cleanup = []
@@ -60,7 +60,7 @@ def main():
                       metavar="FILE",
                       help="where to save the output MST (stdout prints to stdout) [default: do not save output]")
     parser.add_option("-r", "--rev",
-                      help="SHA1 of the git revision to build the mst binary from [default: use existing binary and do not log]"),
+                      help="SHA1 of the git revision to build the mst binary from [default: use existing binary and do not log]")
     parser.add_option("-t", "--type",
                       default="perf",
                       help="what kind of test to do [default: %default]")
@@ -110,7 +110,7 @@ def main():
         out = options.output_file
     elif options.check:
         out = random_tmp_filename(10)
-        __files_to_cleanup.append(out_is_tmp)
+        __files_to_cleanup.append(out)
     else:
         out = "/dev/null"
 
