@@ -9,10 +9,11 @@ def quiet_remove(fn):
 def get_path_to_tools_root():
     """Gets the path to the root of the MST tools directory."""
     # strip off 'mstutil.py'
+    dir = os.path.dirname(__file__) + '/'
     if __file__[0:1] == '/':
-        return __file__[:-10]
+        return dir
     else:
-        return os.getcwd() + '/' + __file__[:-10]
+        return os.getcwd() + '/' + dir
 
 def get_path_to_project_root():
     """Gets the path to the root of the MST project."""
