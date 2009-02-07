@@ -2,7 +2,7 @@
 
 from mstutil import get_path_to_tools_root, get_tracked_inputs, get_tracked_revs
 from mstutil import get_correctness_results, get_performance_results, get_weight_results
-from optparse import OptionParser
+from optparse import OptionGroup, OptionParser
 import os, sys
 
 def get_num_runs_missing_for_data(data, input_graph, num_desired_runs):
@@ -41,21 +41,23 @@ Searches for missing results and uses run_test.py to collect it."""
     parser.add_option("-r", "--rev",
                       help="restrict the missing data check to the specified revision")
 
-    parser.add_option("-p", "--performance",
+    group = OptionGroup(parser, "Data Collection Options")
+    group.add_option("-p", "--performance",
                       action="store_true", default=True,
                       help="collect performance data (this is the default)")
-    parser.add_option("-c", "--correctness",
+    group.add_option("-c", "--correctness",
                       action="store_true", default=False,
                       help="collect correctness data")
-    parser.add_option("-v", "--num_vertices",
+    group.add_option("-v", "--num_vertices",
                       metavar="V", type="int", default=0,
                       help="collect weight data for V vertices (requires -d or -e)")
-    parser.add_option("-d", "--dimensionality",
+    group.add_option("-d", "--dimensionality",
                       metavar="D", type="int", default=0,
                       help="collect weight data for randomly positioned vertices in D-dimensional space (requires -v)")
-    parser.add_option("-e", "--edge",
+    group.add_option("-e", "--edge",
                       action="store_true", default=False,
                       help="collect weight data for random uniform edge weights in the range (0, 1] (requires -v)")
+    parser.add_option_group(group)
 
     (options, args) = parser.parse_args()
     if len(args) > 0:
