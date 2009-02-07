@@ -7,6 +7,7 @@ import os, sys
 
 def get_num_runs_missing_for_data(data, input_graph, num_desired_runs):
     """Returns the number of values left to be collected."""
+    input_graph = os.path.basename(input_graph)
     if data.has_key(input_graph):
         return max(0, num_desired_runs - len(data[input_graph]))
     else:
