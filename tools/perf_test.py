@@ -10,8 +10,8 @@ def benchmark(mst_binary, input_graph, out, do_log):
 def determine_weight(mst_binary, input_graph, out, do_log):
     print "using '%s' to determine MST weight of '%s' saving to '%s' (log=%s)" % (mst_binary, input_graph, out, str(do_log))
 
-def test_mst(test_type, mst_binary, input_graph, out, do_log):
-    if test_type == "perf":
+def test_mst(is_test_perf, mst_binary, input_graph, out, do_log):
+    if is_test_perf:
         benchmark(mst_binary, input_graph, out, do_log)
     else:
         determine_weight(mst_binary, input_graph, out, do_log)
@@ -39,15 +39,14 @@ def __generate_input_graph(argstr):
 
 def main():
     usage = """usage: %prog [options]
-Tests the performance of the MST implementation or uses it to find the weight of an MST.
+Tests the performance of the MST implementation.  Alternatively, when -g is used
+with a special argument (below), this determines the weight of the MST.
 
-GEN_ARGS can be arbitrary arguments or one of the following special arguments to generate a complete graph:
-  edge: random uniform edge weights [0, 1]
-  locN: randomly position vertices in N-dimensional space with axis ranges [0,1]
-
-TYPE can be one of the following:
-  perf - performance benchmark (CPU time)
-  weight - MST weight computation"""
+GEN_ARGS can be arbitrary arguments (to test performance) or one of the
+following special arguments to generate a complete graph (for MST weight
+computation only):
+  edge,NUM_VERTICES: random uniform edge weights [0, 1]
+  locN,NUM_VERTICES: randomly position vertices in N-dimensional space with axis ranges [0,1]"""
     parser = OptionParser(usage)
     parser.add_option("-c", "--check",
                       metavar="CORRECT_OUTPUT_FILE",
@@ -66,9 +65,6 @@ TYPE can be one of the following:
                       help="where to save the output MST (stdout prints to stdout) [default: do not save output]")
     parser.add_option("-r", "--rev",
                       help="SHA1 of the git revision to build the mst binary from [default: use existing binary and do not log]")
-    parser.add_option("-t", "--type",
-                      default="perf",
-                      help="what kind of test to do [default: %default]")
     parser.add_option("-x", "--dont-log",
                       action="store_true", default=False,
                       help="do not log the result")
@@ -77,15 +73,8 @@ TYPE can be one of the following:
     if len(args) > 0:
         parser.error("too many arguments: none expected")
 
-    # validate the test type
-    if options.type == "p":
-        options.type = "perf"
-    elif options.type == "w":
-        options.type = "weight"
-    elif options.type != "perf" and options.type != "weight":
-        parser.error("-t must be either 'perf' or 'weight'")
-
     # get the input file
+    is_test_perf = True
     gen_input_args = None
     if options.generate_input is not None and options.input_file is not None:
         parser.error("-g and -i are mutually exclusive")
@@ -107,6 +96,8 @@ TYPE can be one of the following:
         # if it was not a special case, just pass the args straight through
         if gen_input_args is None:
             gen_input_args = options.generate_input
+        else:
+            is_test_perf = False
 
         input_graph = __generate_input_graph(gen_input_args)
     else:
@@ -137,7 +128,7 @@ TYPE can be one of the following:
         out = "/dev/null"
 
     # do the first run (and check the output if requested)
-    test_mst(options.type, mst_binary, input_graph, out, not options.dont_log)
+    test_mst(is_test_perf, mst_binary, input_graph, out, not options.dont_log)
     if options.check is not None:
         correct_out = options.check
         if options.dont_log:
@@ -159,7 +150,7 @@ TYPE can be one of the following:
         if gen_input_args is not None:
             os.system('rm -f ' + __input_graph_to_cleanup)
             input_graph = __generate_input_graph(gen_input_args)
-        test_mst(options.type, mst_binary, input_graph, "/dev/null", not options.dont_log)
+        test_mst(is_test_perf, mst_binary, input_graph, "/dev/null", not options.dont_log)
 
     __cleanup_and_exit()
 
