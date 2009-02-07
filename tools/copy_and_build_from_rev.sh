@@ -20,6 +20,10 @@ fi
 src=$1
 dst=$2
 
+# make sure we're in the repo
+dir=`dirname $src`
+cd $dir
+
 if [ $# -eq 3 ]; then
     origBranch=`git branch -a | fgrep '*' | sed -e 's#* ##'`
 
@@ -41,7 +45,6 @@ if [ $# -eq 3 ]; then
 fi
 
 # build and copy the binary
-dir=`dirname $src`
 name=`basename $src`
 make -C $dir $name
 cp $src $dst
@@ -52,7 +55,7 @@ if [ $# -eq 3 ]; then
     git branch -D $tmpBranch
 
     # restore stashed changes
-    if [ $numChanges -gt 0 ]; then    
+    if [ $numChanges -gt 0 ]; then
         git stash pop > /dev/null
         echo "Restored stashed changes"
     fi
