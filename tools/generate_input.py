@@ -33,7 +33,7 @@ def main():
 
     try:
         num_verts = int(args[0])
-    except TypeError:
+    except ValueError:
         parser.error("NUM_VERTICES must be an integer")
 
     try:
@@ -44,7 +44,7 @@ def main():
             num_edges = int(sne)
             if num_edges > num_verts * num_verts:
                 parser.error("-n may not be larger than NUM_VERTICES squared")
-    except TypeError:
+    except ValueError:
         parser.error("-n must either be an integer or 'complete'")
 
     if options.style is not None:
@@ -58,7 +58,7 @@ def main():
         (d, m1, m2) = options.vertex_pos_range.split(',', 3)
         try:
             (num_dims, min_pos, max_pos) = (int(d), float(m1), float(m2))
-        except TypeError:
+        except ValueError:
             parser.error("option -v requires its arguments to be in the form int,float,float")
 
         if num_dims < 0:
@@ -72,7 +72,7 @@ def main():
         (m1, m2) = options.edge_weight_range.split(',', 2)
         try:
             (min_pos, max_pos) = (float(m1), float(m2))
-        except TypeError:
+        except ValueError:
             parser.error("option -e requires its arguments to be in the form float,float")
 
         if min_pos < 0.1:
