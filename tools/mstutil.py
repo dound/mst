@@ -3,7 +3,7 @@ import os, random
 def quiet_remove(fn):
     try:
         os.remove(fn)
-    except os.OSError:
+    except OSError:
         pass
 
 def get_path_to_tools_root():

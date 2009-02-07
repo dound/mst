@@ -71,6 +71,9 @@ computation only):
     parser.add_option("-x", "--dont-log",
                       action="store_true", default=False,
                       help="do not log the result")
+    parser.add_option("-X", "--dont-log-any",
+                      action="store_true", default=False,
+                      help="do not log the result for this or for checking")
 
     (options, args) = parser.parse_args()
     if len(args) > 0:
@@ -109,11 +112,15 @@ computation only):
     if options.num_runs < 1:
         parser.error("-n must be at least 1")
 
+    if options.dont_log_any:
+        options.dont_log = True
+
     # get the mst binary we want to test with
     mst_binary = random_tmp_filename(10)
     __files_to_cleanup.append(mst_binary)
     if options.rev is None:
         options.dont_log = True  # no logging allowed on binaries which aren't checked in to the repo
+        options.dont_log_any = True
         options.rev = ""         # tells the script to just use the current revision
     cmd = 'copy_and_build_from_rev.sh %s %s %s' % (get_path_to_mst_binary(), mst_binary, options.rev)
     if options.quiet:
@@ -136,7 +143,7 @@ computation only):
     test_mst(is_test_perf, mst_binary, input_graph, out, not options.dont_log)
     if options.check is not None:
         correct_out = options.check
-        if options.dont_log:
+        if options.dont_log_any:
             log_opt = "-x"
         else:
             log_opt = ""
