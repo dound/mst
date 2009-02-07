@@ -19,6 +19,9 @@ def print_input_header(num_verts, num_edges, about):
     print '%u' % num_verts
     print '%u' % num_edges
 
+def edges_in_complete_undirected_graph(num_verts):
+    return (num_verts * (num_verts - 1)) / 2
+
 def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, precision):
     # print the header for the graph file being generated
     about = "m=%d n=%d min=%.1f max=%.1f prec=%d seed=%s" % (num_verts, num_edges,
@@ -27,7 +30,7 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
     fmt = '%u %u %.' + str(precision) + 'f'
 
     # handle the complete graph case efficiently
-    if num_verts * num_verts == num_edges:
+    if edges_in_complete_undirected_graph(num_verts) == num_edges:
         for i in range(0, num_verts):
             for j in range(i+1, num_verts):
                 print fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
@@ -37,7 +40,7 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
     sys.exit(-1)
 
 def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos, precision):
-    if num_verts * num_verts != num_edges:
+    if edges_in_complete_undirected_graph(num_verts) != num_edges:
         print 'not yet implemented error: gen_random_vertex_positions only works for generating complete graphs'
         sys.exit(-1)
 
@@ -88,11 +91,11 @@ def main():
     try:
         sne = options.num_edges
         if sne == 'c' or sne == 'complete' or sne is None:
-            num_edges = num_verts * num_verts
+            num_edges = edges_in_complete_undirected_graph(num_verts)
         else:
             num_edges = int(sne)
-            if num_edges > num_verts * num_verts:
-                parser.error("-n may not be larger than NUM_VERTICES squared")
+            if num_edges > edges_in_complete_undirected_graph(num_verts):
+                parser.error("-n may not be larger than NUM_VERTICES*(NUM_VERTICES-1)/2")
     except ValueError:
         parser.error("-n must either be an integer or 'complete'")
 
