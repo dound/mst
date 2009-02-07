@@ -36,14 +36,14 @@ if [ $# -eq 3 ]; then
         git stash save
 
         # try to gracefully cleanup on Ctrl-C before exiting
-        trap 'echo Warning: unstashing changes on Ctrl-C; git checkout $origBranch; git stash pop > /dev/null; git branch -D $tmpBranch; exit 1' 2
+        trap 'echo Warning: unstashing changes on Ctrl-C; git checkout -q $origBranch; git stash pop > /dev/null; git branch -D $tmpBranch; exit 1' 2
     fi
 
     # create a temporary branch which includes commits up to the specified revision
     rev=$3
     tmpBranch=tmp$rev
     git branch $tmpBranch $rev
-    git checkout $tmpBranch
+    git checkout -q $tmpBranch
 fi
 
 # build and copy the binary
@@ -53,7 +53,7 @@ cp $src $dst
 
 if [ $# -eq 3 ]; then
     # cleanup the temporary branch
-    git checkout $origBranch
+    git checkout -q $origBranch
     git branch -D $tmpBranch
 
     # restore stashed changes
