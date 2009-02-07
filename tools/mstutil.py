@@ -24,7 +24,7 @@ def get_path_to_mst_binary():
 
 def get_path_to_inputs():
     """Gets the path to the input graphs."""
-    return get_path_to_project_root() + 'inputs/'
+    return get_path_to_project_root() + 'input/'
 
 def get_path_to_correctness_results(rev=''):
     """Gets the path to the correctness results."""
