@@ -15,16 +15,19 @@ def get_num_runs_missing_for_data(data, input_graph, num_desired_runs):
 
 def collect_missing_correctness_data(input_graph, rev, _):
     cmd = 'run_test.py -i %s -r %s -n 1 -c -q -x' % (input_graph, rev)
-    return os.system(get_path_to_tools_root() + cmd) == 0
+    ret = os.system(get_path_to_tools_root() + cmd)
+    return ret == 0
 
 def collect_missing_performance_data(input_graph, rev, num_runs):
     cmd = 'run_test.py -i %s -r %s -n %s -q' % (input_graph, rev, num_runs)
-    return os.system(get_path_to_tools_root() + cmd) == 0
+    ret = os.system(get_path_to_tools_root() + cmd)
+    return ret == 0
 
 def collect_missing_weight_data(inputs, rev, num_runs):
     (wtype, num_verts) = inputs
     cmd = 'run_test.py -g %s,%s -r %s -n %s -q' % (num_verts, wtype, rev, num_runs)
-    return os.system(get_path_to_tools_root() + cmd) == 0
+    ret = os.system(get_path_to_tools_root() + cmd)
+    return ret == 0
 
 def main():
     usage = """usage: %prog [options]
