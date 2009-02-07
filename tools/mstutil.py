@@ -85,7 +85,7 @@ def __get_results(path, str_to_val, str_val_type):
     fh = open(path, "r")
     lines = fh.readlines()
     for line in lines:
-        if line[0:1] != '#':
+        if len(line)>0 and line[0:1] != '#':
             s = line.split()
             if len(s) != 2:
                 raise FileFormatError('line should have two columns (has %d): %s' % (len(s), line))
