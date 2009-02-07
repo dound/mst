@@ -33,13 +33,17 @@ def __generate_input_graph(argstr):
     cmd = './generate_input.py %s > %s' % (argstr, input_graph)
     ret = os.system(cmd)
     if ret != 0:
-        print 'error: aborting test (input generation failed)'
+        print 'error: aborting test (input generation failed): ./generate_input.py %s' % argstr
         __cleanup_and_exit(ret)
     return input_graph
 
 def main():
     usage = """usage: %prog [options]
 Tests the performance of the MST implementation or uses it to find the weight of an MST.
+
+GEN_ARGS can be arbitrary arguments or one of the following special arguments to generate a complete graph:
+  edge: random uniform edge weights [0, 1]
+  locN: randomly position vertices in N-dimensional space with axis ranges [0,1]
 
 TYPE can be one of the following:
   perf - performance benchmark (CPU time)
@@ -50,7 +54,7 @@ TYPE can be one of the following:
                       help="check output using check_output.py (only for the first run; exits if the check fails)")
     parser.add_option("-g", "--generate-input",
                       metavar="GEN_ARGS",
-                      help="generate and use as input a graph from ./generate_input.py GEN_ARGS (one for each run)")
+                      help="generate (and use as input) a graph from ./generate_input.py GEN_ARGS (one for each run)")
     parser.add_option("-i", "--input-file",
                       metavar="FILE",
                       help="FILE which describes the graph to use as input")
@@ -82,12 +86,29 @@ TYPE can be one of the following:
         parser.error("-t must be either 'perf' or 'weight'")
 
     # get the input file
+    gen_input_args = None
     if options.generate_input is not None and options.input_file is not None:
         parser.error("-g and -i are mutually exclusive")
     elif options.input_file is not None:
         input_graph = options.input_file
     elif options.generate_input is not None:
-        input_graph = __generate_input_graph(options.generate_input)
+        s = options.generate_input.split(',',2)
+        gen_type = s[0]
+        if gen_type == "edge":
+            if len(s) != 2:
+                parser.error('-g edge,NUM_VERTICES form requires exactly these args')
+            gen_input_args = "-p 15 -e 0.0,1.0 %s" % s[1]
+        elif len(gen_type)==4 and gen_type[:3] == "loc":
+            if len(s) != 2:
+                parser.error('-g %s,NUM_VERTICES form requires exactly these args' % gen_type)
+            d = gen_type[3:]
+            gen_input_args = "-p 15 -v %s,0.0,1.0 %s" % (d, s[1])
+
+        # if it was not a special case, just pass the args straight through
+        if gen_input_args is None:
+            gen_input_args = options.generate_input
+
+        input_graph = __generate_input_graph(gen_input_args)
     else:
         parser.error("at least one of -g and -i must be used to specify the input graph")
 
@@ -135,9 +156,9 @@ TYPE can be one of the following:
 
     # remaining runs, if any
     for _ in range(options.num_runs-1):
-        if options.generate_input is not None:
+        if gen_input_args is not None:
             os.system('rm -f ' + __input_graph_to_cleanup)
-            input_graph = __generate_input_graph(options.generate_input)
+            input_graph = __generate_input_graph(gen_input_args)
         test_mst(options.type, mst_binary, input_graph, "/dev/null", not options.dont_log)
 
     __cleanup_and_exit()
