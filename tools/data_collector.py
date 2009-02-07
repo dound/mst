@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from mstutil import get_path_to_tools_root, get_tracked_inputs, get_tracked_revs
+from mstutil import get_path_to_project_root, get_path_to_tools_root, get_tracked_inputs, get_tracked_revs
 from mstutil import get_correctness_results, get_performance_results, get_weight_results
 from optparse import OptionGroup, OptionParser
 import os, sys
@@ -119,6 +119,7 @@ Searches for missing results and uses run_test.py to collect it."""
         revs = get_tracked_revs()
 
     # collect the data
+    root_len = len(get_path_to_project_root())
     missing_none = True
     for rev in revs:
         data = get_results(rev)
@@ -133,7 +134,7 @@ Searches for missing results and uses run_test.py to collect it."""
                     missing_none = False
                     msg = 'failed to collect'
                 if msg is not None:
-                    print '%s: input=%s \t rev=%s runsLeft=%u' % (msg, i, rev, n)
+                    print '%s: %s\trev=%s\trunsLeft=%u' % (msg, i[root_len:], rev, n)
 
     if missing_none:
         print 'No performance data is missing!'
