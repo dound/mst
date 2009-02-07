@@ -4,6 +4,10 @@ from mstutil import get_path_to_mst_binary, get_path_to_tools_root, quiet_remove
 from optparse import OptionParser
 import os, sys
 
+# include-with-submit # note: this file has been automatically altered for submission to reduce dependencies
+# include-with-submit #       on functionality not strictly needed for the 'random' binary to work
+# include-with-submit get_path_to_tools_root = lambda : './'
+
 def benchmark(mst_binary, input_graph, out, do_log):
     print "measuring performance of '%s' on '%s' saving to '%s' (log=%s)" % (mst_binary, input_graph, out, str(do_log))
 
@@ -125,7 +129,9 @@ computation only):
     cmd = 'copy_and_build_from_rev.sh %s %s %s' % (get_path_to_mst_binary(), mst_binary, options.rev)
     if options.quiet:
         cmd += ' > /dev/null'
-    ret = os.system(get_path_to_tools_root() + cmd)
+    ret = os.system(get_path_to_tools_root() + cmd) # exclude-from-submit
+    # include-with-submit ret = 0
+    # include-with-submit mst_binary = './mst'
     if ret != 0:
         print 'error: unable to copy and build the mst binary'
         __cleanup_and_exit(ret)
