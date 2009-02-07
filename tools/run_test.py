@@ -30,10 +30,10 @@ def __generate_input_graph(argstr):
     global __input_graph_to_cleanup
     input_graph = random_tmp_filename(10)
     __input_graph_to_cleanup = input_graph
-    cmd = './generate_input.py %s > %s' % (argstr, input_graph)
-    ret = os.system(cmd)
+    cmd = 'generate_input.py %s > %s' % (argstr, input_graph)
+    ret = os.system(get_path_to_tools_root() + cmd)
     if ret != 0:
-        print 'error: aborting test (input generation failed): ./generate_input.py %s' % argstr
+        print 'error: aborting test (input generation failed): generate_input.py %s' % argstr
         __cleanup_and_exit(ret)
     return input_graph
 
@@ -53,7 +53,7 @@ computation only):
                       help="check output using check_output.py (only for the first run; exits if the check fails)")
     parser.add_option("-g", "--generate-input",
                       metavar="GEN_ARGS",
-                      help="generate (and use as input) a graph from ./generate_input.py GEN_ARGS (one for each run)")
+                      help="generate (and use as input) a graph from generate_input.py GEN_ARGS (one for each run)")
     parser.add_option("-i", "--input-file",
                       metavar="FILE",
                       help="FILE which describes the graph to use as input")
@@ -115,10 +115,10 @@ computation only):
     if options.rev is None:
         options.dont_log = True  # no logging allowed on binaries which aren't checked in to the repo
         options.rev = ""         # tells the script to just use the current revision
-    cmd = './copy_and_build_from_rev.sh %s %s %s' % (get_path_to_mst_binary(), mst_binary, options.rev)
+    cmd = 'copy_and_build_from_rev.sh %s %s %s' % (get_path_to_mst_binary(), mst_binary, options.rev)
     if options.quiet:
         cmd += ' > /dev/null'
-    ret = os.system(cmd)
+    ret = os.system(get_path_to_tools_root() + cmd)
     if ret != 0:
         print 'error: unable to copy and build the mst binary'
         __cleanup_and_exit(ret)
@@ -140,8 +140,8 @@ computation only):
             log_opt = "-x"
         else:
             log_opt = ""
-        cmd = "./check_output.py -i %s %s %s %s" % (input_graph, log_opt, correct_out, out)
-        ret = os.system(cmd)
+        cmd = "check_output.py -i %s %s %s %s" % (input_graph, log_opt, correct_out, out)
+        ret = os.system(get_path_to_tools_root() + cmd)
     else:
         ret = 0
 
