@@ -28,7 +28,9 @@ if [ $# -eq 3 ]; then
     origBranch=`git branch -a | fgrep '*' | sed -e 's#* ##'`
 
     # stash any unsaved changes (so they aren't merged into our temporary branch)
+    set +o errexit
     numChanges=`git s | fgrep -c 'modified:'`
+    set -o errexit
     if [ $numChanges -gt 0 ]; then
         trap 'echo "Warning: changed files may have been stashed away; try git stash list"; exit 1' 2
         git stash save
