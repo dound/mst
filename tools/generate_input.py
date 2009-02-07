@@ -95,7 +95,9 @@ def main():
         else:
             num_edges = int(sne)
             if num_edges > edges_in_complete_undirected_graph(num_verts):
-                parser.error("-n may not be larger than NUM_VERTICES*(NUM_VERTICES-1)/2")
+                parser.error("-n may not be larger than NUM_VERTICES*(NUM_VERTICES-1)/2 (complete graph may not have self-loops or parallel edges)")
+            elif num_edges < num_verts - 1:
+                parser.error("-n may not be less than NUM_VERTICES-1 (graph must be connected)")
     except ValueError:
         parser.error("-n must either be an integer or 'complete'")
 
