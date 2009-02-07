@@ -16,11 +16,25 @@ def test_mst(type, mst_binary, input_graph, out, do_log):
     else:
         determine_time(mst_binary, input_graph, out, do_log)
 
+__input_graph_to_cleanup = None
 __files_to_cleanup = []
-def cleanup_and_exit(code=0):
+def __cleanup_and_exit(code=0):
     for fn in __files_to_cleanup:
         os.system('rm -f ' + fn)
+    if __input_graph_to_cleanup is not None:
+        os.system('rm -f ' + __input_graph_to_cleanup)
     sys.exit(code)
+
+def __generate_input_graph(argstr):
+    """Generate a graph from the specified string of arguments and return the file it is saved in."""
+    input_graph = random_tmp_filename(10)
+    __input_graph_to_cleanup = input_graph
+    cmd = './generate_input %s > %s' % (argstr, input_graph)
+    ret = os.system(cmd)
+    if ret != 0:
+        print 'error: aborting test (input generation failed)'
+        __cleanup_and_exit(ret)
+    return input_graph
 
 def main():
     desc  = "Measures the performance of an MST."
@@ -35,7 +49,7 @@ def main():
                       help="check output using check_output.py (only for the first run; exits if the check fails)")
     parser.add_option("-g", "--generate-input",
                       metavar="GEN_ARGS",
-                      help="generate and use as input a graph from ./generate_input.py GEN_ARGS")
+                      help="generate and use as input a graph from ./generate_input.py GEN_ARGS (generates a new graph for each run)")
     parser.add_option("-i", "--input-file",
                       metavar="FILE",
                       help="FILE which describes the graph to use as input")
@@ -72,14 +86,7 @@ def main():
     elif options.input_file is not None:
         input_graph = options.input_file
     elif options.generate_input is not None:
-        # generate the input file
-        input_graph = random_tmp_filename(10)
-        __files_to_cleanup.append(input_graph)
-        cmd = './generate_input %s > %s' % (options.generate_input, input_graph)
-        ret = os.system(cmd)
-        if ret != 0:
-            print 'error: aborting test (input generation failed)'
-            cleanup_and_exit(ret)
+        input_graph = __generate_input_graph(options.generate_input)
     else:
         parser.error("at least one of -g and -i must be used to specify the input graph")
 
@@ -96,7 +103,7 @@ def main():
     ret = os.system(cmd)
     if ret != 0:
         print 'error: unable to copy and build the mst binary'
-        cleanup_and_exit(ret)
+        __cleanup_and_exit(ret)
 
     # prepare the output file
     if options.output_file:
@@ -123,13 +130,16 @@ def main():
     # exit if checking failed
     if ret != 0:
         print "error: check failed (bailing out)"
-        cleanup_and_exit(ret)
+        __cleanup_and_exit(ret)
 
     # remaining runs, if any
     for _ in range(options.num_runs-1):
+        if options.generate_input is not None:
+            os.system('rm -f ' + __input_graph_to_cleanup)
+            input_graph = __generate_input_graph(options.generate_input)
         test_mst(options.type, mst_binary, input_graph, "/dev/null", not options.dont_log)
 
-    cleanup_and_exit()
+    __cleanup_and_exit()
 
 if __name__ == "__main__":
     sys.exit(main())
