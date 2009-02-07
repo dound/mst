@@ -90,6 +90,8 @@ Searches for missing results and uses run_test.py to collect it."""
         inputs = (wtype, options.num_vertices)
         get_results = (lambda _ : get_weight_results(wtype))
         collect_missing_data = collect_missing_weight_data
+    elif options.dimensionality > 0 or options.edge:
+        parser.error('-v is required whenever -d or -e is used')
 
     # prepare for a correctness data collection
     if options.correctness:
