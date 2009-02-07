@@ -22,7 +22,7 @@ def main():
                       help="number of decimal points to specify for edge weights [default: %default]")
     parser.add_option("-e", "--edge-weight-range",
                       metavar="MIN,MAX", 
-                      help="range of edge weights (min exclusive, max inclusive) [default: >=0.1]")
+                      help="range of edge weights (min exclusive, max inclusive) [default: [0.1,100000]]")
     parser.add_option("-v", "--vertex-pos-range",
                       metavar="DIM,MIN,MAX",
                       help="dimensionality of vertex positions and the range of each dimension (min inclusive, max inclusive) [not used by default; mutually exclusive with -e]")
@@ -89,9 +89,9 @@ def main():
         if min_pos > max_pos:
             parser.error("option -e requires the minimum edge length < maximum edge length")
     else:
-        # use defaults which describe a very large range
+        # use defaults which describes the maximum range for the assignment
         min_pos = 0.1
-        max_pos = float(sys.maxint)
+        max_pos = 100000
 
     gen_random_edge_lengths(num_verts, num_edges, min_pos, max_pos, options.precision)
 
