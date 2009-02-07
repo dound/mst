@@ -28,15 +28,15 @@ def get_path_to_inputs():
 
 def get_path_to_correctness_results(rev=''):
     """Gets the path to the correctness results."""
-    return get_path_to_project_root() + 'results/corr/' + rev
+    return get_path_to_project_root() + 'result/corr/' + rev
 
 def get_path_to_performance_results(rev=''):
     """Gets the path to the performance results."""
-    return get_path_to_project_root() + 'results/perf/' + rev
+    return get_path_to_project_root() + 'result/perf/' + rev
 
 def get_path_to_weight_results(wtype=''):
     """Gets the path to the weight results."""
-    return get_path_to_project_root() + 'results/weight/' + wtype
+    return get_path_to_project_root() + 'result/weight/' + wtype
 
 def is_mst_binary_accessible():
     """Returns whether the mst solver binary can be accessed."""
