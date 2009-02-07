@@ -13,7 +13,7 @@ def main():
     parser = OptionParser(usage)
     parser.add_option("-i", "--input_graph",
                       metavar="FILE",
-                      help="the input graph which corresponds to these outputs"),
+                      help="the input graph which corresponds to these outputs")
     parser.add_option("-q", "--quick",
                       action="store_true", default=False,
                       help="only check the output MST weight (implied if INPUT is omitted)")
