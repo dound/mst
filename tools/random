@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# wrapper script to meet the requirements for part 2 of the CS161 project
+# usage: <# of nodes> <# of graphs to generate> <graphs type>
+#   <graphs type> values:
+#     1 => weight of a random complete graph with random uniformly distributed edge lengths [0,1]
+#     2 => weight of a random complete graph with vertex locations randomly uniformly distributed [0,1] in 2 dimensions
+#     3 => like 2 except 3-d (cube)
+#     4 => like 2 except 4-d (hypercube)
+
+if [ $# -ne 3 ]; then
+    echo "usage: <# of nodes> <# of graphs to generate> <graphs type>"
+    if [ $# -ne 0 ]; then
+        echo "error: requires exactly three arguments"
+    fi
+    exit 1
+fi
+
+if [ $3 -eq 1 ]; then
+    ./run_test.py -q -g edge,$1 -n $2
+elif [ $3 -eq 2 -o $3 -eq 3 -o $3 -eq 4 ]; then
+    ./run_test.py -q -g loc$3,$1 -n $2
+else
+    echo "error: invalid graph type (try running this without arguments for help)"
+    exit 1
+fi
