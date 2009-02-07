@@ -13,17 +13,28 @@ __rnd = Random(__RND_SEED)
 
 def print_input_header(num_verts, num_edges, about):
     # stick a comment in the input file describing it
-    print '# %s -- %s' % (strftime('%A %Y-%b-%d at %H:%M:%S'), about)
+    print '# %s: %s' % (strftime('%A %Y-%b-%d at %H:%M:%S'), about)
 
     # the real header
     print '%u' % num_verts
     print '%u' % num_edges
 
-
 def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, precision):
-    print "gen_random_edge_lengths: m=%d n=%d min=%.1f max=%.1f prec=%d" % (num_verts, num_edges,
-                                                                            min_edge_len, max_edge_len, precision)
-    # min_edge_len is EXCLUSIVE (e.g., it may be 0.0)
+    # print the header for the graph file being generated
+    about = "m=%d n=%d min=%.1f max=%.1f prec=%d seed=%s" % (num_verts, num_edges,
+                                                             min_edge_len, max_edge_len, precision, str(__RND_SEED))
+    print_input_header(num_verts, num_edges, about)
+    fmt = '%u %u %.' + str(precision) + 'f'
+
+    # handle the complete graph case efficiently
+    if num_verts * num_verts == num_edges:
+        for i in range(0, num_verts):
+            for j in range(i+1, num_verts):
+                print fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
+        return
+
+    print 'not yet implemented error: gen_random_edge_lengths only works for generating complete graphs'
+    sys.exit(-1)
 
 def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos, precision):
     if num_verts * num_verts != num_edges:
