@@ -1,16 +1,50 @@
 #!/usr/bin/env python
 
+from math import sqrt
 from optparse import OptionParser
+from os import urandom
+from random import Random
+from struct import unpack
+from time import strftime
 import sys
 
+__RND_SEED = unpack('Q', urandom(8))[0]  # generate a truly random 8-byte seed
+__rnd = Random(__RND_SEED)
+
+def print_input_header(num_verts, num_edges, about):
+    # stick a comment in the input file describing it
+    print '# %s -- %s' % (strftime('%A %Y-%b-%d at %H:%M:%S'), about)
+
+    # the real header
+    print '%u' % num_verts
+    print '%u' % num_edges
+
+
 def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, precision):
-    print "gen_random_edge_lengths: m=%d n=%d min=%.1f max=%.1f prec=%d" % (num_verts, num_edges, 
+    print "gen_random_edge_lengths: m=%d n=%d min=%.1f max=%.1f prec=%d" % (num_verts, num_edges,
                                                                             min_edge_len, max_edge_len, precision)
     # min_edge_len is EXCLUSIVE (e.g., it may be 0.0)
 
 def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos, precision):
-    print "gen_random_vertex_positions: m=%d n=%d d=%d min=%.1f max=%.1f prec=%d" % (num_verts, num_edges, 
-                                                                                     num_dims, min_pos, max_pos, precision)
+    if num_verts * num_verts != num_edges:
+        print 'not yet implemented error: gen_random_vertex_positions only works for generating complete graphs'
+        sys.exit(-1)
+
+    # generate all of the coordinates in one big array
+    coords = [__rnd.uniform(min_pos,max_pos) for _ in range(num_verts*num_dims)]
+
+    # print the header for the graph file being generated
+    about = "m=%d n=%d d=%d min=%.1f max=%.1f prec=%d seed=%s" % (num_verts, num_edges, num_dims,
+                                                                  min_pos, max_pos, precision, str(__RND_SEED))
+    print_input_header(num_verts, num_edges, about)
+
+    # print the edge weights for each pair
+    fmt = '%u %u %.' + str(precision) + 'f'
+    for i in range(0, num_verts):
+        io = i * num_dims
+        for j in range(i+1, num_verts):
+            jo = j * num_dims
+            print fmt % (i, j, sqrt(sum([(coords[io+o]-coords[jo+o])*(coords[io+o]-coords[jo+o]) for o in range(num_dims)])))
 
 def main():
     usage = "usage: %prog [options] NUM_VERTICES\nGenerates a connected graph with no self-loops or parallel edges."
@@ -21,7 +55,7 @@ def main():
                       type="int", default=1,
                       help="number of decimal points to specify for edge weights [default: %default]")
     parser.add_option("-e", "--edge-weight-range",
-                      metavar="MIN,MAX", 
+                      metavar="MIN,MAX",
                       help="range of edge weights (min exclusive, max inclusive) [default: [0.1,100000]]")
     parser.add_option("-v", "--vertex-pos-range",
                       metavar="DIM,MIN,MAX",
