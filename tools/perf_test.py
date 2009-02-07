@@ -77,7 +77,7 @@ TYPE can be one of the following:
         options.type = "perf"
     elif options.type == "w":
         options.type = "weight"
-    elif options.test != "perf" and options.test != "weight":
+    elif options.type != "perf" and options.type != "weight":
         parser.error("-t must be either 'perf' or 'weight'")
 
     # get the input file
