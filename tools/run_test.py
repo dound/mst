@@ -63,6 +63,9 @@ computation only):
     parser.add_option("-o", "--output-file",
                       metavar="FILE",
                       help="where to save the output MST (stdout prints to stdout) [default: do not save output]")
+    parser.add_option("-q", "--quiet",
+                      action="store_true", default=False,
+                      help="do not log the result")
     parser.add_option("-r", "--rev",
                       help="SHA1 of the git revision to build the mst binary from [default: use existing binary and do not log]")
     parser.add_option("-x", "--dont-log",
@@ -113,6 +116,8 @@ computation only):
         options.dont_log = True  # no logging allowed on binaries which aren't checked in to the repo
         options.rev = ""         # tells the script to just use the current revision
     cmd = './copy_and_build_from_rev.sh %s %s %s' % (get_path_to_mst_binary(), mst_binary, options.rev)
+    if options.quiet:
+        cmd += ' > /dev/null'
     ret = os.system(cmd)
     if ret != 0:
         print 'error: unable to copy and build the mst binary'
