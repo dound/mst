@@ -3,13 +3,14 @@
 from mstutil import get_path_to_project_root, get_path_to_tools_root, get_tracked_inputs, get_tracked_revs
 from mstutil import get_correctness_results, get_performance_results, get_weight_results
 from optparse import OptionGroup, OptionParser
-import os, sys
+import os, sys, types
 
-def get_num_runs_missing_for_data(data, input_graph, num_desired_runs):
+def get_num_runs_missing_for_data(data, input_val, num_desired_runs):
     """Returns the number of values left to be collected."""
-    input_graph = os.path.basename(input_graph)
-    if data.has_key(input_graph):
-        return max(0, num_desired_runs - len(data[input_graph]))
+    if type(input_val) is types.StringType:
+        input_val = os.path.basename(input_val)
+    if data.has_key(input_val):
+        return max(0, num_desired_runs - len(data[input_val]))
     else:
         return num_desired_runs
 
@@ -87,7 +88,7 @@ Searches for missing results and uses run_test.py to collect it."""
         if num_on == 0:
             parser.error('-v requires either -d or -e be specified too')
 
-        inputs = (wtype, options.num_vertices)
+        inputs = [(wtype, options.num_vertices)]
         get_results = (lambda _ : get_weight_results(wtype))
         collect_missing_data = collect_missing_weight_data
     elif options.dimensionality > 0 or options.edge:
@@ -146,7 +147,7 @@ Searches for missing results and uses run_test.py to collect it."""
                     missing_none = False
                     msg = 'failed to collect'
                 if msg is not None:
-                    print '%s: %s\trev=%s\trunsLeft=%u' % (msg, i[root_len:], rev, n)
+                    print '%s: %s\trev=%s\trunsLeft=%u' % (msg, str(i)[root_len:], rev, n)
 
     if missing_none:
         print 'No performance data is missing!'
