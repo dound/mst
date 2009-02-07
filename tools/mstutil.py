@@ -28,5 +28,25 @@ def random_filename(sz):
     """Returns a random string of the specified length composed of letters and/or numbers."""
     return "".join([random.choice("abcdefghijklmnopqrstuvwxyz0123456789") for _ in range(sz)])
 
+class FileFormatError(Exception):
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
+
+def get_tracked_revs():
+    """Returns revisions we are tracking in an array of SHA1 revision IDs"""
+    ret = []
+    fh = open(get_path_to_tools_root() + 'conf/tracked_revs', "r")
+    lines = fh.readlines()
+    for line in lines:
+        if line[0:1] != '#':
+            s = line.split('\t', 4)
+            if len(s) != 4:
+                raise FileFormatError('line should have four columns (has %d): %s' % (len(s), line))
+            ret.append(s[2])
+    fh.close()
+    return ret
+
 if __name__ == "__main__":
     print get_path_to_project_root()
