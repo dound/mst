@@ -65,7 +65,7 @@ computation only):
                       help="where to save the output MST (stdout prints to stdout) [default: do not save output]")
     parser.add_option("-q", "--quiet",
                       action="store_true", default=False,
-                      help="do not log the result")
+                      help="do not print extraneous info to stdout")
     parser.add_option("-r", "--rev",
                       help="SHA1 of the git revision to build the mst binary from [default: use existing binary and do not log]")
     parser.add_option("-x", "--dont-log",
