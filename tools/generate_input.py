@@ -56,10 +56,10 @@ def main():
                       help="number of decimal points to specify for edge weights [default: %default]")
     parser.add_option("-e", "--edge-weight-range",
                       metavar="MIN,MAX",
-                      help="range of edge weights (min exclusive, max inclusive) [default: [0.1,100000]]")
+                      help="range of edge weights (range inclusive) [default: [0.1,100000]]")
     parser.add_option("-v", "--vertex-pos-range",
                       metavar="DIM,MIN,MAX",
-                      help="dimensionality of vertex positions and the range of each dimension (min inclusive, max inclusive) [not used by default; mutually exclusive with -e]")
+                      help="dimensionality of vertex positions and the range of each dimension (range inclusive) [not used by default; mutually exclusive with -e]")
     parser.add_option("-s", "--style",
                       help="how to place edges [default: random with no self-loops or parallel edges]")
 
@@ -114,20 +114,20 @@ def main():
     if options.edge_weight_range:
         (m1, m2) = options.edge_weight_range.split(',', 2)
         try:
-            (min_pos, max_pos) = (float(m1), float(m2))
+            (min_edge_len, max_edge_len) = (float(m1), float(m2))
         except ValueError:
             parser.error("option -e requires its arguments to be in the form float,float")
 
-        if min_pos < 0.0:
-            parser.error("option -e requires minimum edge length (exclusive) to be >= 0.0")
-        if min_pos > max_pos:
+        if min_edge_len < 0.0:
+            parser.error("option -e requires minimum edge length to be >= 0.0")
+        if min_edge_len > max_edge_len:
             parser.error("option -e requires the minimum edge length < maximum edge length")
     else:
         # use defaults which describes the maximum range for the assignment
-        min_pos = 0.1
-        max_pos = 100000
+        min_edge_len = 0
+        max_edge_len = 100000
 
-    gen_random_edge_lengths(num_verts, num_edges, min_pos, max_pos, options.precision)
+    gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, options.precision)
 
 if __name__ == "__main__":
     sys.exit(main())
