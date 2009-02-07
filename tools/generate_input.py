@@ -6,7 +6,7 @@ from os import urandom
 from random import Random
 from struct import unpack
 from time import strftime
-import sys
+import heapq, sys
 
 __RND_SEED = unpack('Q', urandom(8))[0]  # generate a truly random 8-byte seed
 __rnd = Random(__RND_SEED)
@@ -36,64 +36,39 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
                 print fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
         return
 
-    # handle the non-complete graph case
-    # create a "bit"-vector of which nodes are connected to which (none to start)
-    # how to check if i,j is connected: connectivity[i*num_verts+j]
-    # note: this uses 2x the needed memory but is much easier (speed) to reference
-    connectivity = [False] * (num_verts * num_verts)
+    # handle the non-complete graph case: O(|V|^2 * log(|V|^2))
 
-    # make sure we end up with a connected graph by walking through each node
-    # and randomly connecting it to one of the previous nodes
+    # a hashtable to remember which nodes form a spannning tree (ST): contains
+    # tuple (u,v) if it is part of our ST
+    spanning_tree = {}
+
+    # 1) make sure we end up with a connected graph by walking through each node
+    #    and randomly connecting it to one of the previous nodes
     for i in range(1,num_verts):  # skip first vertex
         # pick a random vertex in the connected part of the graph to connect to
         j = __rnd.randint(0, i-1)
-        connectivity[i*num_verts + j] = True
+        spanning_tree[(i,j)] = True
+        print fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
 
     # account for the edges we just added
-    num_edges_done = num_verts - 1
+    num_edges -= (num_verts - 1)
+    if num_edges == 0:
+        return
 
-    # randomly any remaining edges between unconnected vertices
+    # 2) randomly add any remaining edges between unconnected vertices
+    heap = []
 
-    # This is O(|E| * |V|^2) - fine for sparse graphs, but horrible for dense
-    # ones.  If we essentially reverse the problem and figure out which edges to
-    # NOT connect, this will run in O(z * |V|^2) where z = maximum number of
-    # edges to remove, which is |V|*(|V|-1)/2 - (|V|-1) or O(|V|^2) - thus the
-    # total running time would be O(|V|^4).
-
-    # add one edge each time through
-    for _ in range(num_edges - num_edges_done):
-        # let z be the number of vertex pairs which are NOT yet connected AND NOT yet considered
-        z = edges_in_complete_undirected_graph(num_verts) - num_edges_done
-        done = False
-
-        for i in range(0, num_verts):
-            oi = i * num_verts
-            for j in range(i+1, num_verts):
-                o = oi + j
-                if not connectivity[o]:
-                    # chances increase as we get later in the vertex-pairs so
-                    # that each vertex-pair has an even chance AND so we
-                    # definitely add at least 1 edge per outermost loop (chance
-                    # on final iteration will be 1.0)
-                    chance = 1.0 / z
-                    if __rnd.random() < chance:
-                        connectivity[o] = True
-                        num_edges_done += 1
-                        done = True  # only 1 edge is added per outermost loop
-                        break
-                    else:
-                        # one less edge to consider on this pass
-                        z -= 1
-            if done:
-                break
-
-    # now that we know which edges are connected, choose weights for them
+    # put all edges in the heap with some random key
     for i in range(0, num_verts):
-        oi = i * num_verts
         for j in range(i+1, num_verts):
-            o = oi + j
-            if connectivity[o]:
-                print fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
+            heapq.heappush(heap, (__rnd.random(), i, j))
+
+    # use the minimum edges in the heap as the edges in our graph
+    while num_edges > 0:
+        (_, i, j) = heapq.heappop(heap)
+        if not spanning_tree.has_key((i, j)):
+            num_edges -= 1
+            print fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
 
 def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos, precision):
     if edges_in_complete_undirected_graph(num_verts) != num_edges:
