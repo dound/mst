@@ -12,27 +12,26 @@ import heapq, os, sys
 __RND_SEED = unpack('Q', urandom(8))[0]  # generate a truly random 8-byte seed
 __rnd = Random(__RND_SEED)
 
-def print_input_header(num_verts, num_edges, about, out):
+def print_input_header(out):
+    print >> out, '%u' % num_verts
+    print >> out, '%u' % num_edges
+
+def print_input_footer(num_verts, num_edges, about, out):
+    """End with a comment in the input file describing it.  It should not be
+    read by mst since it doesn't expect lines after the last edge."""
     min_edges = num_verts - 1
     num_edges_scaled = num_edges - min_edges
     num_edge_choices = edges_in_complete_undirected_graph(num_verts) - min_edges
     density = float(num_edges_scaled) / num_edge_choices
-
-    # stick a comment in the input file describing it
     print >> out, '# %s: %s density=%.2f' % (strftime('%A %Y-%b-%d at %H:%M:%S'), about, density)
-
-    # the real header
-    print >> out, '%u' % num_verts
-    print >> out, '%u' % num_edges
 
 def edges_in_complete_undirected_graph(num_verts):
     return (num_verts * (num_verts - 1)) / 2
 
 def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, precision, out):
-    # print the header for the graph file being generated
     about = "m=%d n=%d min=%.1f max=%.1f prec=%d seed=%s" % (num_verts, num_edges,
                                                              min_edge_len, max_edge_len, precision, str(__RND_SEED))
-    print_input_header(num_verts, num_edges, about, out)
+    print_input_header(out)
     fmt = '%u %u %.' + str(precision) + 'f'
 
     # handle the complete graph case efficiently
@@ -40,7 +39,7 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
         for i in range(0, num_verts):
             for j in range(i+1, num_verts):
                 print >> out, fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
-        return
+        return about
 
     # handle the non-complete graph case: O(|V|^2 * log(|V|^2))
 
@@ -59,7 +58,7 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
     # account for the edges we just added
     num_edges -= (num_verts - 1)
     if num_edges == 0:
-        return
+        return about
 
     # 2) randomly add any remaining edges between unconnected vertices
     heap = []
@@ -76,6 +75,8 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
             num_edges -= 1
             print >> out, fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
 
+    return about
+
 def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos, precision, out):
     if edges_in_complete_undirected_graph(num_verts) != num_edges:
         die('not yet implemented error: gen_random_vertex_positions only works for generating complete graphs')
@@ -83,10 +84,7 @@ def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos
     # generate all of the coordinates in one big array
     coords = [__rnd.uniform(min_pos,max_pos) for _ in range(num_verts*num_dims)]
 
-    # print the header for the graph file being generated
-    about = "m=%d n=%d d=%d min=%.1f max=%.1f prec=%d seed=%s" % (num_verts, num_edges, num_dims,
-                                                                  min_pos, max_pos, precision, str(__RND_SEED))
-    print_input_header(num_verts, num_edges, about, out)
+    print_input_header(out)
 
     # print the edge weights for each pair
     fmt = '%u %u %.' + str(precision) + 'f'
@@ -95,6 +93,9 @@ def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos
         for j in range(i+1, num_verts):
             jo = j * num_dims
             print >> out, fmt % (i, j, sqrt(sum([(coords[io+o]-coords[jo+o])*(coords[io+o]-coords[jo+o]) for o in range(num_dims)])))
+
+    return "m=%d n=%d d=%d min=%.1f max=%.1f prec=%d seed=%s" % (num_verts, num_edges, num_dims,
+                                                                 min_pos, max_pos, precision, str(__RND_SEED))
 
 def main():
     usage = """usage: %prog [options] NUM_VERTICES
@@ -188,27 +189,28 @@ must be specified."""
         if num_dims < 0:
             parser.error("option -v requires dimensionality to be a strictly positive integer")
 
-        gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos, options.precision, out)
-        return
-
-    # default: randomly choose edge weights in some range
-    if options.edge_weight_range:
-        (m1, m2) = options.edge_weight_range.split(',', 2)
-        try:
-            (min_edge_len, max_edge_len) = (float(m1), float(m2))
-        except ValueError:
-            parser.error("option -e requires its arguments to be in the form float,float")
-
-        if min_edge_len < 0.0:
-            parser.error("option -e requires minimum edge length to be >= 0.0")
-        if min_edge_len > max_edge_len:
-            parser.error("option -e requires the minimum edge length < maximum edge length")
+        about = gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos, options.precision, out)
     else:
-        # use defaults which describes the maximum range for the assignment
-        min_edge_len = 0
-        max_edge_len = 100000
+        # default: randomly choose edge weights in some range
+        if options.edge_weight_range:
+            (m1, m2) = options.edge_weight_range.split(',', 2)
+            try:
+                (min_edge_len, max_edge_len) = (float(m1), float(m2))
+            except ValueError:
+                parser.error("option -e requires its arguments to be in the form float,float")
 
-    gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, options.precision, out)
+            if min_edge_len < 0.0:
+                parser.error("option -e requires minimum edge length to be >= 0.0")
+            if min_edge_len > max_edge_len:
+                parser.error("option -e requires the minimum edge length < maximum edge length")
+        else:
+            # use defaults which describes the maximum range for the assignment
+            min_edge_len = 0
+            max_edge_len = 100000
+
+        about = gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, options.precision, out)
+
+    print_input_footer(num_verts, num_edges, about, out):
     if out != sys.stdout:
         out.close()
 
