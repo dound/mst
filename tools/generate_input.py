@@ -12,7 +12,7 @@ import heapq, os, sys
 __RND_SEED = unpack('Q', urandom(8))[0]  # generate a truly random 8-byte seed
 __rnd = Random(__RND_SEED)
 
-def print_input_header(out):
+def print_input_header(num_verts, num_edges, out):
     print >> out, '%u' % num_verts
     print >> out, '%u' % num_edges
 
@@ -31,7 +31,7 @@ def edges_in_complete_undirected_graph(num_verts):
 def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, precision, out):
     about = "m=%d n=%d min=%.1f max=%.1f prec=%d seed=%s" % (num_verts, num_edges,
                                                              min_edge_len, max_edge_len, precision, str(__RND_SEED))
-    print_input_header(out)
+    print_input_header(num_verts, num_edges, out)
     fmt = '%u %u %.' + str(precision) + 'f'
 
     # handle the complete graph case efficiently
@@ -84,7 +84,7 @@ def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos
     # generate all of the coordinates in one big array
     coords = [__rnd.uniform(min_pos,max_pos) for _ in range(num_verts*num_dims)]
 
-    print_input_header(out)
+    print_input_header(num_verts, num_edges, out)
 
     # print the edge weights for each pair
     fmt = '%u %u %.' + str(precision) + 'f'
@@ -210,7 +210,7 @@ must be specified."""
 
         about = gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, options.precision, out)
 
-    print_input_footer(num_verts, num_edges, about, out):
+    print_input_footer(num_verts, num_edges, about, out)
     if out != sys.stdout:
         out.close()
 
