@@ -16,7 +16,7 @@ LIBS   =
 CFLAGS = -c -Wall $(BUILD_TYPE_FLAGS)
 
 # project sources
-SRCS = mst.c
+SRCS = mst.c kruskal.c
 OBJS = $(patsubst %.c,%.o,$(SRCS))
 DEPS = $(patsubst %.c,.%.d,$(SRCS))
 
