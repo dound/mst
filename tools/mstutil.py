@@ -1,4 +1,9 @@
-import os, random
+import os, random, sys
+
+def die(errmsg):
+    """Prints the message to stderr and then exits with error code -1."""
+    print >> sys.stderr, errmsg
+    sys.exit(-1)
 
 def quiet_remove(fn):
     try:
