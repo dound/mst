@@ -29,7 +29,7 @@ def get_path_to_mst_binary():
     return get_path_to_project_root() + 'src/mst'
 
 def get_path_to_inputs():
-    """Gets the path to the input graphs."""
+    """Gets the path to the input graphs (only for part 1, as part 2 graphs are not saved)."""
     return get_path_to_project_root() + 'input/'
 
 def get_path_to_correctness_results(rev=''):
