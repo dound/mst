@@ -12,29 +12,34 @@ import heapq, sys
 __RND_SEED = unpack('Q', urandom(8))[0]  # generate a truly random 8-byte seed
 __rnd = Random(__RND_SEED)
 
-def print_input_header(num_verts, num_edges, about):
+def print_input_header(num_verts, num_edges, about, out):
+    min_edges = num_verts - 1
+    num_edges_scaled = num_edges - min_edges
+    num_edge_choices = edges_in_complete_undirected_graph(num_verts) - min_edges
+    density = float(num_edges_scaled) / num_edge_choices
+
     # stick a comment in the input file describing it
-    print '# %s: %s' % (strftime('%A %Y-%b-%d at %H:%M:%S'), about)
+    print >> out, '# %s: %s density=%.2f' % (strftime('%A %Y-%b-%d at %H:%M:%S'), about, density)
 
     # the real header
-    print '%u' % num_verts
-    print '%u' % num_edges
+    print >> out, '%u\n' % num_verts
+    print >> out, '%u\n' % num_edges
 
 def edges_in_complete_undirected_graph(num_verts):
     return (num_verts * (num_verts - 1)) / 2
 
-def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, precision):
+def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, precision, out):
     # print the header for the graph file being generated
     about = "m=%d n=%d min=%.1f max=%.1f prec=%d seed=%s" % (num_verts, num_edges,
                                                              min_edge_len, max_edge_len, precision, str(__RND_SEED))
-    print_input_header(num_verts, num_edges, about)
+    print_input_header(num_verts, num_edges, about, out)
     fmt = '%u %u %.' + str(precision) + 'f'
 
     # handle the complete graph case efficiently
     if edges_in_complete_undirected_graph(num_verts) == num_edges:
         for i in range(0, num_verts):
             for j in range(i+1, num_verts):
-                print fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
+                print >> out, fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
         return
 
     # handle the non-complete graph case: O(|V|^2 * log(|V|^2))
@@ -49,7 +54,7 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
         # pick a random vertex in the connected part of the graph to connect to
         j = __rnd.randint(0, i-1)
         spanning_tree[(i,j)] = True
-        print fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
+        print >> out, fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
 
     # account for the edges we just added
     num_edges -= (num_verts - 1)
@@ -69,9 +74,9 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
         (_, i, j) = heapq.heappop(heap)
         if not spanning_tree.has_key((i, j)):
             num_edges -= 1
-            print fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
+            print >> out, fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
 
-def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos, precision):
+def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos, precision, out):
     if edges_in_complete_undirected_graph(num_verts) != num_edges:
         die('not yet implemented error: gen_random_vertex_positions only works for generating complete graphs')
 
@@ -81,7 +86,7 @@ def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos
     # print the header for the graph file being generated
     about = "m=%d n=%d d=%d min=%.1f max=%.1f prec=%d seed=%s" % (num_verts, num_edges, num_dims,
                                                                   min_pos, max_pos, precision, str(__RND_SEED))
-    print_input_header(num_verts, num_edges, about)
+    print_input_header(num_verts, num_edges, about, out)
 
     # print the edge weights for each pair
     fmt = '%u %u %.' + str(precision) + 'f'
@@ -89,13 +94,19 @@ def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos
         io = i * num_dims
         for j in range(i+1, num_verts):
             jo = j * num_dims
-            print fmt % (i, j, sqrt(sum([(coords[io+o]-coords[jo+o])*(coords[io+o]-coords[jo+o]) for o in range(num_dims)])))
+            print >> out, fmt % (i, j, sqrt(sum([(coords[io+o]-coords[jo+o])*(coords[io+o]-coords[jo+o]) for o in range(num_dims)])))
 
 def main():
-    usage = "usage: %prog [options] NUM_VERTICES\nGenerates a connected graph with no self-loops or parallel edges."
+    usage = """usage: %prog [options] NUM_VERTICES
+Generates a connected graph with no self-loops or parallel edges.  Output is
+sent to the default filename unless -e or -v is specified: in these cases, -o
+must be specified."""
+
     parser = OptionParser(usage)
     parser.add_option("-n", "--num-edges",
                       help="number of edges to put in the graph [default: complete graph]")
+    parser.add_option("-o", "--output-file",
+                      help="where to output the generated graph [default is inputs/<STYLE>-<NUM_VERTICES>-<NUM_EDGES>-<RANDOM_SEED>.g")
     parser.add_option("-p", "--precision",
                       type="int", default=1,
                       help="number of decimal points to specify for edge weights [default: %default]")
@@ -139,9 +150,27 @@ def main():
 
     if options.style is not None:
         parser.error("option -s is not yet supported")
+    else:
+        style_str = ''
 
     if options.edge_weight_range and options.vertex_pos_range:
         parser.error("option -e and -v are mutually exclusive")
+
+    # determine the output file to use
+    if options.output_file is None:
+        if options.vertex_pos_range or options.edge_weight_range:
+            parser.error('-e or -v require -o to be specified too')
+        else:
+            options.output_file = get_path_to_inputs() + '%s%u-%u-%str.g' % (style_str, num_verts, num_edges, str(__RND_SEED))
+
+    # open the desired output file
+    if options.output_file == 'stdout':
+        out = sys.stdout
+    else:
+        try:
+            out = open(options.output_file, 'w')
+        except IOError, errstr:
+            die('generate_input: error: ' + errstr)
 
     # see if the user wants edge weights computed from vertex positions
     if options.vertex_pos_range:
@@ -154,7 +183,7 @@ def main():
         if num_dims < 0:
             parser.error("option -v requires dimensionality to be a strictly positive integer")
 
-        gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos, options.precision)
+        gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos, options.precision, out)
         return
 
     # default: randomly choose edge weights in some range
@@ -174,7 +203,9 @@ def main():
         min_edge_len = 0
         max_edge_len = 100000
 
-    gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, options.precision)
+    gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, options.precision, out)
+    if out != sys.stdout:
+        out.close()
 
 if __name__ == "__main__":
     sys.exit(main())
