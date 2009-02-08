@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from math import sqrt
+from mstutil import die, get_path_to_inputs
 from optparse import OptionParser
 from os import urandom
 from random import Random
@@ -72,8 +73,7 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
 
 def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos, precision):
     if edges_in_complete_undirected_graph(num_verts) != num_edges:
-        print 'not yet implemented error: gen_random_vertex_positions only works for generating complete graphs'
-        sys.exit(-1)
+        die('not yet implemented error: gen_random_vertex_positions only works for generating complete graphs')
 
     # generate all of the coordinates in one big array
     coords = [__rnd.uniform(min_pos,max_pos) for _ in range(num_verts*num_dims)]
