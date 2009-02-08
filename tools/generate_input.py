@@ -41,10 +41,10 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
                 print >> out, fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
         return about
 
-    # handle the non-complete graph case: O(|V|^2 * log(|V|^2))
+    # handle the non-complete graph case
 
     # a hashtable to remember which nodes form a spannning tree (ST): contains
-    # tuple (u,v) if it is part of our ST
+    # tuple (u,v) if it is part of our ST (only use u > v: links are unidir)
     spanning_tree = {}
 
     # 1) make sure we end up with a connected graph by walking through each node
@@ -61,19 +61,60 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
         return about
 
     # 2) randomly add any remaining edges between unconnected vertices
-    heap = []
 
-    # put all edges in the heap with some random key
-    for i in range(0, num_verts):
-        for j in range(i+1, num_verts):
-            heapq.heappush(heap, (__rnd.random(), i, j))
+    # We have two algorithms - one specialized for dense matrices, the other for
+    # sparse matrices.  The running times are (let Z = (V * (V - 1)):
+    #     dense:  Z * log(Z) + E * log(Z) = O(V^2*log(V^2))
+    #     sparse: E * Z / (Z - 2 * E)     = O(E*V^2 / (V^2 - E))
+    #
+    # Empirically, sparse is faster than dense unless the density is less
+    # than about 0.5.
+    #
+    # However, the above estimate for sparse is actually a bit loose - it
+    # assumes every edge is as hard to insert as the last edge being inserted.
+    # The tight upper bound would be:
+    #     sparse: sum from i=0 to i=E-1 (inclusive) over 1 / prob_success
+    #             prob_success = 1 - 2 * i / (V^2 - V)
+    #
+    # I do not know how to reduce this summation so we can compare it with the
+    # dense algorithm, but empirically it is this tight bound for sparse is
+    # faster that the dense algorithm for all densities.
 
-    # use the minimum edges in the heap as the edges in our graph
-    while num_edges > 0:
-        (_, i, j) = heapq.heappop(heap)
-        if not spanning_tree.has_key((i, j)):
-            num_edges -= 1
-            print >> out, fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
+    # Assume the loose upper-bound is correct and switch over to the dense
+    # algorithm when the density is quite high (empirically measured).
+    density = num_edges / float(edges_in_complete_undirected_graph(num_verts))
+    print 'density=%s' % str(density)
+    if density > 0.5 and False:
+        print 'here'
+        heap = []
+
+        # put all edges in the heap with some random key
+        for i in range(0, num_verts):
+            for j in range(i+1, num_verts):
+                heapq.heappush(heap, (__rnd.random(), i, j))
+
+        # use the minimum edges in the heap as the edges in our graph
+        while num_edges > 0:
+            (_, i, j) = heapq.heappop(heap)
+            if not spanning_tree.has_key((i, j)):
+                num_edges -= 1
+                print >> out, fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
+    else:
+        while num_edges > 0:
+            # choose random vertices for an edge to connect
+            r1 = __rnd.randint(0, num_verts)
+            r2 = __rnd.randint(0, num_verts)
+            if r1 > r2:
+                i = r1
+                j = r2
+            else:
+                i = r2
+                j = r1
+            # add the edge if it is new
+            if i!=j and not spanning_tree.has_key((i, j)):
+                spanning_tree[(i, j)] = True
+                print >> out, fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
+                num_edges -= 1
 
     return about
 
