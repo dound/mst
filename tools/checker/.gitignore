@@ -1,0 +1,3 @@
+.*.d
+*.o
+boost_compute_mst_weight
