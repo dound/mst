@@ -53,8 +53,8 @@ computation only):
   locN,NUM_VERTICES: randomly position vertices in N-dimensional space with axis ranges [0,1]"""
     parser = OptionParser(usage)
     parser.add_option("-c", "--check",
-                      metavar="CORRECT_OUTPUT_FILE",
-                      help="check output using check_output.py (only for the first run; exits if the check fails)")
+                      action="store_true", default=False,
+                      help="whether to check output using check_output.py (only for the first run; exits if the check fails)")
     parser.add_option("-g", "--generate-input",
                       metavar="GEN_ARGS",
                       help="generate (and use as input) a graph from generate_input.py GEN_ARGS (one for each run)")
@@ -148,12 +148,11 @@ computation only):
     # do the first run (and check the output if requested)
     test_mst(is_test_perf, mst_binary, input_graph, out, not options.dont_log)
     if options.check is not None:
-        correct_out = options.check
         if options.dont_log_any:
             log_opt = "-x"
         else:
             log_opt = ""
-        cmd = "check_output.py -i %s %s %s %s" % (input_graph, log_opt, correct_out, out)
+        cmd = "check_output.py -i %s %s %s" % (input_graph, log_opt, out)
         ret = os.system(get_path_to_tools_root() + cmd)
     else:
         ret = 0
