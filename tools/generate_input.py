@@ -161,7 +161,7 @@ must be specified."""
         if options.vertex_pos_range or options.edge_weight_range:
             parser.error('-e or -v require -o to be specified too')
         else:
-            options.output_file = get_path_to_inputs() + '%s%u-%u-%str.g' % (style_str, num_verts, num_edges, str(__RND_SEED))
+            options.output_file = get_path_to_inputs() + '%s%u-%u-%s.g' % (style_str, num_verts, num_edges, str(__RND_SEED))
 
     # open the desired output file
     if options.output_file == 'stdout':

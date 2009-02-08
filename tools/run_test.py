@@ -34,7 +34,7 @@ def __generate_input_graph(argstr):
     global __input_graph_to_cleanup
     input_graph = random_tmp_filename(10)
     __input_graph_to_cleanup = input_graph
-    cmd = 'generate_input.py %s > %s' % (argstr, input_graph)
+    cmd = 'generate_input.py %s -f %s' % (argstr, input_graph)
     ret = os.system(get_path_to_tools_root() + cmd)
     if ret != 0:
         print 'error: aborting test (input generation failed): generate_input.py %s' % argstr
