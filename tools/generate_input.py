@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
 from math import sqrt
-from mstutil import die, get_path_to_inputs
+from mstutil import die, get_path_to_inputs, get_path_to_checker_binary
 from optparse import OptionParser
 from os import urandom
 from random import Random
 from struct import unpack
 from time import strftime
-import heapq, sys
+import heapq, os, sys
 
 __RND_SEED = unpack('Q', urandom(8))[0]  # generate a truly random 8-byte seed
 __rnd = Random(__RND_SEED)
@@ -22,8 +22,8 @@ def print_input_header(num_verts, num_edges, about, out):
     print >> out, '# %s: %s density=%.2f' % (strftime('%A %Y-%b-%d at %H:%M:%S'), about, density)
 
     # the real header
-    print >> out, '%u\n' % num_verts
-    print >> out, '%u\n' % num_edges
+    print >> out, '%u' % num_verts
+    print >> out, '%u' % num_edges
 
 def edges_in_complete_undirected_graph(num_verts):
     return (num_verts * (num_verts - 1)) / 2
@@ -103,6 +103,9 @@ sent to the default filename unless -e or -v is specified: in these cases, -o
 must be specified."""
 
     parser = OptionParser(usage)
+    parser.add_option("-c", "--correctness",
+                      action="store_true", default=False,
+                      help="generate the output with the correctness checker")
     parser.add_option("-n", "--num-edges",
                       help="number of edges to put in the graph [default: complete graph]")
     parser.add_option("-o", "--output-file",
@@ -157,11 +160,13 @@ must be specified."""
         parser.error("option -e and -v are mutually exclusive")
 
     # determine the output file to use
+    auto_out = False
     if options.output_file is None:
         if options.vertex_pos_range or options.edge_weight_range:
             parser.error('-e or -v require -o to be specified too')
         else:
             options.output_file = get_path_to_inputs() + '%s%u-%u-%s.g' % (style_str, num_verts, num_edges, str(__RND_SEED))
+            auto_out = True
 
     # open the desired output file
     if options.output_file == 'stdout':
@@ -206,6 +211,16 @@ must be specified."""
     gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, options.precision, out)
     if out != sys.stdout:
         out.close()
+
+    # generate output with correctness checker, if desired
+    if options.correctness:
+        if not auto_out:
+            print >> sys.stderr, "warning: skipping correctness output (only done when -f is not specified)"
+
+        checker = get_path_to_checker_binary(True)
+        corr_file = get_path_to_inputs() + 'corr/%s%u-%u-%s.corr' % (style_str, num_verts, num_edges, str(__RND_SEED))
+        if os.system('%s %s > %s' % (checker, options.output_file, corr_file)) != 0:
+            print >> sys.stderr, "warning: failed to generate correctness output"
 
 if __name__ == "__main__":
     sys.exit(main())

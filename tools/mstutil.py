@@ -28,6 +28,14 @@ def get_path_to_mst_binary():
     """Gets the path to the mst solver binary."""
     return get_path_to_project_root() + 'src/mst'
 
+def get_path_to_checker_binary(make_sure_it_exists=False):
+    """Gets the path to our correctness checker."""
+    dir = get_path_to_tools_root() + 'checker/'
+    path = dir + 'boost_compute_mst_weight'
+    if make_sure_it_exists:
+        os.system('make -C %s > /dev/null' % dir)
+    return path
+
 def get_path_to_inputs():
     """Gets the path to the input graphs (only for part 1, as part 2 graphs are not saved)."""
     return get_path_to_project_root() + 'input/'
