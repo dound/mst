@@ -10,7 +10,7 @@ int main(int argc, char** argv) {
   typedef std::pair<int, int> E;
 
   if(argc < 2) {
-      fprintf(stderr, "checker: usage: %s INPUT_GRAPH [WHETHER_TO_PRINT_EDGE_WEIGHTS]", argv[0]);
+      fprintf(stderr, "checker: usage: %s INPUT_GRAPH [WHETHER_TO_PRINT_EDGE_WEIGHTS]\n", argv[0]);
       exit(1);
   }
   bool print_mst_edges = argc > 2;
@@ -22,19 +22,25 @@ int main(int argc, char** argv) {
   else {
       fp = fopen(argv[1], "r");
       if(fp == NULL) {
-          fprintf(stderr, "checker: unable to open file %s", argv[1]);
+          fprintf(stderr, "checker: unable to open file %s\n", argv[1]);
           exit(1);
       }
   }
 
   // read the prescribed input format
   unsigned num_verts, num_edges;
-  fscanf(fp, "%u %u", &num_verts, &num_edges);
+  if(fscanf(fp, "%u %u", &num_verts, &num_edges) != 2) {
+      fprintf(stderr, "checker: bad header in input %s\n", argv[1]);
+      exit(1);
+  }
   E* edge_array = new E[num_edges];
   float* weights = new float[num_edges];
   int u, v;
   for(unsigned i=0; i<num_edges; i++){
-      fscanf(fp, "%d %d %f", &u, &v, &weights[i]);
+      if(fscanf(fp, "%d %d %f", &u, &v, &weights[i]) != 3) {
+          fprintf(stderr, "checker: bad line in input %s\n", argv[1]);
+          exit(1);
+      }
       edge_array[i] = E(u, v);
   }
   fclose(fp);
