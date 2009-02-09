@@ -9,8 +9,8 @@ from struct import unpack
 from time import strftime
 import heapq, os, sys
 
-__RND_SEED = unpack('Q', urandom(8))[0]  # generate a truly random 8-byte seed
-__rnd = Random(__RND_SEED)
+__RND_SEED = None
+__rnd = None
 
 def print_input_header(num_verts, num_edges, out):
     print >> out, '%u' % num_verts
@@ -155,6 +155,9 @@ must be specified."""
     parser.add_option("-p", "--precision",
                       type="int", default=1,
                       help="number of decimal points to specify for edge weights [default: %default]")
+    parser.add_option("-r", "--random-seed",
+                      metavar="R", type="int", default=None,
+                      help="what random seed to use [default: choose a truly random seed using urandom()]")
     parser.add_option("-e", "--edge-weight-range",
                       metavar="MIN,MAX",
                       help="range of edge weights (range inclusive) [default: [0.1,100000]]")
@@ -170,6 +173,16 @@ must be specified."""
     elif len(args) > 1:
         parser.error("too many arguments")
 
+    # initialize the random number generator
+    global __RND_SEED
+    global __rnd
+    if options.random_seed is not None:
+        __RND_SEED = options.random_seed
+    else:
+        __RND_SEED = unpack('Q', urandom(8))[0]  # generate a truly random 8-byte seed
+    __rnd = Random(__RND_SEED)
+
+    # determine how many vertices should be in the graph
     try:
         num_verts = int(args[0])
     except ValueError:
