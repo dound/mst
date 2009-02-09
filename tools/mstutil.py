@@ -37,8 +37,12 @@ def get_path_to_checker_binary(make_sure_it_exists=False):
     return path
 
 def get_path_to_inputs():
-    """Gets the path to the input graphs (only for part 1, as part 2 graphs are not saved)."""
+    """Gets the path to the logs of what graphs were generated."""
     return get_path_to_project_root() + 'input/'
+
+def get_path_to_generated_inputs():
+    """Gets the path to the generated input graphs."""
+    return get_path_to_project_root() + 'input/gen'
 
 def get_path_to_correctness_results(rev=''):
     """Gets the path to the correctness results."""

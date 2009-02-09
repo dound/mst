@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 from math import sqrt
-from mstutil import die, get_path_to_inputs, get_path_to_checker_binary
+from input_tracking import track_input
+from mstutil import die, get_path_to_generated_inputs, get_path_to_checker_binary, random_tmp_filename
 from optparse import OptionParser
 from os import urandom
 from random import Random
@@ -141,8 +142,8 @@ def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos
 def main():
     usage = """usage: %prog [options] NUM_VERTICES
 Generates a connected graph with no self-loops or parallel edges.  Output is
-sent to the default filename unless -e or -v is specified: in these cases, -o
-must be specified."""
+sent to the default filename (""" + get_path_to_generated_inputs() + """/V-E-SEED.g)
+unless -e or -v is specified: in these cases, -o must be specified."""
 
     parser = OptionParser(usage)
     parser.add_option("-c", "--correctness",
@@ -158,14 +159,17 @@ must be specified."""
     parser.add_option("-r", "--random-seed",
                       metavar="R", type="int", default=None,
                       help="what random seed to use [default: choose a truly random seed using urandom()]")
+    parser.add_option("-s", "--style",
+                      help="how to place edges [default: random with no self-loops or parallel edges]")
+    parser.add_option("-t", "--dont-track",
+                      action="store_true", default=False,
+                      help="whether to log this input in our list of generated inputs")
     parser.add_option("-e", "--edge-weight-range",
                       metavar="MIN,MAX",
                       help="range of edge weights (range inclusive) [default: [0.1,100000]]")
     parser.add_option("-v", "--vertex-pos-range",
                       metavar="DIM,MIN,MAX",
                       help="dimensionality of vertex positions and the range of each dimension (range inclusive) [not used by default; mutually exclusive with -e]")
-    parser.add_option("-s", "--style",
-                      help="how to place edges [default: random with no self-loops or parallel edges]")
 
     (options, args) = parser.parse_args()
     if len(args) < 1:
@@ -220,7 +224,7 @@ must be specified."""
         if options.vertex_pos_range or options.edge_weight_range:
             parser.error('-e or -v require -o to be specified too')
         else:
-            options.output_file = get_path_to_inputs() + '%s%u-%u-%s.g' % (style_str, num_verts, num_edges, str(__RND_SEED))
+            options.output_file = get_path_to_generated_inputs() + '%s%u-%u-%s.g' % (style_str, num_verts, num_edges, str(__RND_SEED))
             auto_out = True
 
     # open the desired output file
@@ -244,6 +248,9 @@ must be specified."""
             parser.error("option -v requires dimensionality to be a strictly positive integer")
 
         about = gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos, options.precision, out)
+        dimensionality = d
+        min_val = min_pos
+        max_val = max_pos
     else:
         # default: randomly choose edge weights in some range
         if options.edge_weight_range:
@@ -263,20 +270,43 @@ must be specified."""
             max_edge_len = 100000
 
         about = gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, options.precision, out)
+        dimensionality = 0
+        min_val = min_edge_len
+        max_val = max_edge_len
 
     print_input_footer(num_verts, num_edges, about, out)
     if out != sys.stdout:
         out.close()
 
     # generate output with correctness checker, if desired
+    mst_weight = -1
     if options.correctness:
         if not auto_out:
             print >> sys.stderr, "warning: skipping correctness output (only done when -f is not specified)"
+            return
+        elif options.dont_track:
+            print >> sys.stderr, "warning: skipping correctness output (only done when -t is not specified)"
+            return
 
         checker = get_path_to_checker_binary(True)
-        corr_file = get_path_to_inputs() + 'corr/%s%u-%u-%s.corr' % (style_str, num_verts, num_edges, str(__RND_SEED))
+        corr_file = random_tmp_filename()
         if os.system('%s %s > %s' % (checker, options.output_file, corr_file)) != 0:
             print >> sys.stderr, "warning: failed to generate correctness output"
+        else:
+            try:
+                fh = open(corr_file)
+                mst_weight = float(fh.readline())
+            except IOError, errstr:
+                print >> sys.stderr, "warning: unable to read generated correctness output: " + errstr
+            except ValueError:
+                print >> sys.stderr, "warning: unable to read generated correctness output (bad format)"
+            finally:
+                fh.close()
+            os.remove(corr_file)
+
+    # record this new input in our input log
+    if not options.dont_track:
+        track_input(options.precision, dimensionality, min_val, max_val, num_verts, num_edges, __RND_SEED, mst_weight)
 
 if __name__ == "__main__":
     sys.exit(main())
