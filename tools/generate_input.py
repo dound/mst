@@ -3,7 +3,7 @@
 from math import sqrt
 from input_tracking import track_input
 from mstutil import die, get_path_to_generated_inputs, get_path_to_checker_binary, random_filename, random_tmp_filename
-from optparse import OptionParser
+from optparse import OptionGroup, OptionParser
 from os import urandom
 from random import Random
 from struct import unpack
@@ -167,12 +167,15 @@ used.)"""
     parser.add_option("-t", "--dont-track",
                       action="store_true", default=False,
                       help="whether to log this input in our list of generated inputs")
-    parser.add_option("-e", "--edge-weight-range",
-                      metavar="MIN,MAX",
-                      help="range of edge weights (range inclusive) [default: [0.1,100000]]")
-    parser.add_option("-v", "--vertex-pos-range",
-                      metavar="DIM,MIN,MAX",
-                      help="dimensionality of vertex positions and the range of each dimension (range inclusive) [not used by default; mutually exclusive with -e]")
+
+    group = OptionGroup(parser, "Generation Type Options")
+    group.add_option("-e", "--edge-weight-range",
+                     metavar="MIN,MAX",
+                     help="range of edge weights (range inclusive) [default: [0.1,100000]]")
+    group.add_option("-v", "--vertex-pos-range",
+                     metavar="DIM,MIN,MAX",
+                     help="dimensionality of vertex positions and the range of each dimension (range inclusive) [not used by default; mutually exclusive with -e]")
+    parser.add_option_group(group)
 
     (options, args) = parser.parse_args()
     if len(args) < 1:
