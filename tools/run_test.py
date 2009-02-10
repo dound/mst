@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from check_output import check, CheckerError, extract_answer
-from data import DataError, DataSet, PerfResult, CORRECT, INCORRECT
+from data import DataError, DataSet, PerfResult, WeightResult, CORRECT, INCORRECT
 from generate_input import main as generate_input, extract_input_footer, ExtractInputFooterError
 from mstutil import get_path_to_mst_binary, get_path_to_tools_root, quiet_remove, random_tmp_filename
 from optparse import OptionParser
@@ -11,8 +11,10 @@ import os, sys
 # include-with-submit #       on functionality not strictly needed for the 'random' binary to work
 # include-with-submit get_path_to_tools_root = lambda : './'
 
-def benchmark(mst_binary, input_graph, out, rev, trial_num):
-    print "measuring performance of '%s' on '%s' saving to '%s' (trial=%u)" % (mst_binary, input_graph, out, trial_num)
+def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
+    print "benchmarking '%s' (rev=%s, trial=%u, out=%s)" % (input_graph, rev, trial_num, out)
+
+    # run mst (and time it)
     time_file = random_tmp_filename(10)
     cmd = '/usr/bin/time -f %%U -o %s %s %s > %s' % (time_file, mst_binary, input_graph, out)
     ret = os.system(cmd)
@@ -24,10 +26,22 @@ def benchmark(mst_binary, input_graph, out, rev, trial_num):
     except CheckerError, e:
         print >> sys.stderr, "failed to read time file: " + e
         return
+    quiet_remove(time_file)
+
+    # try to get the weight (if we output the result somewhere)
+    if out != "/dev/null":
+        try:
+            mst_weight = extract_answer(out)
+        except CheckerError, e:
+            print >> sys.stderr, "failed to read weight file: " + e
+            return
+        str_mst_weight = '  mst_weight=' + str(mst_weight)
+    else:
+        str_mst_weight = ''
 
     # check to see if we are supposed to log the result
     if trial_num < 0:
-        print '%s ===> %.2f' % (cmd, time_sec)
+        print ('%s ===> time=%.2f'+str_mst_weight) % (cmd, time_sec)
         return
 
     # extract properties of the graph
@@ -37,21 +51,22 @@ def benchmark(mst_binary, input_graph, out, rev, trial_num):
         raise CheckerError("run test error: unable to extract the input footer for %s: %s" % (input_graph, e))
 
     # log the result
-    data = PerfResult(ti.num_verts, ti.num_edges, ti.seed, rev, trial_num, time_sec)
-    try:
-        DataSet.add_data_to_log_file(data)
-    except DataError, e:
-        print >> sys.stderr, "Unable to log result to file %s (was trying to log %s): %s" % (str(data), e)
-
-def determine_weight(mst_binary, input_graph, out, rev, trial_num):
-    print "using '%s' to determine MST weight of '%s' saving to '%s' (trial=%u)" % (mst_binary, input_graph, out, trial_num)
+    if for_time:
+        data = PerfResult(ti.num_verts, ti.num_edges, ti.seed, rev, trial_num, time_sec)
+        try:
+            DataSet.add_data_to_log_file(data)
+        except DataError, e:
+            print >> sys.stderr, "Unable to log result to file %s (was trying to log %s): %s" % (str(data), e)
+    else:
+        data = WeightResult(ti.dims, ti.num_verts, ti.seed, rev, trial_num, mst_weight)
+        try:
+            DataSet.add_data_to_log_file(data)
+        except DataError, e:
+            print >> sys.stderr, "Unable to log result to file %s (was trying to log %s): %s" % (str(data), e)
 
 def test_mst(is_test_perf, mst_binary, input_graph, out, do_log, rev, trial_num):
     trial_num = -1 if not do_log else trial_num
-    if is_test_perf:
-        benchmark(mst_binary, input_graph, out, rev, trial_num)
-    else:
-        determine_weight(mst_binary, input_graph, out, rev, trial_num)
+    benchmark(mst_binary, input_graph, out, rev, trial_num, is_test_perf)
 
 __input_graph_to_cleanup = None
 __files_to_cleanup = []
