@@ -3,9 +3,18 @@
 #include <stdio.h>
 #include <string.h>
 
+#define USE_DOUBLES 0
+#if USE_DOUBLES == 1
+#   define FP_TYPE double
+#   define SCANF_FP_STR "%d %d %lf"
+#else
+#   define FP_TYPE float
+#   define SCANF_FP_STR "%d %d %f"
+#endif
+
 int main(int argc, char** argv) {
   using namespace boost;
-  typedef adjacency_list < vecS, vecS, undirectedS, no_property, property < edge_weight_t, float > > Graph;
+  typedef adjacency_list < vecS, vecS, undirectedS, no_property, property < edge_weight_t, FP_TYPE > > Graph;
   typedef graph_traits < Graph >::edge_descriptor Edge;
   typedef std::pair<int, int> E;
 
@@ -34,10 +43,10 @@ int main(int argc, char** argv) {
       exit(1);
   }
   E* edge_array = new E[num_edges];
-  float* weights = new float[num_edges];
+  FP_TYPE* weights = new FP_TYPE[num_edges];
   int u, v;
   for(unsigned i=0; i<num_edges; i++){
-      if(fscanf(fp, "%d %d %f", &u, &v, &weights[i]) != 3) {
+      if(fscanf(fp, SCANF_FP_STR, &u, &v, &weights[i]) != 3) {
           fprintf(stderr, "checker: bad line in input %s\n", argv[1]);
           exit(1);
       }
@@ -54,12 +63,12 @@ int main(int argc, char** argv) {
   kruskal_minimum_spanning_tree(g, std::back_inserter(spanning_tree));
 
   // compute and print the total weight of the MST
-  float total_weight = 0;
+  FP_TYPE total_weight = 0;
   for (std::vector < Edge >::iterator ei = spanning_tree.begin();
        ei != spanning_tree.end(); ++ei) {
       total_weight += weight[*ei];
   }
-  printf("%.1f\n", total_weight);
+  printf("%.15f\n", total_weight);
 
   // print edges if desired
   if(print_mst_edges) {
