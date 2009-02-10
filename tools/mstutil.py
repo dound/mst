@@ -42,7 +42,7 @@ def get_path_to_inputs():
 
 def get_path_to_generated_inputs():
     """Gets the path to the generated input graphs."""
-    return get_path_to_project_root() + 'input/gen'
+    return get_path_to_project_root() + 'input/gen/'
 
 def get_path_to_correctness_results(rev=''):
     """Gets the path to the correctness results."""
