@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-from mstutil import die, get_path_to_project_root, get_path_to_tools_root
+from mstutil import die, get_path_to_project_root
 from shutil import copy2, copytree, move
 from time import strftime
-import os, sys
+import os
 
 def sh_or_die(cmd, msg):
     if os.system(cmd) != 0:
