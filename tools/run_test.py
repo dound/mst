@@ -11,17 +11,18 @@ import os, sys
 # include-with-submit #       on functionality not strictly needed for the 'random' binary to work
 # include-with-submit get_path_to_tools_root = lambda : './'
 
-def benchmark(mst_binary, input_graph, out, do_log):
-    print "measuring performance of '%s' on '%s' saving to '%s' (log=%s)" % (mst_binary, input_graph, out, str(do_log))
+def benchmark(mst_binary, input_graph, out, trial_num):
+    print "measuring performance of '%s' on '%s' saving to '%s' (trial=%u)" % (mst_binary, input_graph, out, trial_num)
 
-def determine_weight(mst_binary, input_graph, out, do_log):
-    print "using '%s' to determine MST weight of '%s' saving to '%s' (log=%s)" % (mst_binary, input_graph, out, str(do_log))
+def determine_weight(mst_binary, input_graph, out, trial_num):
+    print "using '%s' to determine MST weight of '%s' saving to '%s' (trial=%u)" % (mst_binary, input_graph, out, trial_num)
 
-def test_mst(is_test_perf, mst_binary, input_graph, out, do_log):
+def test_mst(is_test_perf, mst_binary, input_graph, out, do_log, trial_num):
+    trial_num = -1 if not do_log else trial_num
     if is_test_perf:
-        benchmark(mst_binary, input_graph, out, do_log)
+        benchmark(mst_binary, input_graph, out, trial_num)
     else:
-        determine_weight(mst_binary, input_graph, out, do_log)
+        determine_weight(mst_binary, input_graph, out, trial_num)
 
 __input_graph_to_cleanup = None
 __files_to_cleanup = []
@@ -154,7 +155,7 @@ computation only):
         out = "/dev/null"
 
     # do the first run (and check the output if requested)
-    test_mst(is_test_perf, mst_binary, input_graph, out, not options.dont_log)
+    test_mst(is_test_perf, mst_binary, input_graph, out, not options.dont_log, options.trial_num)
     if options.check:
         rev = None if options.rev is "" else options.rev
         run = None if options.trial_num < 0 else options.trial_num
@@ -174,7 +175,7 @@ computation only):
         if gen_input_args is not None:
             quiet_remove(__input_graph_to_cleanup)
             input_graph = __generate_input_graph(gen_input_args)
-        test_mst(is_test_perf, mst_binary, input_graph, "/dev/null", not options.dont_log)
+        test_mst(is_test_perf, mst_binary, input_graph, "/dev/null", not options.dont_log, options.trial_num)
 
     __cleanup_and_exit()
 
