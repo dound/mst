@@ -1,27 +1,53 @@
 #!/usr/bin/env python
 
-from mstutil import die, get_path_to_inputs, get_path_to_checker_binary
+from mstutil import die, get_path_to_inputs, get_path_to_checker_binary, random_tmp_filename
 from optparse import OptionParser
 import os, sys
 
-def get_answer(fn, what):
-    # get the correct answer
+class CheckerError(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+    def __str__(self):
+        return self.msg
+
+def extract_answer(fn, what):
+    """Get the answer from output from either mst or the checker"""
     try:
         fh = open(fn)
         try:
             ans = float(fh.readline())
-        except ValueError:
-            die("check_output.py: error: invalid answer in %s file %s" % (what, fn))
+            return ans
+        except ValueError, e:
+            raise CheckerError("checker error: invalid answer in %s file %s: %s" % (what, fn, e))
         fh.close()
     except IOError, errstr:
-        die("check_output.py: error: failed to read %s data from %s" % (what, fn))
-    return ans
+        raise CheckerError("checker error: failed to read %s data from %s: %s" % (what, fn, errstr))
+
+def compute_mst_weight(input_graph, what):
+    """Computes and returns the MST weight of input_graph using the checker"""
+    corr_file = random_tmp_filename(10)
+    try:
+        w = __compute_mst_weight(input_graph, what, corr_file)
+        os.remove(corr_file)
+        return w
+    except CheckerError:
+        os.remove(corr_file)
+        raise
+
+def __compute_mst_weight(input_graph, what, corr_file):
+    """Internal method to actual compute the MST weight of input_graph"""
+    checker = get_path_to_checker_binary(True)
+    ret = os.system('%s %s > %s' % (checker, input_graph, corr_file))
+    if ret == 0:
+        return extract_answer(corr_file, what)
+    else:
+        raise CheckerError("checker error: failed to generate %s output for " + (what, input_graph))
 
 def check(input_graph, output_to_test, tolerance, verbose, do_log):
     print "check '%s' with solution '%s' based on input '%s' (verbose=%s, log=%s)" % \
         (output_to_test, output_correct, input_graph, str(verbose), str(do_log))
 
-    corr_file = get_path_to_inputs() + 'corr/%s' % os.basename(input_graph)
+    corr_file = get_path_to_inputs() + 'corr/%s' % os.path.basename(input_graph)
 
     # make the correctness file which caches the right answer if it does not exist
     if not os.path.exists(corr_file):
@@ -30,8 +56,8 @@ def check(input_graph, output_to_test, tolerance, verbose, do_log):
             die("check_output.py: error: failed to generate new correctness data for " + input_graph)
 
     # get the output answers
-    ans_corr = get_answer(corr_file, 'correctness')
-    ans_out = get_answer(output_to_test, 'output file being tested')
+    ans_corr = extract_answer(corr_file, 'correctness')
+    ans_out = extract_answer(output_to_test, 'output file being tested')
 
     # are the same?
     fmt = '%.' + tolerance + 'f'
@@ -40,7 +66,7 @@ def check(input_graph, output_to_test, tolerance, verbose, do_log):
     if str_ans_corr == str_ans_out:
         code = 0    # succcess!
     else:
-        print >> stderr, "correctness FAILED: %s (correct is %s, output had %s)" % (input_graph, str_ans_corr, str_ans_out)
+        print >> sys.stderr, "correctness FAILED: %s (correct is %s, output had %s)" % (input_graph, str_ans_corr, str_ans_out)
         code = -1
 
     # log the result of the correctness check

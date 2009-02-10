@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
-from math import sqrt
+from check_output import CheckerError, compute_mst_weight
 from input_tracking import track_input
-from mstutil import die, get_path_to_generated_inputs, get_path_to_checker_binary, random_tmp_filename
+from math import sqrt
+from mstutil import die, get_path_to_generated_inputs
 from optparse import OptionGroup, OptionParser
 from os import urandom
 from random import Random
@@ -148,7 +149,7 @@ used.)"""
     parser = OptionParser(usage)
     parser.add_option("-c", "--correctness",
                       action="store_true", default=False,
-                      help="generate the output with the correctness checker")
+                      help="compute and log the correct output")
     parser.add_option("-m", "--may-use-existing",
                       action="store_true", default=False,
                       help="will not generate a new graph if the output file already exists")
@@ -300,22 +301,10 @@ used.)"""
         if options.dont_track:
             print >> sys.stderr, "warning: skipping correctness output (only done when -t is not specified)"
             return 0
-
-        checker = get_path_to_checker_binary(True)
-        corr_file = random_tmp_filename(10)
-        if os.system('%s %s > %s' % (checker, options.output_file, corr_file)) != 0:
-            print >> sys.stderr, "warning: failed to generate correctness output"
-        else:
-            try:
-                fh = open(corr_file)
-                mst_weight = float(fh.readline())
-            except IOError, errstr:
-                print >> sys.stderr, "warning: unable to read generated correctness output: " + errstr
-            except ValueError:
-                print >> sys.stderr, "warning: unable to read generated correctness output (bad format)"
-            finally:
-                fh.close()
-            os.remove(corr_file)
+        try:
+            mst_weight = compute_mst_weight(options.output_file, "correctness")
+        except CheckerError, e:
+            print >> sys.stderr, e
 
     # record this new input in our input log
     if not options.dont_track:
