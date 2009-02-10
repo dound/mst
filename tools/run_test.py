@@ -170,6 +170,8 @@ computation only):
 
     # remaining runs, if any
     for _ in range(options.num_runs-1):
+        if options.trial_num >= 0:
+            options.trial_num += 1
         if gen_input_args is not None:
             quiet_remove(__input_graph_to_cleanup)
             input_graph = __generate_input_graph(gen_input_args)
