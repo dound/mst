@@ -156,6 +156,9 @@ used.)"""
     parser.add_option("-p", "--precision",
                       type="int", default=1,
                       help="number of decimal points to specify for edge weights [default: %default]")
+    parser.add_option("-q", "--quiet",
+                      action="store_true", default=False,
+                      help="do not log any extraneous information to stdout")
     parser.add_option("-r", "--random-seed",
                       metavar="R", type="int", default=None,
                       help="what random seed to use [default: choose a truly random seed using urandom()]")
@@ -185,6 +188,10 @@ used.)"""
     else:
         __RND_SEED = unpack('Q', urandom(8))[0]  # generate a truly random 8-byte seed
     __rnd = Random(__RND_SEED)
+
+    def print_if_not_quiet(msg):
+        if not options.quiet:
+            print msg
 
     # determine how many vertices should be in the graph
     try:
@@ -274,7 +281,7 @@ used.)"""
         max_val = max_edge_len
 
     print_input_footer(num_verts, num_edges, about, out)
-    print 'graph saved to ' + options.output_file
+    print_if_not_quiet('graph saved to ' + options.output_file)
     if out != sys.stdout:
         out.close()
 
@@ -304,7 +311,7 @@ used.)"""
     # record this new input in our input log
     if not options.dont_track:
         logfn = track_input(options.precision, dimensionality, min_val, max_val, num_verts, num_edges, __RND_SEED, mst_weight)
-        print 'logged to ' + logfn
+        print_if_not_quiet('logged to ' + logfn)
 
 if __name__ == "__main__":
     sys.exit(main())
