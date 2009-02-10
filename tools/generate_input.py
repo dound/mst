@@ -289,7 +289,7 @@ unless -e or -v is specified: in these cases, -o must be specified."""
             return
 
         checker = get_path_to_checker_binary(True)
-        corr_file = random_tmp_filename()
+        corr_file = random_tmp_filename(10)
         if os.system('%s %s > %s' % (checker, options.output_file, corr_file)) != 0:
             print >> sys.stderr, "warning: failed to generate correctness output"
         else:
