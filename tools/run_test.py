@@ -2,7 +2,8 @@
 
 from check_output import check, CheckerError, extract_answer
 from data import DataError, DataSet, PerfResult, WeightResult, CORRECT, INCORRECT
-from generate_input import main as generate_input, extract_input_footer, ExtractInputFooterError
+from data import extract_input_footer, ExtractInputFooterError
+from generate_input import main as generate_input
 from mstutil import get_path_to_mst_binary, get_path_to_tools_root, quiet_remove, random_tmp_filename
 from optparse import OptionParser
 import os, sys

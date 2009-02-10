@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from data import DataError, DataSet, InputSolution, CorrResult, CORRECT, INCORRECT
-from generate_input import ExtractInputFooterError, extract_input_footer
+from data import extract_input_footer, ExtractInputFooterError
 from mstutil import get_path_to_checker_binary, random_tmp_filename
 from optparse import OptionParser
 import os, sys

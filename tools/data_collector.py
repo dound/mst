@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 from data import DataError, DataSet, InputSolution, CorrResult, PerfResult, WeightResult, get_tracked_revs
-from generate_input import ExtractInputFooterError, extract_input_footer
+from data import extract_input_footer, ExtractInputFooterError
 from mstutil import get_path_to_project_root, get_path_to_tools_root
+
 from optparse import OptionGroup, OptionParser
 import os, sys
 

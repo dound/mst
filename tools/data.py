@@ -1,4 +1,5 @@
 from mstutil import compare_float, get_path_to_project_root, get_path_to_tools_root
+import os, re
 
 class DataError(Exception):
     def __init__(self, msg):
@@ -351,6 +352,40 @@ class WeightResult(__Result):
     def get_path_to(wtype):
         return get_path_to_project_root() + 'result/weight/' + wtype
 
+class ExtractInputFooterError(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+    def __str__(self):
+        return self.msg
+
+def __re_get_group(pattern, haystack, group_num=0):
+    """Returns the value associated with the requested group num in the result
+    from re.search, or raises an ExtractInputFooterError if it does not match"""
+    x = re.search(pattern, haystack)
+    if x is None:
+        return None
+    else:
+        return x.groups()[group_num]
+
+def extract_input_footer(input_graph):
+    """Returns the Input object representing the footer info"""
+    lines = os.popen('tail -n 1 "%s" 2> /dev/null' % input_graph).readlines()
+    if len(lines) == 0:
+        raise ExtractInputFooterError("Failed to extract the footer from " + input_graph)
+    about = lines[0]
+
+    try:
+        num_dims = int(__re_get_group(r'd=(\d*)', about))
+    except ExtractInputFooterError:
+        num_dims = 0
+
+    num_verts = int(__re_get_group(r'm=(\d*)', about))
+    num_edges = int(__re_get_group(r'n=(\d*)', about))
+    min_val = float(__re_get_group(r'min=(\d*.\d*)', about))
+    max_val = float(__re_get_group(r'max=(\d*.\d*)', about))
+    precision = int(__re_get_group(r'prec=(\d*)', about))
+    seed = int(__re_get_group(r'seed=(\d*)', about))
+    return Input(precision, num_dims, min_val, max_val, num_verts, num_edges, seed)
 
 def get_tracked_revs():
     """Returns revisions we are tracking as an array of SHA1 revision IDs"""
