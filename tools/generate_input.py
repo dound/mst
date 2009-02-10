@@ -246,7 +246,7 @@ used.)"""
             parser.error("option -v requires dimensionality to be a strictly positive integer")
 
         about = gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos, options.precision, out)
-        dimensionality = d
+        dimensionality = num_dims
         min_val = min_pos
         max_val = max_pos
     else:
