@@ -245,7 +245,7 @@ used.)"""
     else:
         if options.may_use_existing and os.path.exists(options.output_file):
             print_if_not_quiet('skipping input generation: %s already exists' % options.output_file)
-            return
+            return 0
         try:
             out = open(options.output_file, 'w')
         except IOError, errstr:
@@ -299,7 +299,7 @@ used.)"""
     if options.correctness:
         if options.dont_track:
             print >> sys.stderr, "warning: skipping correctness output (only done when -t is not specified)"
-            return
+            return 0
 
         checker = get_path_to_checker_binary(True)
         corr_file = random_tmp_filename(10)
@@ -321,6 +321,8 @@ used.)"""
     if not options.dont_track:
         logfn = track_input(options.precision, dimensionality, min_val, max_val, num_verts, num_edges, __RND_SEED, mst_weight)
         print_if_not_quiet('logged to ' + logfn)
+
+    return 0
 
 if __name__ == "__main__":
     sys.exit(main())

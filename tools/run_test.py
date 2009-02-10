@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from generate_input import main as generate_input
 from mstutil import get_path_to_mst_binary, get_path_to_tools_root, quiet_remove, random_tmp_filename
 from optparse import OptionParser
 import os, sys
@@ -34,10 +35,15 @@ def __generate_input_graph(argstr):
     global __input_graph_to_cleanup
     input_graph = random_tmp_filename(10)
     __input_graph_to_cleanup = input_graph
-    cmd = 'generate_input.py %s -f %s' % (argstr, input_graph)
-    ret = os.system(get_path_to_tools_root() + cmd)
+    args = (argstr + ' -mqto ' + input_graph).split()
+
+    try:
+        errstr = "unknown error"
+        ret = generate_input(args)
+    except errstr:
+        ret = -1
     if ret != 0:
-        print 'error: aborting test (input generation failed): generate_input.py %s' % argstr
+        print 'error: aborting test (input generation failed): %s: %s' % (errstr, argstr)
         __cleanup_and_exit(ret)
     return input_graph
 
@@ -57,13 +63,13 @@ computation only):
                       help="whether to check output using check_output.py (only for the first run; exits if the check fails)")
     parser.add_option("-g", "--generate-input",
                       metavar="GEN_ARGS",
-                      help="generate (and use as input) a graph from generate_input.py GEN_ARGS (one for each run)")
+                      help="generate (and use as input) a graph from generate_input.py GEN_ARGS (one for each run); -mqt will also be passed")
     parser.add_option("-i", "--input-file",
                       metavar="FILE",
                       help="FILE which describes the graph to use as input")
     parser.add_option("-n", "--num-runs",
                       metavar="N", type="int", default=1,
-                      help="number of runs to execute")
+                      help="number of runs to execute [default: %default]")
     parser.add_option("-o", "--output-file",
                       metavar="FILE",
                       help="where to save the output MST (stdout prints to stdout) [default: do not save output]")
