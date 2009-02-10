@@ -37,10 +37,12 @@ tools = root + 'tools/'
 random = 'random'
 run_test = 'run_test.py'
 gen_input = 'generate_input.py'
+input_tracking = 'input_tracking.py'
 mstutil = 'mstutil.py'
 copy2(tools + random, submit + random)
 copy2(tools + run_test, submit + run_test)
 copy2(tools + gen_input, submit + gen_input)
+copy2(tools + input_tracking, submit + input_tracking)
 copy2(tools + mstutil, submit + mstutil)
 
 # hack up run_test.py a bit so we don't have to include its usual dependency
