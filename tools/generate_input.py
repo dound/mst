@@ -2,7 +2,7 @@
 
 from math import sqrt
 from input_tracking import track_input
-from mstutil import die, get_path_to_generated_inputs, get_path_to_checker_binary, random_tmp_filename
+from mstutil import die, get_path_to_generated_inputs, get_path_to_checker_binary, random_filename, random_tmp_filename
 from optparse import OptionParser
 from os import urandom
 from random import Random
@@ -220,10 +220,11 @@ used.)"""
 
     # determine the output file to use
     if options.output_file is None:
+        path = get_path_to_generated_inputs()
         if options.vertex_pos_range or options.edge_weight_range:
-            options.output_file = random_tmp_filename(10) + '.g'
+            options.output_file = path + random_filename(10) + '.g'
         else:
-            options.output_file = get_path_to_generated_inputs() + '%s%u-%u-%s.g' % (style_str, num_verts, num_edges, str(__RND_SEED))
+            options.output_file = path + '%s%u-%u-%s.g' % (style_str, num_verts, num_edges, str(__RND_SEED))
 
     # open the desired output file
     if options.output_file == 'stdout':
@@ -273,6 +274,7 @@ used.)"""
         max_val = max_edge_len
 
     print_input_footer(num_verts, num_edges, about, out)
+    print 'graph saved to ' + options.output_file
     if out != sys.stdout:
         out.close()
 
@@ -301,7 +303,8 @@ used.)"""
 
     # record this new input in our input log
     if not options.dont_track:
-        track_input(options.precision, dimensionality, min_val, max_val, num_verts, num_edges, __RND_SEED, mst_weight)
+        logfn = track_input(options.precision, dimensionality, min_val, max_val, num_verts, num_edges, __RND_SEED, mst_weight)
+        print 'logged to ' + logfn
 
 if __name__ == "__main__":
     sys.exit(main())
