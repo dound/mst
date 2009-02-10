@@ -153,7 +153,7 @@ computation only):
 
     # do the first run (and check the output if requested)
     test_mst(is_test_perf, mst_binary, input_graph, out, not options.dont_log)
-    if options.check is not None:
+    if options.check:
         if options.dont_log_any:
             log_opt = "-x"
         else:
