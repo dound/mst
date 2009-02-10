@@ -35,8 +35,10 @@ class TrackedInput:
             return self.num_verts - other.num_verts
         if self.num_edges != other.num_edges:
             return self.num_edges - other.num_edges
-        if self.seed != other.seed:
-            return self.seed - other.seed
+        if self.seed < other.seed:
+            return -1
+        if self.seed > other.seed:
+            return 1
         return 0
 
     def __hash__(self):
