@@ -41,8 +41,16 @@ def get_path_to_inputs():
     return get_path_to_project_root() + 'input/'
 
 def get_path_to_generated_inputs():
-    """Gets the path to the generated input graphs."""
-    return get_path_to_project_root() + 'input/gen/'
+    """Gets the path to a symlink to the generated input graphs stored in /tmp/<user>-gen."""
+    real_path = '/tmp/' + os.getlogin() + '-gen/'
+    if not os.path.exists(real_path):
+        os.mkdir(real_path)
+
+    symlink = get_path_to_project_root() + 'input/gen'
+    if not os.path.exists(symlink):
+        os.symlink(real_path, symlink)
+
+    return symlink + '/'
 
 def get_path_to_correctness_results(rev=''):
     """Gets the path to the correctness results."""
