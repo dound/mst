@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
+from data import DataSet, InputSolution
 from generate_input import ExtractInputFooterError, extract_input_footer
-from input_tracking import get_tracked_input_fn, get_tracked_inputs, save_tracked_inputs
 from mstutil import get_path_to_checker_binary, random_tmp_filename
 from optparse import OptionParser
 import os, sys
@@ -55,25 +55,25 @@ def get_and_log_mst_weight_from_checker(input_graph, force_recompute=False):
         raise CheckerError("checker error: unable to extract the input footer for %s: %s" % (input_graph, e))
 
     # load in the inputs in the category of input_graph
-    logfn = get_tracked_input_fn(ti.precision, ti.dimensionality, ti.min, ti.max)
-    inputs = get_tracked_inputs(logfn)
-    if inputs.has_key(ti):
-        ti = inputs[ti]
+    logfn = InputSolution.get_path_to(ti.prec, ti.dims, ti.min, ti.max)
+    ds = DataSet.read_from_file(InputSolution, logfn)
+    if ds.dataset.has_key(ti):
+        input_soln = ds.dataset[ti]
         do_log = True
+
+        # see if we already know the answer
+        if not force_recompute:
+            if input_soln.has_mst_weight():
+                return input_soln.mst_weight  # cache hit!
     else:
         # if we weren't tracking the input before, don't start now
         do_log = False
 
-    # see if we already know the answer
-    if not force_recompute:
-        if ti.mst_weight >= 0:
-            return ti.mst_weight  # cache hit!
-
     # compute the answer and (if specified) save it
-    w = compute_mst_weight(input_graph, 'correctness')
+    w = compute_mst_weight(input_graph)
     if do_log:
-        ti.update_mst_weight(w)
-        save_tracked_inputs(logfn, inputs)
+        if input_soln.update_mst_weight(w):
+            ds.save_to_file(logfn)
     return w
 
 def check(input_graph, output_to_test, tolerance, force_recompute, do_log):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from check_output import CheckerError, compute_mst_weight
-from input_tracking import track_input, TrackedInput
+from data import DataSet, Input, InputSolution
 from math import sqrt
 from mstutil import die, get_path_to_generated_inputs
 from optparse import OptionGroup, OptionParser
@@ -27,7 +27,7 @@ def print_input_footer(num_verts, num_edges, about, out):
     density = float(num_edges_scaled) / num_edge_choices
     print >> out, '# %s: %s density=%.2f' % (strftime('%A %Y-%b-%d at %H:%M:%S'), about, density)
 
-class ExtractInputFooterError:
+class ExtractInputFooterError(Exception):
     def __init__(self, msg):
         self.msg = msg
     def __str__(self):
@@ -43,7 +43,7 @@ def __re_get_group(pattern, haystack, group_num=0):
         return x.groups()[group_num]
 
 def extract_input_footer(input_graph):
-    """Returns the TrackedInput representing the footer info"""
+    """Returns the Input object representing the footer info"""
     lines = os.popen('tail -n 1 "%s" 2> /dev/null' % input_graph).readlines()
     if len(lines) == 0:
         raise ExtractInputFooterError("Failed to extract the footer from " + input_graph)
@@ -60,7 +60,7 @@ def extract_input_footer(input_graph):
     max_val = float(__re_get_group(r'max=(\d*.\d*)', about))
     precision = int(__re_get_group(r'prec=(\d*)', about))
     seed = int(__re_get_group(r'seed=(\d*)', about))
-    return TrackedInput(precision, num_dims, min_val, max_val, num_verts, num_edges, seed)
+    return Input(precision, num_dims, min_val, max_val, num_verts, num_edges, seed)
 
 def edges_in_complete_undirected_graph(num_verts):
     return (num_verts * (num_verts - 1)) / 2
@@ -343,8 +343,9 @@ used.)"""
 
     # record this new input in our input log
     if not options.dont_track:
-        logfn = track_input(options.precision, dimensionality, min_val, max_val, num_verts, num_edges, __RND_SEED, mst_weight)
-        print_if_not_quiet('logged to ' + logfn)
+        data = InputSolution(options.precision, dimensionality, min_val, max_val, num_verts, num_edges, __RND_SEED, mst_weight)
+        DataSet.add_data_to_log_file(data)
+        print_if_not_quiet('logged to ' + data.get_path())
 
     return 0
 

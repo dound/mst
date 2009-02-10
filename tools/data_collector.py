@@ -1,37 +1,34 @@
 #!/usr/bin/env python
 
-from mstutil import get_path_to_project_root, get_path_to_tools_root, get_tracked_inputs, get_tracked_revs
-from mstutil import get_correctness_results, get_performance_results, get_weight_results
+from data import DataError, DataSet, InputSolution, CorrResult, PerfResult, WeightResult, get_tracked_revs
+from generate_input import ExtractInputFooterError, extract_input_footer
+from mstutil import get_path_to_project_root, get_path_to_tools_root
 from optparse import OptionGroup, OptionParser
-import os, sys, types
+import os, sys
 
-def get_num_runs_missing_for_data(data, input_val, num_desired_runs):
+def get_num_runs_missing_for_data(results, inpt, num_desired_runs):
     """Returns the number of values left to be collected."""
-    if type(input_val) is types.StringType:
-        # get just the filename
-        input_val = os.path.basename(input_val)
-    else:
-        # get just the number of vertices from the tuple
-        input_val = str(input_val[1])
+    for i in range(num_desired_runs):
+        key = (inpt, i)
+        if not results.has_key(key):
+            return num_desired_runs - i
+    return 0
 
-    if data.has_key(input_val):
-        return max(0, num_desired_runs - len(data[input_val]))
-    else:
-        return num_desired_runs
-
-def collect_missing_correctness_data(input_graph, rev, _):
-    cmd = 'run_test.py -i %s -r %s -n 1 -c -q -x' % (input_graph, rev)
+def collect_missing_correctness_data(inpt, rev, num_runs):
+    gen = inpt.make_args_for_generate_input()
+    cmd = 'run_test.py -g "%s" -r %s -n %u -c -x' % (gen, rev, num_runs)
     ret = os.system(get_path_to_tools_root() + cmd)
     return ret == 0
 
-def collect_missing_performance_data(input_graph, rev, num_runs):
-    cmd = 'run_test.py -i %s -r %s -n %s -q' % (input_graph, rev, num_runs)
+def collect_missing_performance_data(inpt, rev, num_runs):
+    gen = inpt.make_args_for_generate_input()
+    cmd = 'run_test.py -g "%s" -r %s -n %u' % (gen, rev, num_runs)
     ret = os.system(get_path_to_tools_root() + cmd)
     return ret == 0
 
-def collect_missing_weight_data(inputs, rev, num_runs):
-    (wtype, num_verts) = inputs
-    cmd = 'run_test.py -g %s,%s -r %s -n %s -q' % (num_verts, wtype, rev, num_runs)
+def collect_missing_weight_data(inpt, _, num_runs):
+    gen = inpt.make_args_for_generate_input()
+    cmd = 'run_test.py -g "%s" -n %s' % (gen, num_runs)
     ret = os.system(get_path_to_tools_root() + cmd)
     return ret == 0
 
@@ -75,6 +72,7 @@ Searches for missing results and uses run_test.py to collect it."""
 
     if options.num_runs < 1:
         parser.error("-n must be at least 1")
+    input_solns = None
 
     # prepare for a weight data collection
     num_on = 0
@@ -93,36 +91,42 @@ Searches for missing results and uses run_test.py to collect it."""
         if num_on == 0:
             parser.error('-v requires either -d or -e be specified too')
 
-        inputs = [(wtype, options.num_vertices)]
+        input_path = InputSolution.get_path_to(15, options.dimensionality, 0.0, 1.0)
+        input_solns = DataSet.read_from_file(InputSolution, input_path)
         revs = [None] # not revision-specific (assuming our alg is correct)
-        get_results = (lambda _ : get_weight_results(wtype))
+        get_results_for_rev = lambda _ : DataSet.read_from_file(WeightResult, WeightResult.get_path_to(wtype))
         collect_missing_data = collect_missing_weight_data
     elif options.dimensionality > 0 or options.edge:
         parser.error('-v is required whenever -d or -e is used')
 
+    # handle -i: collect data for a particular graph
+    if options.input_graph is not None:
+        try:
+            i = extract_input_footer(options.input_graph)
+        except ExtractInputFooterError, e:
+            parser.error(e)
+        input_solns = [InputSolution(i.prec,i.dims,i.min,i.max,i.num_verts,i.num_edges,i.seed)]
+
     # prepare for a correctness data collection
     if options.correctness:
         num_on += 1
-        get_results = lambda rev : get_correctness_results(rev)
+        get_results_for_rev = lambda rev : DataSet.read_from_file(CorrResult, CorrResult.get_path_to(rev))
         collect_missing_data = collect_missing_correctness_data
-        if options.num_runs > 1:
-            options.num_runs = 1
-            print 'warning: number of runs coerced to 1 for correctness checking'
 
     # make sure no more than 1 type of data collection was specified
     if num_on > 1:
         parser.error('at most one of -c, -d, and -e may be specified')
     elif num_on == 0:
         # prepare for a performance data collection (default if nothing else is specified)
-        get_results = lambda rev : get_performance_results(rev)
+        get_results_for_rev = lambda rev : DataSet.read_from_file(PerfResult, PerfResult.get_path_to(rev))
         collect_missing_data = collect_missing_performance_data
 
     # prepare the inputs and revisions for non-weight data collection schemes
     if options.num_vertices == 0:
-        if options.input_graph is not None:
-            inputs = [options.input_graph]
-        else:
-            inputs = get_tracked_inputs()
+        # get all performance inputs if we are not collecting for a single graph
+        if input_solns is None:
+            input_path = InputSolution.get_path_to(1, 0, 0, 100000)
+            input_solns = DataSet.read_from_file(InputSolution, input_path)
 
         # prepare the revisions to collect data for
         if options.rev is not None:
@@ -130,33 +134,35 @@ Searches for missing results and uses run_test.py to collect it."""
         else:
             revs = get_tracked_revs()
 
-    # collect the data
+    # pull out just the Input object (results are keyed on these, not InputSolution)
+    inputs = [i.input() for i in input_solns]
+
+    # collect the data!
+    what_to_do = None if options.list_only else collect_missing_data
+    if collect_data(revs, get_results_for_rev, inputs, what_to_do, options.num_runs):
+        print 'All requested data has been collected!'
+
+def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_runs):
     root_len = len(get_path_to_project_root())
     missing_none = True
-    errno = None
     for rev in revs:
+        # load info about the results we have to far for this rev
         try:
-            data = get_results(rev)
-        except IOError, strerror:
+            results = get_results_for_rev(rev)  # results is an [DataSet]
+        except DataError, e:
             missing_none = False
             if rev is None:
-                print 'warning: skipped data collection: %s' % strerror
+                print >> sys.stderr, 'skipped data collection: %s' % e
             else:
-                print 'warning: %s skipped: %s' % (rev, strerror)
-            continue
-        except FileFormatError, strerror:
-            missing_none = False
-            if rev is None:
-                print 'warning: invalid file: %s' % strerror
-            else:
-                print 'warning: %s has an invalid file: %s' % (rev, strerror)
+                print >> sys.stderr, '%s skipped: %s' % (rev, e)
             continue
 
-        for i in inputs:
-            n = get_num_runs_missing_for_data(data, i, options.num_runs)
+        # for each input, make sure we have run it on this rev
+        for i in inputs: # inputs is an [Input]
+            n = get_num_runs_missing_for_data(results, i, num_runs)
             if n > 0:
                 msg = None
-                if options.list_only:
+                if collect_missing_data is None:
                     missing_none = False
                     msg = 'missing'
                 elif not collect_missing_data(i, rev, n):
@@ -164,12 +170,11 @@ Searches for missing results and uses run_test.py to collect it."""
                     msg = 'failed to collect'
                 if msg is not None:
                     if rev is None:
-                        print '%s: runsLeft=%u' % (msg, n)
+                        print '%s: %s runsLeft=%u' % (msg, str(i)[root_len:], n)
                     else:
-                        print '%s: %s\trev=%s\trunsLeft=%u' % (msg, str(i)[root_len:], rev, n)
+                        print '%s: %s rev=%s runsLeft=%u' % (msg, str(i)[root_len:], rev, n)
 
-    if missing_none:
-        print 'No performance data is missing!'
+    return missing_none
 
 if __name__ == "__main__":
     sys.exit(main())
