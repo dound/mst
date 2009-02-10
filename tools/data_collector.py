@@ -14,21 +14,21 @@ def get_num_runs_missing_for_data(results, inpt, num_desired_runs):
             return num_desired_runs - i
     return 0
 
-def collect_missing_correctness_data(inpt, rev, num_runs):
+def collect_missing_correctness_data(inpt, rev, first_run_id, num_runs):
     gen = inpt.make_args_for_generate_input()
-    cmd = 'run_test.py -g "%s" -r %s -n %u -c -x' % (gen, rev, num_runs)
+    cmd = 'run_test.py -g "%s" -r %s -n %u -c -x -t %u' % (gen, rev, num_runs, first_run_id)
     ret = os.system(get_path_to_tools_root() + cmd)
     return ret == 0
 
-def collect_missing_performance_data(inpt, rev, num_runs):
+def collect_missing_performance_data(inpt, rev, first_run_id, num_runs):
     gen = inpt.make_args_for_generate_input()
-    cmd = 'run_test.py -g "%s" -r %s -n %u' % (gen, rev, num_runs)
+    cmd = 'run_test.py -g "%s" -r %s -n %u -t %u' % (gen, rev, num_runs, first_run_id)
     ret = os.system(get_path_to_tools_root() + cmd)
     return ret == 0
 
-def collect_missing_weight_data(inpt, _, num_runs):
+def collect_missing_weight_data(inpt, _, first_run_id, num_runs):
     gen = inpt.make_args_for_generate_input()
-    cmd = 'run_test.py -g "%s" -n %s' % (gen, num_runs)
+    cmd = 'run_test.py -g "%s" -n %s -t %u' % (gen, num_runs, first_run_id)
     ret = os.system(get_path_to_tools_root() + cmd)
     return ret == 0
 
@@ -165,7 +165,7 @@ def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_ru
                 if collect_missing_data is None:
                     missing_none = False
                     msg = 'missing'
-                elif not collect_missing_data(i, rev, n):
+                elif not collect_missing_data(i, rev, num_runs-n, n):
                     missing_none = False
                     msg = 'failed to collect'
                 if msg is not None:
