@@ -14,11 +14,11 @@ def quiet_remove(fn):
 def get_path_to_tools_root():
     """Gets the path to the root of the MST tools directory."""
     # strip off 'mstutil.py'
-    dir = os.path.dirname(__file__) + '/'
+    d = os.path.dirname(__file__) + '/'
     if __file__[0:1] == '/':
-        return dir
+        return d
     else:
-        return os.getcwd() + '/' + dir
+        return os.getcwd() + '/' + d
 
 def get_path_to_project_root():
     """Gets the path to the root of the MST project."""
@@ -30,10 +30,10 @@ def get_path_to_mst_binary():
 
 def get_path_to_checker_binary(make_sure_it_exists=False):
     """Gets the path to our correctness checker."""
-    dir = get_path_to_tools_root() + 'checker/'
-    path = dir + 'boost_compute_mst_weight'
+    d = get_path_to_tools_root() + 'checker/'
+    path = d + 'boost_compute_mst_weight'
     if make_sure_it_exists:
-        os.system('make -C %s > /dev/null' % dir)
+        os.system('make -C %s > /dev/null' % d)
     return path
 
 def get_path_to_inputs():
