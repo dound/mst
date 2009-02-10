@@ -142,9 +142,9 @@ def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos
 def main():
     usage = """usage: %prog [options] NUM_VERTICES
 Generates a connected graph with no self-loops or parallel edges.  Output is
-sent to the default filename (""" + get_path_to_generated_inputs() + """/V-E-SEED.g)
-unless -e or -v is specified: in these cases, -o must be specified."""
-
+sent to the default filename (""" + get_path_to_generated_inputs() + """/with
+V-E-SEED.g unless -e or -v are specified in which case a random filename is
+used.)"""
     parser = OptionParser(usage)
     parser.add_option("-c", "--correctness",
                       action="store_true", default=False,
@@ -152,7 +152,7 @@ unless -e or -v is specified: in these cases, -o must be specified."""
     parser.add_option("-n", "--num-edges",
                       help="number of edges to put in the graph [default: complete graph]")
     parser.add_option("-o", "--output-file",
-                      help="where to output the generated graph [default is inputs/<STYLE>-<NUM_VERTICES>-<NUM_EDGES>-<RANDOM_SEED>.g")
+                      help="where to output the generated graph [default is inputs/[<STYLE>-]<NUM_VERTICES>-<NUM_EDGES>-<RANDOM_SEED>.g")
     parser.add_option("-p", "--precision",
                       type="int", default=1,
                       help="number of decimal points to specify for edge weights [default: %default]")
@@ -219,13 +219,11 @@ unless -e or -v is specified: in these cases, -o must be specified."""
         parser.error("option -e and -v are mutually exclusive")
 
     # determine the output file to use
-    auto_out = False
     if options.output_file is None:
         if options.vertex_pos_range or options.edge_weight_range:
-            parser.error('-e or -v require -o to be specified too')
+            options.output_file = random_tmp_filename(10) + '.g'
         else:
             options.output_file = get_path_to_generated_inputs() + '%s%u-%u-%s.g' % (style_str, num_verts, num_edges, str(__RND_SEED))
-            auto_out = True
 
     # open the desired output file
     if options.output_file == 'stdout':
@@ -281,10 +279,7 @@ unless -e or -v is specified: in these cases, -o must be specified."""
     # generate output with correctness checker, if desired
     mst_weight = -1
     if options.correctness:
-        if not auto_out:
-            print >> sys.stderr, "warning: skipping correctness output (only done when -f is not specified)"
-            return
-        elif options.dont_track:
+        if options.dont_track:
             print >> sys.stderr, "warning: skipping correctness output (only done when -t is not specified)"
             return
 
