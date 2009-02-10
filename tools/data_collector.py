@@ -15,8 +15,10 @@ def get_num_runs_missing_for_data(results, inpt, num_desired_runs):
     return 0
 
 def collect_missing_correctness_data(inpt, rev, first_run_id, num_runs):
+    # use a for-loop here b/c run_test only does -c on the first run it is called
     gen = inpt.make_args_for_generate_input()
-    cmd = 'run_test.py -g "%s" -r %s -n %u -c -x -t %u' % (gen, rev, num_runs, first_run_id)
+    for i in range(num_runs):
+        cmd = 'run_test.py -g "%s" -r %s -n 1 -c -x -t %u' % (gen, rev, first_run_id+1)
     ret = os.system(get_path_to_tools_root() + cmd)
     return ret == 0
 
@@ -28,7 +30,7 @@ def collect_missing_performance_data(inpt, rev, first_run_id, num_runs):
 
 def collect_missing_weight_data(inpt, _, first_run_id, num_runs):
     gen = inpt.make_args_for_generate_input()
-    cmd = 'run_test.py -g "%s" -n %s -t %u' % (gen, num_runs, first_run_id)
+    cmd = 'run_test.py -g "%s" -n %u -t %u' % (gen, num_runs, first_run_id)
     ret = os.system(get_path_to_tools_root() + cmd)
     return ret == 0
 
