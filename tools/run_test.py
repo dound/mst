@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from check_output import check, CheckerError
+from data import CORRECT, INCORRECT
 from generate_input import main as generate_input
 from mstutil import get_path_to_mst_binary, get_path_to_tools_root, quiet_remove, random_tmp_filename
 from optparse import OptionParser
@@ -154,19 +156,16 @@ computation only):
     # do the first run (and check the output if requested)
     test_mst(is_test_perf, mst_binary, input_graph, out, not options.dont_log)
     if options.check:
-        if options.dont_log_any:
-            log_opt = "-x"
-        else:
-            log_opt = ""
-        cmd = "check_output.py -i %s %s %s" % (input_graph, log_opt, out)
-        ret = os.system(get_path_to_tools_root() + cmd)
-    else:
-        ret = 0
+        rev = None if options.rev is "" else options.rev
+        run = None if options.trial_num < 0 else options.trial_num
+        try:
+            ret = check(input_graph, out, 0.1, False, rev, run)
+        except CheckerError, e:
+            ret = INCORRECT
 
-    # exit if checking failed
-    if ret != 0:
-        print "error: check failed (bailing out)"
-        __cleanup_and_exit(ret)
+        if ret != CORRECT:
+            print "run_test error: check failed: " + e
+            __cleanup_and_exit(-1)
 
     # remaining runs, if any
     for _ in range(options.num_runs-1):
