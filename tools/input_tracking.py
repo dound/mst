@@ -62,7 +62,7 @@ def get_tracked_input_fn(precision, dimensionality, min_val, max_val):
         else:
             logbasename = 'other-redge.inputs'
     else:
-        if may_be_part2_input:
+        if may_be_part2_input and dimensionality>=2 and dimensionality<=4:
             logbasename = 'p2-rvert-%ud.inputs' % dimensionality
         else:
             logbasename = 'other-rvert.inputs'
@@ -122,3 +122,4 @@ def track_input(precision, dimensionality, min_val, max_val, num_verts, num_edge
         changed = True
     if changed:
         save_tracked_inputs(logfn, inputs)
+    return logfn
