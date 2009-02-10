@@ -40,7 +40,7 @@ def __generate_input_graph(argstr):
     try:
         errstr = "unknown error"
         ret = generate_input(args)
-    except errstr:
+    except Exception, errstr:
         ret = -1
     if ret != 0:
         print 'error: aborting test (input generation failed): %s: %s' % (errstr, argstr)
@@ -81,9 +81,9 @@ computation only):
     parser.add_option("-x", "--dont-log",
                       action="store_true", default=False,
                       help="do not log the result")
-    parser.add_option("-X", "--dont-log-any",
-                      action="store_true", default=False,
-                      help="do not log the result for this or for checking")
+    parser.add_option("-t", "--trial-num",
+                      type="int", default=-1,
+                      help="run/trial identifier [default: do not log the trial, so ignore it]")
 
     (options, args) = parser.parse_args()
     if len(args) > 0:
@@ -122,7 +122,7 @@ computation only):
     if options.num_runs < 1:
         parser.error("-n must be at least 1")
 
-    if options.dont_log_any:
+    if options.trial_num < 0:
         options.dont_log = True
 
     # get the mst binary we want to test with
@@ -130,7 +130,7 @@ computation only):
     __files_to_cleanup.append(mst_binary)
     if options.rev is None:
         options.dont_log = True  # no logging allowed on binaries which aren't checked in to the repo
-        options.dont_log_any = True
+        options.trial_num = -1
         options.rev = ""         # tells the script to just use the current revision
     cmd = 'copy_and_build_from_rev.sh %s %s %s' % (get_path_to_mst_binary(), mst_binary, options.rev)
     if options.quiet:
