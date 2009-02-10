@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from check_output import CheckerError, compute_mst_weight
-from input_tracking import track_input
+from input_tracking import track_input, TrackedInput
 from math import sqrt
 from mstutil import die, get_path_to_generated_inputs
 from optparse import OptionGroup, OptionParser
@@ -9,7 +9,7 @@ from os import urandom
 from random import Random
 from struct import unpack
 from time import strftime
-import heapq, os, sys
+import heapq, os, re, sys
 
 __RND_SEED = None
 __rnd = None
@@ -26,6 +26,41 @@ def print_input_footer(num_verts, num_edges, about, out):
     num_edge_choices = edges_in_complete_undirected_graph(num_verts) - min_edges
     density = float(num_edges_scaled) / num_edge_choices
     print >> out, '# %s: %s density=%.2f' % (strftime('%A %Y-%b-%d at %H:%M:%S'), about, density)
+
+class ExtractInputFooterError:
+    def __init__(self, msg):
+        self.msg = msg
+    def __str__(self):
+        return self.msg
+
+def __re_get_group(pattern, haystack, group_num=0):
+    """Returns the value associated with the requested group num in the result
+    from re.search, or raises an ExtractInputFooterError if it does not match"""
+    x = re.search(pattern, haystack)
+    if x is None:
+        return None
+    else:
+        return x.groups()[group_num]
+
+def extract_input_footer(input_graph):
+    """Returns the TrackedInput representing the footer info"""
+    lines = os.popen('tail -n 1 "%s" 2> /dev/null' % input_graph).readlines()
+    if len(lines) == 0:
+        raise ExtractInputFooterError("Failed to extract the footer from " + input_graph)
+    about = lines[0]
+
+    try:
+        num_dims = int(__re_get_group(r'd=(\d*)', about))
+    except ExtractInputFooterError:
+        num_dims = 0
+
+    num_verts = int(__re_get_group(r'm=(\d*)', about))
+    num_edges = int(__re_get_group(r'n=(\d*)', about))
+    min_val = float(__re_get_group(r'min=(\d*.\d*)', about))
+    max_val = float(__re_get_group(r'max=(\d*.\d*)', about))
+    precision = int(__re_get_group(r'prec=(\d*)', about))
+    seed = int(__re_get_group(r'seed=(\d*)', about))
+    return TrackedInput(precision, num_dims, min_val, max_val, num_verts, num_edges, seed)
 
 def edges_in_complete_undirected_graph(num_verts):
     return (num_verts * (num_verts - 1)) / 2
