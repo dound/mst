@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-from mstutil import die, get_path_to_inputs, get_path_to_checker_binary, random_tmp_filename
+from generate_input import ExtractInputFooterError, extract_input_footer
+from input_tracking import get_tracked_input_fn, get_tracked_inputs, save_tracked_inputs
+from mstutil import get_path_to_checker_binary, random_tmp_filename
 from optparse import OptionParser
 import os, sys
 
@@ -10,7 +12,7 @@ class CheckerError(Exception):
     def __str__(self):
         return self.msg
 
-def extract_answer(fn, what):
+def extract_answer(fn):
     """Get the answer from output from either mst or the checker"""
     try:
         fh = open(fn)
@@ -18,48 +20,72 @@ def extract_answer(fn, what):
             ans = float(fh.readline())
             return ans
         except ValueError, e:
-            raise CheckerError("checker error: invalid answer in %s file %s: %s" % (what, fn, e))
+            raise CheckerError("checker error: invalid answer in file %s: %s" % (fn, e))
         fh.close()
     except IOError, errstr:
-        raise CheckerError("checker error: failed to read %s data from %s: %s" % (what, fn, errstr))
+        raise CheckerError("checker error: failed to read data from %s: %s" % (fn, errstr))
 
-def compute_mst_weight(input_graph, what):
+def compute_mst_weight(input_graph):
     """Computes and returns the MST weight of input_graph using the checker"""
     corr_file = random_tmp_filename(10)
     try:
-        w = __compute_mst_weight(input_graph, what, corr_file)
+        w = __compute_mst_weight(input_graph, corr_file)
         os.remove(corr_file)
         return w
     except CheckerError:
         os.remove(corr_file)
         raise
 
-def __compute_mst_weight(input_graph, what, corr_file):
+def __compute_mst_weight(input_graph, corr_file):
     """Internal method to actual compute the MST weight of input_graph"""
     checker = get_path_to_checker_binary(True)
     ret = os.system('%s %s > %s' % (checker, input_graph, corr_file))
     if ret == 0:
-        return extract_answer(corr_file, what)
+        return extract_answer(corr_file)
     else:
-        raise CheckerError("checker error: failed to generate %s output for " + (what, input_graph))
+        raise CheckerError("checker error: failed to generate output for " + input_graph)
 
-def check(input_graph, output_to_test, tolerance, verbose, do_log):
-    print "check '%s' with solution '%s' based on input '%s' (verbose=%s, log=%s)" % \
-        (output_to_test, output_correct, input_graph, str(verbose), str(do_log))
+def get_and_log_mst_weight_from_checker(input_graph, force_recompute=False):
+    """Returns the weight of input_graph's MST according to the checker.  If
+    force_recompute is not True, then it will check the input log cache to see
+    if we already know the answer first.  Logs the result."""
+    try:
+        ti = extract_input_footer(input_graph)
+    except ExtractInputFooterError, e:
+        raise CheckerError("checker error: unable to extract the input footer for %s: %s" % (input_graph, e))
 
-    corr_file = get_path_to_inputs() + 'corr/%s' % os.path.basename(input_graph)
+    # load in the inputs in the category of input_graph
+    logfn = get_tracked_input_fn(ti.precision, ti.dimensionality, ti.min, ti.max)
+    inputs = get_tracked_inputs(logfn)
+    if inputs.has_key(ti):
+        ti = inputs[ti]
+        do_log = True
+    else:
+        # if we weren't tracking the input before, don't start now
+        do_log = False
 
-    # make the correctness file which caches the right answer if it does not exist
-    if not os.path.exists(corr_file):
-        checker = get_path_to_checker_binary(True)
-        if os.system('%s %s > %s' % (checker, input_graph, corr_file)) != 0:
-            die("check_output.py: error: failed to generate new correctness data for " + input_graph)
+    # see if we already know the answer
+    if not force_recompute:
+        if ti.mst_weight >= 0:
+            return ti.mst_weight  # cache hit!
 
-    # get the output answers
-    ans_corr = extract_answer(corr_file, 'correctness')
-    ans_out = extract_answer(output_to_test, 'output file being tested')
+    # compute the answer and (if specified) save it
+    w = compute_mst_weight(input_graph, 'correctness')
+    if do_log:
+        ti.update_mst_weight(w)
+        save_tracked_inputs(logfn, inputs)
+    return w
 
-    # are the same?
+def check(input_graph, output_to_test, tolerance, force_recompute, do_log):
+    """Checks whether the MST weight of input_graph matches output_to_test to
+    the specified tolerance.
+    @param force_recompute  whether the checker's MST weight can come from cache
+    @param do_log           whether to log the result of the correctness check
+    """
+    ans_out = extract_answer(output_to_test)
+    ans_corr = get_and_log_mst_weight_from_checker(input_graph, force_recompute, do_log)
+
+    # are they the same?
     fmt = '%.' + tolerance + 'f'
     str_ans_corr = fmt % ans_corr
     str_ans_out = fmt % ans_out
@@ -70,43 +96,33 @@ def check(input_graph, output_to_test, tolerance, verbose, do_log):
         code = -1
 
     # log the result of the correctness check
-    # TODO ...
+    if do_log:
+        pass # TODO
 
-def main():
-    usage = """usage: %prog [options] OUTPUT_TO_CHECK
+def main(argv=sys.argv[1:]):
+    usage = """usage: %prog [options] INPUT_GRAPH OUTPUT_TO_CHECK
 Checks the validity of an MST.  Exits with code 0 on success.  Otherwise, it
 prints an error message and exits with a non-zero code."""
     parser = OptionParser(usage)
-    parser.add_option("-i", "--input_graph",
-                      metavar="FILE",
-                      help="the input graph which corresponds to these outputs")
-    parser.add_option("-q", "--quick",
+    parser.add_option("-f", "--force-recompute",
                       action="store_true", default=False,
-                      help="only check the output MST weight (implied if INPUT is omitted)")
+                      help="recomputes the MST weight with the checker even if we have a cached value")
     parser.add_option("-t", "--tolerance",
                       type="int", default=1,
                       help="number of decimal places of the weight check which must match exactly [default: %default]")
-    parser.add_option("-v", "--verbose",
-                      action="store_true", default=False,
-                      help="if the output is incorrect this will print a detailed explanation")
     parser.add_option("-x", "--dont-log",
                       action="store_true", default=False,
                       help="do not log the result")
 
-    (options, args) = parser.parse_args()
-    if len(args) < 1:
-        parser.error("missing argument: OUTPUT_TO_CHECK is required")
-    elif len(args) > 1:
+    (options, args) = parser.parse_args(argv)
+    if len(args) < 2:
+        parser.error("missing argument: INPUT_GRAPH and OUTPUT_TO_CHECK is required")
+    elif len(args) > 2:
         parser.error("too many arguments")
 
-    output_to_test = args[0]
-
-    if not options.quick:
-        input_graph = options.input_graph
-    else:
-        input_graph = None
-
-    check(input_graph, output_to_test, options.tolerance, options.verbose, not options.dont_log)
+    input_graph = args[0]
+    output_to_test = args[1]
+    return check(input_graph, output_to_test, options.tolerance, options.force_recompute, not options.dont_log)
 
 if __name__ == "__main__":
     sys.exit(main())

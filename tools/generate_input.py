@@ -337,7 +337,7 @@ used.)"""
             print >> sys.stderr, "warning: skipping correctness output (only done when -t is not specified)"
             return 0
         try:
-            mst_weight = compute_mst_weight(options.output_file, "correctness")
+            mst_weight = compute_mst_weight(options.output_file)
         except CheckerError, e:
             print >> sys.stderr, e
 
