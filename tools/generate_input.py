@@ -2,7 +2,7 @@
 
 from math import sqrt
 from input_tracking import track_input
-from mstutil import die, get_path_to_generated_inputs, get_path_to_checker_binary, random_filename, random_tmp_filename
+from mstutil import die, get_path_to_generated_inputs, get_path_to_checker_binary, random_tmp_filename
 from optparse import OptionGroup, OptionParser
 from os import urandom
 from random import Random
@@ -139,7 +139,7 @@ def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos
     return "m=%d n=%d d=%d min=%.1f max=%.1f prec=%d seed=%s" % (num_verts, num_edges, num_dims,
                                                                  min_pos, max_pos, precision, str(__RND_SEED))
 
-def main():
+def main(argv=sys.argv[1:]):
     usage = """usage: %prog [options] NUM_VERTICES
 Generates a connected graph with no self-loops or parallel edges.  Output is
 sent to the default filename (""" + get_path_to_generated_inputs() + """/with
@@ -149,6 +149,9 @@ used.)"""
     parser.add_option("-c", "--correctness",
                       action="store_true", default=False,
                       help="generate the output with the correctness checker")
+    parser.add_option("-m", "--may-use-existing",
+                      action="store_true", default=False,
+                      help="will not generate a new graph if the output file already exists")
     parser.add_option("-n", "--num-edges",
                       help="number of edges to put in the graph [default: complete graph]")
     parser.add_option("-o", "--output-file",
@@ -177,7 +180,7 @@ used.)"""
                      help="dimensionality of vertex positions and the range of each dimension (range inclusive) [not used by default; mutually exclusive with -e]")
     parser.add_option_group(group)
 
-    (options, args) = parser.parse_args()
+    (options, args) = parser.parse_args(argv)
     if len(args) < 1:
         parser.error("missing NUM_VERTICES")
     elif len(args) > 1:
@@ -232,7 +235,7 @@ used.)"""
     if options.output_file is None:
         path = get_path_to_generated_inputs()
         if options.vertex_pos_range or options.edge_weight_range:
-            options.output_file = path + random_filename(10) + '.g'
+            options.output_file = path + 'other-' + str(__RND_SEED) + '.g'
         else:
             options.output_file = path + '%s%u-%u-%s.g' % (style_str, num_verts, num_edges, str(__RND_SEED))
 
@@ -240,6 +243,9 @@ used.)"""
     if options.output_file == 'stdout':
         out = sys.stdout
     else:
+        if options.may_use_existing and os.path.exists(options.output_file):
+            print_if_not_quiet('skipping input generation: %s already exists' % options.output_file)
+            return
         try:
             out = open(options.output_file, 'w')
         except IOError, errstr:
