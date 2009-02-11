@@ -217,8 +217,7 @@ computation only):
         if out_is_temporary:
             quiet_remove(out)
         if ret != CORRECT:
-            print '%s ===> INCORRECT *** CORRECTNESS FAILED'
-            __cleanup_and_exit(-1)
+            __cleanup_and_exit(-1)  # incorrectness already reported by check()
         else:
             print '%s ===> CORRECT'
 
