@@ -6,6 +6,7 @@ from data import extract_input_footer, ExtractInputFooterError, ppinput
 from generate_input import main as generate_input, is_input_for_part2
 from mstutil import get_path_to_mst_binary, get_path_to_tools_root, quiet_remove, random_tmp_filename
 from optparse import OptionParser
+from socket import gethostname
 import os, sys
 
 # include-with-submit # note: this file has been automatically altered for submission to reduce dependencies
@@ -13,20 +14,28 @@ import os, sys
 # include-with-submit get_path_to_tools_root = lambda : './'
 
 def print_benchmark(input_graph, out, rev, trial_num, for_time):
+    """Returns whether time may be logged."""
     msg = "benchmarking %s (rev=" % input_graph
     msg += 'current' if rev == '' else rev
     msg += ', '
+    ret = True
     if not for_time:
         msg += 'logging weight'
     elif trial_num is None or trial_num < 0:
         msg += 'not logging result'
     else:
-        msg += 'logging time for trial %u' % trial_num
+        if gethostname()[:4] == 'myth':
+            msg += 'logging time for trial %u' % trial_num
+        else:
+            msg += 'cannot log performance on %s (myth only test)' % gethostname()
+            ret = False
     print msg + ', out=%s)' % out
+    return ret
 
 def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
     rel_input_graph = ppinput(input_graph)
-    print_benchmark(rel_input_graph, out, rev, trial_num, for_time)
+    if not print_benchmark(rel_input_graph, out, rev, trial_num, for_time):
+        trial_num = -1  # cancel logging
 
     # determine how to save the output
     kill_out = False
