@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from check_output import CheckerError, compute_mst_weight
-from data import DataSet, InputSolution
+from data import DataSet, InputSolution, ppinput
 from math import sqrt
 from mstutil import die, get_path_to_generated_inputs
 from optparse import OptionGroup, OptionParser
@@ -252,10 +252,8 @@ used.)"""
     else:
         if options.may_use_existing:
             if os.path.exists(options.output_file):
-                print_if_not_quiet('skipping input generation: %s already exists' % options.output_file)
+                print_if_not_quiet('skipping input generation: %s already exists' % ppinput(options.output_file))
                 return 0
-            else:
-                print_if_not_quiet('generating input: %s' % options.output_file)
         try:
             out = open(options.output_file, 'w')
         except IOError, errstr:
@@ -301,7 +299,7 @@ used.)"""
         max_val = max_edge_len
 
     print_input_footer(num_verts, num_edges, about, out)
-    print_if_not_quiet('graph saved to ' + options.output_file)
+    print_if_not_quiet('graph saved to ' + ppinput(options.output_file))
     if out != sys.stdout:
         out.close()
 

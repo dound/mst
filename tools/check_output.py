@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from data import DataError, DataSet, InputSolution, CorrResult, CORRECT, INCORRECT
-from data import extract_input_footer, ExtractInputFooterError
+from data import extract_input_footer, ExtractInputFooterError, ppinput
 from mstutil import get_path_to_checker_binary, random_tmp_filename
 from optparse import OptionParser
 import os, sys
@@ -43,7 +43,7 @@ def __compute_mst_weight(input_graph, corr_file):
     if ret == 0:
         return extract_answer(corr_file)
     else:
-        raise CheckerError("checker error: failed to generate output for " + input_graph)
+        raise CheckerError("checker error: failed to generate output for " + ppinput(input_graph))
 
 def get_and_log_mst_weight_from_checker(input_graph, force_recompute=False, inputslogfn=None):
     """Returns the a 2-tuple of (input, weight).  If force_recompute is not
@@ -52,7 +52,7 @@ def get_and_log_mst_weight_from_checker(input_graph, force_recompute=False, inpu
     try:
         ti = extract_input_footer(input_graph)
     except ExtractInputFooterError, e:
-        raise CheckerError("checker error: unable to extract the input footer for %s: %s" % (input_graph, e))
+        raise CheckerError("checker error: unable to extract the input footer for %s: %s" % (ppinput(input_graph), e))
 
     # load in the inputs in the category of input_graph
     if inputslogfn is None:
@@ -97,7 +97,7 @@ def check(input_graph, output_to_test, tolerance, force_recompute, rev=None, run
     if str_ans_corr == str_ans_out:
         outcome = CORRECT
     else:
-        print >> sys.stderr, "correctness FAILED: %s (correct is %s, output had %s)" % (input_graph, str_ans_corr, str_ans_out)
+        print >> sys.stderr, "correctness FAILED: %s (correct is %s, output had %s)" % (ppinput(input_graph), str_ans_corr, str_ans_out)
         outcome = INCORRECT
 
     # log the result of the correctness check
@@ -108,7 +108,7 @@ def check(input_graph, output_to_test, tolerance, force_recompute, rev=None, run
             print 'logged correctness result to ' + data.get_path()
         except DataError, e:
             fmt = "Unable to log result to file %s (correct is %s, output had %s): %s"
-            print >> sys.stderr, fmt % (input_graph, str_ans_corr, str_ans_out, e)
+            print >> sys.stderr, fmt % (ppinput(input_graph), str_ans_corr, str_ans_out, e)
 
     return (0 if outcome==CORRECT else -1)
 

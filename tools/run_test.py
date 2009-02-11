@@ -2,7 +2,7 @@
 
 from check_output import check, CheckerError, extract_answer
 from data import DataError, DataSet, PerfResult, WeightResult, CORRECT, INCORRECT
-from data import extract_input_footer, ExtractInputFooterError
+from data import extract_input_footer, ExtractInputFooterError, ppinput
 from generate_input import main as generate_input
 from mstutil import get_path_to_mst_binary, get_path_to_tools_root, quiet_remove, random_tmp_filename
 from optparse import OptionParser
@@ -13,7 +13,7 @@ import os, sys
 # include-with-submit get_path_to_tools_root = lambda : './'
 
 def print_benchmark(input_graph, out, rev, trial_num, for_time):
-    str = "benchmarking '%s' (rev=" % input_graph
+    str = "benchmarking %s (rev=" % input_graph
     str += 'current' if rev == '' else rev
     str += ', '
     if trial_num is None or trial_num < 0:
@@ -24,7 +24,8 @@ def print_benchmark(input_graph, out, rev, trial_num, for_time):
     print str + ', out=%s)' % out
 
 def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
-    print_benchmark(input_graph, out, rev, trial_num, for_time)
+    rel_input_graph = ppinput(input_graph)
+    print_benchmark(rel_input_graph, out, rev, trial_num, for_time)
 
     # run mst (and time it)
     time_file = random_tmp_filename(10, 'time')
@@ -60,7 +61,7 @@ def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
     try:
         ti = extract_input_footer(input_graph)
     except ExtractInputFooterError, e:
-        raise CheckerError("run test error: unable to extract the input footer for %s: %s" % (input_graph, e))
+        raise CheckerError("run test error: unable to extract the input footer for %s: %s" % (rel_input_graph, e))
 
     # log the result
     if for_time:
