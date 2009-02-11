@@ -133,6 +133,10 @@ class Input:
         return fmt % (str(self.prec), self.dims, str(self.min), str(self.max),
                       self.num_verts, self.num_edges, str(self.seed))
 
+    @staticmethod
+    def header_row():
+        return "#Prec\tDim\tMin\tMax     \t|V|\t|E|\tSeed"
+
 class AbstractData:
     def __init__(self, prec, dims, min_val, max_val, num_verts, num_edges, seed):
         self.__input = Input(prec, dims, min_val, max_val, num_verts, num_edges, seed)

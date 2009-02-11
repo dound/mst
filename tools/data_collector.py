@@ -180,16 +180,17 @@ def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_ru
             if n > 0:
                 msg = None
                 if collect_missing_data is None:
-                    missing_none = False
                     msg = 'missing'
                 elif not collect_missing_data(i, rev, num_runs-n, n):
-                    missing_none = False
                     msg = 'failed to collect'
                 if msg is not None:
+                    if missing_none:
+                        print 'What\tRev\tLeft\t' + i.header_row()[1:]
+                        missing_none = False
                     if rev is None:
-                        print '%s: %s runsLeft=%u' % (msg, str(i)[root_len:], n)
+                        print '%s\tn/a\t%u\t%s' % (msg, n, str(i))
                     else:
-                        print '%s: %s rev=%s runsLeft=%u' % (msg, str(i)[root_len:], rev, n)
+                        print '%s\t%s\t%u\t%s' % (msg, rev, n, str(i))
 
     return missing_none
 
