@@ -214,10 +214,9 @@ computation only):
         run = None if options.trial_num < 0 else options.trial_num
         try:
             ret = check(input_graph, out, 1, False, rev, run, options.inputs_list_file)
-            errmsg = ''
         except CheckerError, e:
             ret = INCORRECT
-            errmsg = ': ' + str(e)
+            print >> sys.stderr, str(e)
 
         if out_is_temporary:
             quiet_remove(out)
