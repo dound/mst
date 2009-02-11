@@ -27,7 +27,7 @@ def extract_answer(fn):
 
 def compute_mst_weight(input_graph):
     """Computes and returns the MST weight of input_graph using the checker"""
-    corr_file = random_tmp_filename(10)
+    corr_file = random_tmp_filename(10, 'corr')
     try:
         w = __compute_mst_weight(input_graph, corr_file)
         os.remove(corr_file)

@@ -16,7 +16,7 @@ def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
     print "benchmarking '%s' (rev=%s, trial=%u, out=%s)" % (input_graph, rev, trial_num, out)
 
     # run mst (and time it)
-    time_file = random_tmp_filename(10)
+    time_file = random_tmp_filename(10, 'time')
     cmd = '/usr/bin/time -f %%U -o %s %s %s > %s' % (time_file, mst_binary, input_graph, out)
     ret = os.system(cmd)
     if ret != 0:
@@ -81,7 +81,7 @@ def __cleanup_and_exit(code=0):
 def __generate_input_graph(argstr):
     """Generate a graph from the specified string of arguments and return the file it is saved in."""
     global __input_graph_to_cleanup
-    input_graph = random_tmp_filename(10)
+    input_graph = random_tmp_filename(10, 'input')
     __input_graph_to_cleanup = input_graph
     args = (argstr + ' -mqto ' + input_graph).split()
 
@@ -174,7 +174,7 @@ computation only):
         options.dont_log = True
 
     # get the mst binary we want to test with
-    mst_binary = random_tmp_filename(10)
+    mst_binary = random_tmp_filename(10, 'mst')
     __files_to_cleanup.append(mst_binary)
     if options.rev is None:
         options.dont_log = True  # no logging allowed on binaries which aren't checked in to the repo
@@ -196,7 +196,7 @@ computation only):
         out_is_temporary = False
     else:
         if options.check:
-            out = random_tmp_filename(10)
+            out = random_tmp_filename(10, 'out-for-checker')
             __files_to_cleanup.append(out)
             out_is_temporary = True
         else:

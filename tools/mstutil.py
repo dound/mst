@@ -60,9 +60,10 @@ def is_mst_binary_accessible():
     """Returns whether the mst solver binary can be accessed."""
     return os.access(get_path_to_mst_binary(), os.R_OK | os.X_OK)
 
-def random_tmp_filename(sz):
+def random_tmp_filename(sz, prefix=None):
     """Returns a random filename in the /tmp folder prefixed with 'dgu-'."""
-    return "/tmp/dgu-" + random_filename(sz)
+    prefix = '' if prefix is None else prefix+'-'
+    return "/tmp/dgu-" + prefix + random_filename(sz)
 
 def random_filename(sz):
     """Returns a random string of the specified length composed of letters and/or numbers."""
