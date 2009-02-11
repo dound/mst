@@ -318,9 +318,9 @@ class PerfResult(AbstractResult):
 
     @staticmethod
     def from_list(lst):
-        if(len(lst) != 5):
-            raise DataError('PerfResult expected 5 args, got %u: %s' % (len(lst), str(lst)))
-        return PerfResult(lst[0], lst[1], lst[2], lst[3], lst[4])
+        if(len(lst) != 6):
+            raise DataError('PerfResult expected 6 args, got %u: %s' % (len(lst), str(lst)))
+        return PerfResult(lst[0], lst[1], lst[2], lst[3], lst[4], lst[5])
 
     @staticmethod
     def get_path_to(rev):
@@ -356,9 +356,9 @@ class WeightResult(AbstractResult):
 
     @staticmethod
     def from_list(lst):
-        if(len(lst) != 5):
-            raise DataError('WeightResult expected 5 args, got %u: %s' % (len(lst), str(lst)))
-        return WeightResult(lst[0], lst[1], lst[2], lst[3], lst[4])
+        if(len(lst) != 6):
+            raise DataError('WeightResult expected 6 args, got %u: %s' % (len(lst), str(lst)))
+        return WeightResult(lst[0], lst[1], lst[2], lst[3], lst[4], lst[5])
 
     @staticmethod
     def get_path_to(wtype):
