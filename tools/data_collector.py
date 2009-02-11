@@ -61,16 +61,19 @@ Searches for missing results and uses run_test.py to collect it."""
     group.add_option("-c", "--correctness",
                       action="store_true", default=False,
                       help="collect correctness data")
-    group.add_option("-v", "--num_vertices",
+    parser.add_option_group(group)
+
+    group2 = OptionGroup(parser, "Weight (Part II) Data Collection Options")
+    group2.add_option("-v", "--num_vertices",
                       metavar="V", type="int", default=0,
                       help="collect weight data for V vertices (requires -d or -e)")
-    group.add_option("-d", "--dimensionality",
+    group2.add_option("-d", "--dims",
                       metavar="D", type="int", default=0,
                       help="collect weight data for randomly positioned vertices in D-dimensional space (requires -v)")
-    group.add_option("-e", "--edge",
+    group2.add_option("-e", "--edge",
                       action="store_true", default=False,
                       help="collect weight data for random uniform edge weights in the range (0, 1] (requires -v)")
-    parser.add_option_group(group)
+    parser.add_option_group(group2)
 
     (options, args) = parser.parse_args()
     if len(args) > 0:
@@ -86,9 +89,9 @@ Searches for missing results and uses run_test.py to collect it."""
         if options.input_graph or options.inputs_list_file:
             parser.error('-i, -l, and -v are mutually exclusive')
 
-        if options.dimensionality > 0:
+        if options.dims > 0:
             num_on += 1
-            wtype = 'loc%u' % options.dimensionality
+            wtype = 'loc%u' % options.dims
 
         if options.edge:
             num_on += 1
@@ -97,12 +100,12 @@ Searches for missing results and uses run_test.py to collect it."""
         if num_on == 0:
             parser.error('-v requires either -d or -e be specified too')
 
-        input_path = InputSolution.get_path_to(15, options.dimensionality, 0.0, 1.0)
+        input_path = InputSolution.get_path_to(15, options.dims, 0.0, 1.0)
         input_solns = DataSet.read_from_file(InputSolution, input_path)
         revs = [None] # not revision-specific (assuming our alg is correct)
         get_results_for_rev = lambda _ : DataSet.read_from_file(WeightResult, WeightResult.get_path_to(wtype))
         collect_missing_data = collect_missing_weight_data
-    elif options.dimensionality > 0 or options.edge:
+    elif options.dims > 0 or options.edge:
         parser.error('-v is required whenever -d or -e is used')
 
     # handle -i, -l: collect data for a particular graph(s)
