@@ -205,7 +205,7 @@ computation only):
         rev = None if options.rev is "" else options.rev
         run = None if options.trial_num < 0 else options.trial_num
         try:
-            ret = check(input_graph, out, 0.1, False, rev, run)
+            ret = check(input_graph, out, 1, False, rev, run)
             errmsg = ''
         except CheckerError, e:
             ret = INCORRECT
