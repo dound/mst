@@ -85,7 +85,9 @@ Searches for missing results and uses run_test.py to collect it."""
 
     # prepare for a weight data collection
     num_on = 0
+    weight_test = False
     if options.num_vertices > 0:
+        weight_test = True
         if options.input_graph or options.inputs_list_file:
             parser.error('-i, -l, and -v are mutually exclusive')
 
@@ -149,23 +151,28 @@ Searches for missing results and uses run_test.py to collect it."""
             else:
                 revs = [options.rev]
         else:
-            revs = [None] # just use the current revision
+            revs = ['current'] # just use the current revision
 
     # pull out just the Input object (results are keyed on these, not InputSolution)
     inputs = [i.input() for i in input_solns.dataset.values()]
 
     # collect the data!
     what_to_do = None if options.list_only else collect_missing_data
-    if collect_data(revs, get_results_for_rev, inputs, what_to_do, options.num_runs):
+    if collect_data(revs, get_results_for_rev, inputs, what_to_do, options.num_runs, weight_test):
         print 'All requested data has been collected!'
 
-def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_runs):
+def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_runs, weight_test):
     root_len = len(get_path_to_project_root())
     missing_none = True
     for rev in revs:
         # load info about the results we have to far for this rev
         try:
-            results = get_results_for_rev(rev)  # results is an [DataSet]
+            if rev == 'current' and not weight_test:
+                # current rev tracks no results for non-weight data collection
+                results = {}
+            else:
+                # get the previously results collected for this revision and test
+                results = get_results_for_rev(rev).dataset
         except DataError, e:
             missing_none = False
             if rev is None:
