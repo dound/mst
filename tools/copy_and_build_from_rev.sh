@@ -48,7 +48,7 @@ fi
 
 # build and copy the binary
 name=`basename $src`
-make -C $dir $name
+make -C $dir $name > /dev/null
 cp $src $dst
 
 if [ $# -eq 3 ]; then
