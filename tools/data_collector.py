@@ -2,10 +2,13 @@
 
 from data import DataError, DataSet, InputSolution, CorrResult, PerfResult, WeightResult, get_tracked_revs
 from data import extract_input_footer, ExtractInputFooterError
-from mstutil import get_path_to_project_root, get_path_to_tools_root
+from mstutil import get_path_to_tools_root
 
 from optparse import OptionGroup, OptionParser
 import os, sys
+
+REV_SEP   = '**************************************************\n****************** NEW REVISION ******************'
+INPUT_SEP = '--------------------------------------------------'
 
 def get_num_runs_missing_for_data(results, inpt, num_desired_runs):
     """Returns the number of values left to be collected."""
@@ -15,22 +18,28 @@ def get_num_runs_missing_for_data(results, inpt, num_desired_runs):
             return num_desired_runs - i
     return 0
 
+def collect_missing_prep(inpt):
+    print INPUT_SEP
+    return inpt.make_args_for_generate_input() + ' --may-use-existing'
+
 def collect_missing_correctness_data(inpt, rev, first_run_id, num_runs, inputs_list_file_arg):
     # use a for-loop here b/c run_test only does -c on the first run it is called
-    gen = inpt.make_args_for_generate_input() + ' --may-use-existing'
-    for _ in range(num_runs):
+    gen = collect_missing_prep(inpt)
+    for i in range(num_runs):
+        if i != 0:
+            print ''
         cmd = 'run_test.py -g "%s" -r %s -n 1 -C -x -t %u%s' % (gen, rev, first_run_id+1, inputs_list_file_arg)
-    ret = os.system(get_path_to_tools_root() + cmd)
+        ret = os.system(get_path_to_tools_root() + cmd)
     return ret == 0
 
 def collect_missing_performance_data(inpt, rev, first_run_id, num_runs):
-    gen = inpt.make_args_for_generate_input() + ' --may-use-existing'
+    gen = collect_missing_prep(inpt)
     cmd = 'run_test.py -g "%s" -r %s -n %u -t %u' % (gen, rev, num_runs, first_run_id)
     ret = os.system(get_path_to_tools_root() + cmd)
     return ret == 0
 
 def collect_missing_weight_data(inpt, _, first_run_id, num_runs):
-    gen = inpt.make_args_for_generate_input() + ' --may-use-existing'
+    gen = collect_missing_prep(inpt)
     cmd = 'run_test.py -g "%s" -n %u -t %u' % (gen, num_runs, first_run_id)
     ret = os.system(get_path_to_tools_root() + cmd)
     return ret == 0
@@ -162,8 +171,8 @@ Searches for missing results and uses run_test.py to collect it."""
         print 'All requested data has been collected!'
 
 def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_runs, weight_test):
-    root_len = len(get_path_to_project_root())
     missing_none = True
+    first = True
     out = ""
     for rev in revs:
         # load info about the results we have to far for this rev
@@ -174,6 +183,10 @@ def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_ru
             else:
                 # get the previously results collected for this revision and test
                 results = get_results_for_rev(rev).dataset
+            if first:
+                first = False
+            else:
+                print REV_SEP
         except DataError, e:
             missing_none = False
             if rev is None:
@@ -199,6 +212,7 @@ def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_ru
                         out += '\n%s\tn/a\t%u\t%s' % (msg, n, str(i))
                     else:
                         out += '\n%s\t%s\t%u\t%s' % (msg, rev, n, str(i))
+    print INPUT_SEP
     if out != '':
         print out
     return missing_none

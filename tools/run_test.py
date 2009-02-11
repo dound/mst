@@ -259,13 +259,15 @@ computation only):
 
         if out_is_temporary:
             quiet_remove(out)
+
         if ret != CORRECT:
             __cleanup_and_exit(check_fail_exit_code)  # incorrectness already reported by check()
         else:
-            print '%s ===> CORRECT'
+            print 'Correct - output checks out!'
 
     # remaining runs, if any
     for _ in range(options.num_runs-1):
+        print '' # empty line
         if options.trial_num >= 0:
             options.trial_num += 1
         if gen_input_args is not None:
