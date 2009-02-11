@@ -3,7 +3,7 @@
 from check_output import check, CheckerError, extract_answer
 from data import DataError, DataSet, PerfResult, WeightResult, CORRECT, INCORRECT
 from data import extract_input_footer, ExtractInputFooterError, ppinput
-from generate_input import main as generate_input
+from generate_input import main as generate_input, is_input_for_part2
 from mstutil import get_path_to_mst_binary, get_path_to_tools_root, quiet_remove, random_tmp_filename
 from optparse import OptionParser
 import os, sys
@@ -196,6 +196,7 @@ computation only):
         # if it was not a special case, just pass the args straight through
         if gen_input_args is None:
             gen_input_args = options.generate_input
+            is_test_perf = not is_input_for_part2(gen_input_args.split())
         else:
             is_test_perf = False
 
