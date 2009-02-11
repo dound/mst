@@ -181,7 +181,7 @@ class InputSolution(AbstractData):
 
     @staticmethod
     def header_row():
-        return "#Prec Dim Min Max |V| |E| Seed"
+        return "#Prec Dim Min Max |V| |E| Seed MSTWeight"
 
     @staticmethod
     def key(prec, dims, min_val, max_val, num_verts, num_edges, seed):
