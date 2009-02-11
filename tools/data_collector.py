@@ -111,7 +111,12 @@ Searches for missing results and uses run_test.py to collect it."""
         if num_on == 0:
             parser.error('-v requires either -d or -e be specified too')
 
+        if options.num_runs > 1:
+            options.num_runs = 1
+            print 'warning: -v truncates the number of runs to 1 (weight should not change b/w runs)'
+
         input_path = InputSolution.get_path_to(15, options.dims, 0.0, 1.0)
+        print 'reading inputs to run on from ' + input_path
         input_solns = DataSet.read_from_file(InputSolution, input_path)
         revs = [None] # not revision-specific (assuming our alg is correct)
         get_results_for_rev = lambda _ : DataSet.read_from_file(WeightResult, WeightResult.get_path_to(wtype))
@@ -167,10 +172,14 @@ Searches for missing results and uses run_test.py to collect it."""
 
     # collect the data!
     what_to_do = None if options.list_only else collect_missing_data
-    if collect_data(revs, get_results_for_rev, inputs, what_to_do, options.num_runs, weight_test):
-        print 'All requested data has been collected!'
+    ret = collect_data(revs, get_results_for_rev, inputs, what_to_do, options.num_runs, weight_test)
+    return 0 if ret else -1
 
 def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_runs, weight_test):
+    total_results_needed = 0
+    results_collected = 0
+    results_missing = 0
+    revision_errors = 0
     missing_none = True
     first = True
     out = ""
@@ -189,7 +198,8 @@ def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_ru
                 print REV_SEP
         except DataError, e:
             missing_none = False
-            if rev is None:
+            revision_errors += 1
+            if rev is None or rev == 'current':
                 print >> sys.stderr, 'skipped data collection: %s' % e
             else:
                 print >> sys.stderr, '%s skipped: %s' % (rev, e)
@@ -197,6 +207,7 @@ def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_ru
 
         # for each input, make sure we have run it on this rev
         for i in inputs: # inputs is an [Input]
+            total_results_needed += num_runs
             n = get_num_runs_missing_for_data(results, i, num_runs)
             if n > 0:
                 msg = None
@@ -204,7 +215,11 @@ def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_ru
                     msg = 'missing'
                 elif not collect_missing_data(i, rev, num_runs-n, n):
                     msg = 'fail'
+                else:
+                    results_collected += n
+
                 if msg is not None:
+                    results_missing += (num_runs - n)
                     if missing_none:
                         out = 'What\tRev\tLeft\t' + i.header_row()[1:]
                         missing_none = False
@@ -215,6 +230,19 @@ def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_ru
     print INPUT_SEP
     if out != '':
         print out
+        print INPUT_SEP
+
+    if results_collected > 0:
+        print 'Collected %u new results' % results_collected
+    if results_missing > 0:
+        print 'Unable to collect %u results' % results_missing
+    if revision_errors > 0:
+        print 'Unable to collect any results for %u revisions' % revision_errors
+    if missing_none:
+        if results_collected == 0:
+            print 'No results to collect'
+        else:
+            print 'All requested data has been collected!'
     return missing_none
 
 if __name__ == "__main__":
