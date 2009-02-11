@@ -16,16 +16,27 @@ def print_benchmark(input_graph, out, rev, trial_num, for_time):
     msg = "benchmarking %s (rev=" % input_graph
     msg += 'current' if rev == '' else rev
     msg += ', '
-    if trial_num is None or trial_num < 0:
+    if not for_time:
+        msg += 'logging weight'
+    elif trial_num is None or trial_num < 0:
         msg += 'not logging result'
     else:
-        what = 'time' if for_time else 'weight'
-        msg += 'logging %s for trial %u' % (what, trial_num)
+        msg += 'logging time for trial %u' % (what, trial_num)
     print msg + ', out=%s)' % out
 
 def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
     rel_input_graph = ppinput(input_graph)
     print_benchmark(rel_input_graph, out, rev, trial_num, for_time)
+
+    # determine how to save the output
+    kill_out = False
+    if for_time or out != '/dev/null':
+        save_cmd = '> ' + out
+    else:
+        # save just the first line of output so we can get the weight
+        out = random_tmp_filename(10, 'weight')
+        save_cmd = '| head -n 1 > ' + out
+        kill_out = True
 
     # run mst (and time it)
     time_file = random_tmp_filename(10, 'time')
@@ -49,12 +60,14 @@ def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
             print >> sys.stderr, "failed to read weight file: " + e
             return
         str_mst_weight = '  mst_weight=' + str(mst_weight)
+        if kill_out:
+            quiet_remove(out) # was a temporary file we created
     else:
         str_mst_weight = ''
 
     # check to see if we are supposed to log the result
-    if trial_num < 0:
-        print ('benchmark result ===> time=%.2f'+str_mst_weight) % time_sec
+    print ('benchmark result ===> time=%.2f'+str_mst_weight) % time_sec
+    if trial_num < 0 and for_time:
         return
 
     # extract properties of the graph
