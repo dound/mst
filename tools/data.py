@@ -133,9 +133,10 @@ class Input:
         return fmt % (str(self.prec), self.dims, str(self.min), str(self.max),
                       self.num_verts, self.num_edges, str(self.seed))
 
-    @staticmethod
-    def header_row():
-        return "#Prec\tDim\tMin\tMax    \t|V|\t|E|\tSeed               "
+    def header_row(self):
+        max_sp_len = len(str(self.max)) - 3
+        max_sp = ' ' * max_sp_len
+        return "#Prec\tDim\tMin\tMax%s\t|V|\t|E|\tSeed               " % max_sp
 
 class AbstractData:
     def __init__(self, prec, dims, min_val, max_val, num_verts, num_edges, seed):
@@ -156,9 +157,8 @@ class AbstractData:
     def __str__(self):
         return self.input().__str__()
 
-    @staticmethod
-    def header_row():
-        return Input.header_row()
+    def header_row(self):
+        return Input.header_row(self.input())
 
 class InputSolution(AbstractData):
     """Data about about how to generate an input and the MST weight of that input (if known)."""
@@ -192,9 +192,8 @@ class InputSolution(AbstractData):
     def __str__(self):
         return AbstractData.__str__(self) + '\t' + str(self.mst_weight)
 
-    @staticmethod
-    def header_row():
-        return AbstractData.header_row() + "\tCorrectMSTWeight"
+    def header_row(self):
+        return AbstractData.header_row(self) + "\tCorrectMSTWeight"
 
     @staticmethod
     def key(prec, dims, min_val, max_val, num_verts, num_edges, seed):
@@ -252,9 +251,8 @@ class AbstractResult(AbstractData):
     def __str__(self):
         return AbstractData.__str__(self) + ('\t%s\t%s' % (self.rev, str(self.run_num)))
 
-    @staticmethod
-    def header_row():
-        return AbstractData.header_row() + "\tRev\tRun#"
+    def header_row(self):
+        return AbstractData.header_row(self) + "\tRev\tRun#"
 
     @staticmethod
     def get_path_to(rev):
@@ -286,9 +284,8 @@ class CorrResult(AbstractResult):
     def __str__(self):
         return AbstractResult.__str__(self) + ('\t%u' % self.corr)
 
-    @staticmethod
-    def header_row():
-        return AbstractResult.header_row() + '\tCorrect?'
+    def header_row(self):
+        return AbstractResult.header_row(self) + '\tCorrect?'
 
     @staticmethod
     def key(dims, min_val, max_val, num_verts, num_edges, seed, run_num, prec=1):
@@ -330,9 +327,8 @@ class PerfResult(AbstractResult):
     def __str__(self):
         return AbstractResult.__str__(self) + ('\t%.1f' % self.time_sec)
 
-    @staticmethod
-    def header_row():
-        return AbstractResult.header_row() + '\tTime(sec)'
+    def header_row(self):
+        return AbstractResult.header_row(self) + '\tTime(sec)'
 
     @staticmethod
     def key(num_verts, num_edges, seed, run_num, prec=1, dims=0, min_val=0, max_val=100000):
@@ -379,9 +375,8 @@ class WeightResult(AbstractResult):
     def __str__(self):
         return AbstractResult.__str__(self) + ('\t%.15f' % self.mst_weight)
 
-    @staticmethod
-    def header_row():
-        return AbstractResult.header_row() + '\tMST Weight'
+    def header_row(self):
+        return AbstractResult.header_row(self) + '\tMST Weight'
 
     @staticmethod
     def key(dims, num_verts, seed, run_num, prec=15, min_val=0, max_val=1, num_edges=None):
