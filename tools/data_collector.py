@@ -15,11 +15,11 @@ def get_num_runs_missing_for_data(results, inpt, num_desired_runs):
             return num_desired_runs - i
     return 0
 
-def collect_missing_correctness_data(inpt, rev, first_run_id, num_runs):
+def collect_missing_correctness_data(inpt, rev, first_run_id, num_runs, inputs_list_file_arg):
     # use a for-loop here b/c run_test only does -c on the first run it is called
     gen = inpt.make_args_for_generate_input()
     for _ in range(num_runs):
-        cmd = 'run_test.py -g "%s" -r %s -n 1 -c -x -t %u' % (gen, rev, first_run_id+1)
+        cmd = 'run_test.py -g "%s" -r %s -n 1 -c -x -t %u%s' % (gen, rev, first_run_id+1, inputs_list_file_arg)
     ret = os.system(get_path_to_tools_root() + cmd)
     return ret == 0
 
@@ -121,7 +121,8 @@ Searches for missing results and uses run_test.py to collect it."""
     if options.correctness:
         num_on += 1
         get_results_for_rev = lambda rev : DataSet.read_from_file(CorrResult, CorrResult.get_path_to(rev))
-        collect_missing_data = collect_missing_correctness_data
+        options.inputs_list_file_arg = '' if options.inputs_list_file is None else ' -l ' + options.inputs_list_file
+        collect_missing_data = lambda x,y,z: collect_missing_correctness_data(x,y,z,options.inputs_list_file_arg)
 
     # make sure no more than 1 type of data collection was specified
     if num_on > 1:

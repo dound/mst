@@ -115,6 +115,9 @@ computation only):
     parser.add_option("-i", "--input-file",
                       metavar="FILE",
                       help="FILE which describes the graph to use as input")
+    parser.add_option("-l", "--inputs-list-file",
+                      metavar="FILE",
+                      help="specifies where to log correctness info (which inputs list log file) [default: inferred]")
     parser.add_option("-n", "--num-runs",
                       metavar="N", type="int", default=1,
                       help="number of runs to execute [default: %default]")
@@ -200,6 +203,8 @@ computation only):
             __files_to_cleanup.append(out)
             out_is_temporary = True
         else:
+            if options.inputs_list_file:
+                print >> sys.stderr, 'warning: -l does nothing unless -c is also specified'
             out = "/dev/null"
 
     # do the first run (and check the output if requested)
@@ -208,7 +213,7 @@ computation only):
         rev = None if options.rev is "" else options.rev
         run = None if options.trial_num < 0 else options.trial_num
         try:
-            ret = check(input_graph, out, 1, False, rev, run)
+            ret = check(input_graph, out, 1, False, rev, run, options.inputs_list_file)
             errmsg = ''
         except CheckerError, e:
             ret = INCORRECT
