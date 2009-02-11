@@ -1,5 +1,5 @@
 from mstutil import compare_float, get_path_to_generated_inputs, get_path_to_project_root, get_path_to_tools_root
-import os, re
+import os, re, sys
 
 # whether to return pretty-printed input paths quickly or with more helpful info
 FAST_INPUT_PATH_PRETTY_PRINT = False
@@ -135,7 +135,7 @@ class Input:
 
     @staticmethod
     def header_row():
-        return "#Prec\tDim\tMin\tMax     \t|V|\t|E|\tSeed"
+        return "#Prec\tDim\tMin\tMax    \t|V|\t|E|\tSeed               "
 
 class AbstractData:
     def __init__(self, prec, dims, min_val, max_val, num_verts, num_edges, seed):
@@ -155,6 +155,10 @@ class AbstractData:
 
     def __str__(self):
         return self.input().__str__()
+
+    @staticmethod
+    def header_row():
+        return Input.header_row()
 
 class InputSolution(AbstractData):
     """Data about about how to generate an input and the MST weight of that input (if known)."""
@@ -190,7 +194,7 @@ class InputSolution(AbstractData):
 
     @staticmethod
     def header_row():
-        return "#Prec\tDim\tMin\tMax     \t|V|\t|E|\tSeed               \tCorrectMSTWeight"
+        return AbstractData.header_row() + "\tCorrectMSTWeight"
 
     @staticmethod
     def key(prec, dims, min_val, max_val, num_verts, num_edges, seed):
@@ -225,6 +229,8 @@ class AbstractResult(AbstractData):
         AbstractData.__init__(self, prec, dims, min_val, max_val, num_verts, num_edges, seed)
         self.rev = str(rev)
         self.run_num = int(run_num)
+        if len(self.rev) == 0:
+            self.rev = 'n/a'
 
     def get_path(self):
         return self.get_path_to(self.rev)
@@ -243,6 +249,13 @@ class AbstractResult(AbstractData):
         else:
             return self.run_num - other.run_num
 
+    def __str__(self):
+        return AbstractData.__str__(self) + ('\t%s\t%s' % (self.rev, str(self.run_num)))
+
+    @staticmethod
+    def header_row():
+        return AbstractData.header_row() + "\tRev\tRun#"
+
     @staticmethod
     def get_path_to(rev):
         raise DataError('get_path_to should be overriden in AbstractResult children')
@@ -251,12 +264,14 @@ CORRECT = int(True)
 INCORRECT = int(False)
 class CorrResult(AbstractResult):
     """Data about an input, a revision, and whether mst correctly found the MST."""
-    def __init__(self, dims, min_val, max_val, num_verts, num_edges, seed, rev, run_num, corr):
-        AbstractResult.__init__(self, 1, dims, min_val, max_val, num_verts, num_edges, seed, rev, run_num)
+    def __init__(self, dims, min_val, max_val, num_verts, num_edges, seed, rev, run_num, corr, prec=1):
+        AbstractResult.__init__(self, prec, dims, min_val, max_val, num_verts, num_edges, seed, rev, run_num)
         corr = int(corr)
         if corr!=CORRECT and corr!=INCORRECT:
             raise ValueError('invalid corr value: ' + str(corr))
         self.corr = corr
+        if self.input().prec != 1:
+            print >> sys.stderr, 'warning: correctness result with precision %u (expected 1)' % self.input().prec
 
     def is_correct(self):
         return self.corr == CORRECT
@@ -269,23 +284,22 @@ class CorrResult(AbstractResult):
             return (0 if self.corr==other.corr else (1 if self.corr else -1))
 
     def __str__(self):
-        i = self.input()
-        return "%s\t%u\t%s\t%s\t%u\t%u\t%s\t%u\t%u" % (str(i.prec), i.dims, str(i.min), str(i.max),
-                                                       i.num_verts, i.num_edges, str(i.seed), self.run_num, int(self.corr))
+        return AbstractResult.__str__(self) + ('\t%u' % self.corr)
 
     @staticmethod
     def header_row():
-        return "#Prec\tDim\tMin\tMax     \t|V|\t|E|\tSeed               \tRun#\tCorrect?"
+        return AbstractResult.header_row() + '\tCorrect?'
 
     @staticmethod
-    def key(dims, min_val, max_val, num_verts, num_edges, seed, run_num):
-        return (Input(1, dims, min_val, max_val, num_verts, num_edges, seed), run_num)
+    def key(dims, min_val, max_val, num_verts, num_edges, seed, run_num, prec=1):
+        return (Input(prec, dims, min_val, max_val, num_verts, num_edges, seed), run_num)
 
     @staticmethod
     def from_list(lst):
-        if(len(lst) != 9):
-            raise DataError('CorrResult expected 9 args, got %u: %s' % (len(lst), str(lst)))
-        return CorrResult(lst[0], lst[1], lst[2], lst[3], lst[4], lst[5], lst[6], lst[7], lst[8])
+        if(len(lst) != 10):
+            raise DataError('CorrResult expected 10 args, got %u: %s' % (len(lst), str(lst)))
+        return CorrResult(prec=lst[0], dims=lst[1], min_val=lst[2], max_val=lst[3], num_verts=lst[4],
+                          num_edges=lst[5], seed=lst[6], rev=lst[7], run_num=lst[8], corr=lst[9])
 
     @staticmethod
     def get_path_to(rev):
@@ -293,9 +307,18 @@ class CorrResult(AbstractResult):
 
 class PerfResult(AbstractResult):
     """Data about an input, a revision, and how quickly it found the MST."""
-    def __init__(self, num_verts, num_edges, seed, rev, run_num, time_sec):
-        AbstractResult.__init__(self, 1, 0, 0, 100000, num_verts, num_edges, seed, rev, run_num)
+    def __init__(self, num_verts, num_edges, seed, rev, run_num, time_sec, prec=1, dims=0, min_val=0, max_val=100000):
+        AbstractResult.__init__(self, prec, dims, min_val, max_val, num_verts, num_edges, seed, rev, run_num)
         self.time_sec = float(time_sec)
+        i = self.input()
+        if i.prec != 1:
+            print >> sys.stderr, 'warning: performance result with precision %u (expected 1)' % i.prec
+        if i.dims != 0:
+            print >> sys.stderr, 'warning: performance result with dimensionality %u (expected 0)' % i.dims
+        if i.min != 0:
+            print >> sys.stderr, 'warning: performance result with min_val %s (expected 0)' % str(i.min)
+        if i.max != 100000:
+            print >> sys.stderr, 'warning: performance result with max_val %s (expected 100000)' % str(i.max)
 
     def __cmp__(self, other):
         ret = AbstractResult.__cmp__(self, other)
@@ -305,22 +328,22 @@ class PerfResult(AbstractResult):
             return compare_float(self.time_sec, other.time_sec)
 
     def __str__(self):
-        i = self.input()
-        return "%u\t%u\t%s\t%u\t%.1f" % (i.num_verts, i.num_edges, str(i.seed), self.run_num, self.time_sec)
+        return AbstractResult.__str__(self) + ('\t%.1f' % self.time_sec)
 
     @staticmethod
     def header_row():
-        return "#|V|\t|E|\tSeed               \tRun#\tTime(sec)"
+        return AbstractResult.header_row() + '\tTime(sec)'
 
     @staticmethod
-    def key(num_verts, num_edges, seed, run_num):
-        return (Input(1, 0, 0.0, 1.0, num_verts, num_edges, seed), run_num)
+    def key(num_verts, num_edges, seed, run_num, prec=1, dims=0, min_val=0, max_val=100000):
+        return (Input(prec, dims, min_val, max_val, num_verts, num_edges, seed), run_num)
 
     @staticmethod
     def from_list(lst):
-        if(len(lst) != 6):
-            raise DataError('PerfResult expected 6 args, got %u: %s' % (len(lst), str(lst)))
-        return PerfResult(lst[0], lst[1], lst[2], lst[3], lst[4], lst[5])
+        if(len(lst) != 10):
+            raise DataError('PerfResult expected 10 args, got %u: %s' % (len(lst), str(lst)))
+        return PerfResult(prec=lst[0], dims=lst[1], min_val=lst[2], max_val=lst[3], num_verts=lst[4],
+                          num_edges=lst[5], seed=lst[6], rev=lst[7], run_num=lst[8], time_sec=lst[9])
 
     @staticmethod
     def get_path_to(rev):
@@ -328,9 +351,20 @@ class PerfResult(AbstractResult):
 
 class WeightResult(AbstractResult):
     """Data about an input, a revision, and the weight of the MST."""
-    def __init__(self, dims, num_verts, seed, rev, run_num, mst_weight):
-        AbstractResult.__init__(self, 15, dims, 0.0, 1.0, num_verts, int(num_verts)*(int(num_verts)-1)/2, seed, rev, run_num)
+    def __init__(self, dims, num_verts, seed, rev, run_num, mst_weight, prec=15, min_val=0, max_val=1, num_edges=None):
+        num_edges = num_edges if num_edges is not None else int(num_verts)*(int(num_verts)-1)/2
+        AbstractResult.__init__(self, prec, dims, min_val, max_val, num_verts, num_edges, seed, rev, run_num)
         self.mst_weight = float(mst_weight)
+        i = self.input()
+        if i.prec != 15:
+            print >> sys.stderr, 'warning: weight result with precision %u (expected 15)' % i.prec
+        if i.min != 0:
+            print >> sys.stderr, 'warning: weight result with min_val %s (expected 0)' % str(i.min)
+        if i.max != 1:
+            print >> sys.stderr, 'warning: weight result with max_val %s (expected 1)' % str(i.max)
+        exp_edges = i.num_verts*(i.num_verts-1)/2
+        if i.num_edges != exp_edges:
+            print >> sys.stderr, 'warning: weight result with num_edges %u (expected complete graph, i.e., %u)' % (i.num_edges, exp_edges)
 
     def get_path(self):
         return self.get_path_to(self.input().get_wtype())
@@ -343,22 +377,23 @@ class WeightResult(AbstractResult):
             return compare_float(self.mst_weight, other.mst_weight)
 
     def __str__(self):
-        i = self.input()
-        return "%u\t%u\t%u\t%s\t%u\t%.15f" % (i.dims, i.num_verts, i.num_edges, str(i.seed), self.run_num, self.mst_weight)
+        return AbstractResult.__str__(self) + ('\t%.15f' % self.mst_weight)
 
     @staticmethod
     def header_row():
-        return "#Dim\t|V|\tSeed               \tRun#"
+        return AbstractResult.header_row() + '\tMST Weight'
 
     @staticmethod
-    def key(dims, num_verts, seed, run_num):
-        return (Input(15, dims, 0.0, 1.0, num_verts, num_verts*(num_verts-1)/2, seed), run_num)
+    def key(dims, num_verts, seed, run_num, prec=15, min_val=0, max_val=1, num_edges=None):
+        return (Input(prec, dims, min_val, max_val, num_verts,
+                      num_edges if num_edges is not None else num_verts*(num_verts-1)/2, seed), run_num)
 
     @staticmethod
     def from_list(lst):
-        if(len(lst) != 6):
-            raise DataError('WeightResult expected 6 args, got %u: %s' % (len(lst), str(lst)))
-        return WeightResult(lst[0], lst[1], lst[2], lst[3], lst[4], lst[5])
+        if(len(lst) != 10):
+            raise DataError('WeightResult expected 10 args, got %u: %s' % (len(lst), str(lst)))
+        return WeightResult(prec=lst[0], dims=lst[1], min_val=lst[2], max_val=lst[3], num_verts=lst[4],
+                            num_edges=lst[5], seed=lst[6], rev=lst[7], run_num=lst[8], mst_weight=lst[9])
 
     @staticmethod
     def get_path_to(wtype):
