@@ -46,9 +46,10 @@ class DataSet:
             fh = open(logfn, "r")
             lines = fh.readlines()
             for line in lines:
-                s = line.split()
-                t = cls_data.from_list(s)
-                dataset[t.mykey()] = t
+                if line[0:1] != '#':
+                    s = line.split()
+                    t = cls_data.from_list(s)
+                    dataset[t.mykey()] = t
             fh.close()
         except IOError, e:
             raise DataError("I/O error while reading in %s: %s" % (logfn, e))
