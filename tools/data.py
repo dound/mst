@@ -129,8 +129,9 @@ class Input:
         return ret * 31 + self.seed
 
     def __str__(self):
-        return "%s %u %s %s %u %u %s" % (str(self.prec), self.dims, str(self.min), str(self.max),
-                                         self.num_verts, self.num_edges, str(self.seed))
+        fmt = "%s\t%u\t%s\t%s\t%u\t%u\t%s"
+        return fmt % (str(self.prec), self.dims, str(self.min), str(self.max),
+                      self.num_verts, self.num_edges, str(self.seed))
 
 class AbstractData:
     def __init__(self, prec, dims, min_val, max_val, num_verts, num_edges, seed):
@@ -181,11 +182,11 @@ class InputSolution(AbstractData):
             return compare_float(self.mst_weight, other.mst_weight)
 
     def __str__(self):
-        return AbstractData.__str__(self) + ' ' + str(self.mst_weight)
+        return AbstractData.__str__(self) + '\t' + str(self.mst_weight)
 
     @staticmethod
     def header_row():
-        return "#Prec Dim Min Max |V| |E| Seed CorrectMSTWeight"
+        return "#Prec\tDim\tMin\tMax     \t|V|\t|E|\tSeed               \tCorrectMSTWeight"
 
     @staticmethod
     def key(prec, dims, min_val, max_val, num_verts, num_edges, seed):
@@ -265,12 +266,12 @@ class CorrResult(AbstractResult):
 
     def __str__(self):
         i = self.input()
-        return "%s %u %s %s %u %u %s %u %u" % (str(i.prec), i.dims, str(i.min), str(i.max),
-                                               i.num_verts, i.num_edges, str(i.seed), self.run_num, int(self.corr))
+        return "%s\t%u\t%s\t%s\t%u\t%u\t%s\t%u\t%u" % (str(i.prec), i.dims, str(i.min), str(i.max),
+                                                       i.num_verts, i.num_edges, str(i.seed), self.run_num, int(self.corr))
 
     @staticmethod
     def header_row():
-        return "#Prec Dim Min Max |V| |E| Seed Run# Correct?"
+        return "#Prec\tDim\tMin\tMax     \t|V|\t|E|\tSeed               \tRun#\tCorrect?"
 
     @staticmethod
     def key(dims, min_val, max_val, num_verts, num_edges, seed, run_num):
@@ -301,11 +302,11 @@ class PerfResult(AbstractResult):
 
     def __str__(self):
         i = self.input()
-        return "%u %u %s %u %.1f" % (i.num_verts, i.num_edges, str(i.seed), self.run_num, self.time_sec)
+        return "%u\t%u\t%s\t%u\t%.1f" % (i.num_verts, i.num_edges, str(i.seed), self.run_num, self.time_sec)
 
     @staticmethod
     def header_row():
-        return "#|V| |E| Seed Run# Time(sec)"
+        return "#|V|\t|E|\tSeed               \tRun#\tTime(sec)"
 
     @staticmethod
     def key(num_verts, num_edges, seed, run_num):
@@ -339,11 +340,11 @@ class WeightResult(AbstractResult):
 
     def __str__(self):
         i = self.input()
-        return "%u %u %u %s %u %.15f" % (i.dims, i.num_verts, i.num_edges, str(i.seed), self.run_num, self.mst_weight)
+        return "%u\t%u\t%u\t%s\t%u\t%.15f" % (i.dims, i.num_verts, i.num_edges, str(i.seed), self.run_num, self.mst_weight)
 
     @staticmethod
     def header_row():
-        return "#Dim |V| Seed Run#"
+        return "#Dim\t|V|\tSeed               \tRun#"
 
     @staticmethod
     def key(dims, num_verts, seed, run_num):
