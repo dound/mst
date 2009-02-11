@@ -252,7 +252,9 @@ class AbstractResult(AbstractData):
         return AbstractData.__str__(self) + ('\t%s\t%s' % (self.rev, str(self.run_num)))
 
     def header_row(self):
-        return AbstractData.header_row(self) + "\tRev\tRun#"
+        rev_sp_len = len(str(self.rev)) - 3
+        rev_sp = ' ' * rev_sp_len
+        return AbstractData.header_row(self) + "\tRev%s\tRun#" % rev_sp
 
     @staticmethod
     def get_path_to(rev):
