@@ -209,7 +209,7 @@ computation only):
     # get the mst binary we want to test with
     mst_binary = random_tmp_filename(10, 'mst')
     __files_to_cleanup.append(mst_binary)
-    if options.rev is None:
+    if options.rev is None or options.rev.lower() == 'current':
         options.dont_log = True  # no logging allowed on binaries which aren't checked in to the repo
         options.trial_num = -1
         options.rev = ""         # tells the script to just use the current revision
