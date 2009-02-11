@@ -21,7 +21,7 @@ def print_benchmark(input_graph, out, rev, trial_num, for_time):
     elif trial_num is None or trial_num < 0:
         msg += 'not logging result'
     else:
-        msg += 'logging time for trial %u' % (what, trial_num)
+        msg += 'logging time for trial %u' % trial_num
     print msg + ', out=%s)' % out
 
 def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
