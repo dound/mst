@@ -16,12 +16,13 @@ __rnd = None
 
 def get_density(num_verts, num_edges):
     """Returns the 'density' of the edges in a graph"""
-    if num_verts == 1:
-        return 1.0
     min_edges = num_verts - 1
     num_edges_scaled = num_edges - min_edges
     num_edge_choices = edges_in_complete_undirected_graph(num_verts) - min_edges
-    return float(num_edges_scaled) / num_edge_choices
+    if num_edge_choices == 0:
+        return 1.0
+    else:
+        return float(num_edges_scaled) / num_edge_choices
 
 def print_input_header(num_verts, num_edges, out):
     print >> out, '%u' % num_verts
