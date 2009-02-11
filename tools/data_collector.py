@@ -19,7 +19,7 @@ def collect_missing_correctness_data(inpt, rev, first_run_id, num_runs, inputs_l
     # use a for-loop here b/c run_test only does -c on the first run it is called
     gen = inpt.make_args_for_generate_input() + ' --may-use-existing'
     for _ in range(num_runs):
-        cmd = 'run_test.py -g "%s" -r %s -n 1 -c -x -t %u%s' % (gen, rev, first_run_id+1, inputs_list_file_arg)
+        cmd = 'run_test.py -g "%s" -r %s -n 1 -C -x -t %u%s' % (gen, rev, first_run_id+1, inputs_list_file_arg)
     ret = os.system(get_path_to_tools_root() + cmd)
     return ret == 0
 

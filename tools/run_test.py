@@ -127,6 +127,9 @@ computation only):
     parser.add_option("-c", "--check",
                       action="store_true", default=False,
                       help="whether to check output using check_output.py (only for the first run; exits if the check fails)")
+    parser.add_option("-C", "--check-exit-0",
+                      action="store_true", default=False,
+                      help="same as -c, but exit with code 0 even if the correctness check fails")
     parser.add_option("-g", "--generate-input",
                       metavar="GEN_ARGS",
                       help="generate (and use as input) a graph from generate_input.py GEN_ARGS (one for each run); -mqt will also be passed")
@@ -223,6 +226,12 @@ computation only):
         print 'error: unable to copy and build the mst binary'
         __cleanup_and_exit(ret)
 
+    # handle check-exit-0
+    check_fail_exit_code = -1
+    if options.check_exit_0:
+        options.check = True
+        check_fail_exit_code = 0
+
     # prepare the output file
     if options.output_file:
         out = options.output_file
@@ -251,7 +260,7 @@ computation only):
         if out_is_temporary:
             quiet_remove(out)
         if ret != CORRECT:
-            __cleanup_and_exit(-1)  # incorrectness already reported by check()
+            __cleanup_and_exit(check_fail_exit_code)  # incorrectness already reported by check()
         else:
             print '%s ===> CORRECT'
 
