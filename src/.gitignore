@@ -1,3 +1,5 @@
 mst
 *.o
 .*.d
+.cflags_prev
+.cflags_tmp
