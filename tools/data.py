@@ -19,7 +19,7 @@ class DataSet:
             old = self.dataset[key]
             if old == data:
                 return False
-        data[key] = data
+        self.dataset[key] = data
         return True
 
     def save_to_file(self, logfn):
