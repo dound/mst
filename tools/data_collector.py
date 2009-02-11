@@ -127,7 +127,7 @@ Searches for missing results and uses run_test.py to collect it."""
         num_on += 1
         get_results_for_rev = lambda rev : DataSet.read_from_file(CorrResult, CorrResult.get_path_to(rev))
         options.inputs_list_file_arg = '' if options.inputs_list_file is None else ' -l ' + options.inputs_list_file
-        collect_missing_data = lambda x,y,z: collect_missing_correctness_data(x,y,z,options.inputs_list_file_arg)
+        collect_missing_data = lambda w,x,y,z: collect_missing_correctness_data(w,x,y,z,options.inputs_list_file_arg)
 
     # make sure no more than 1 type of data collection was specified
     if num_on > 1:
