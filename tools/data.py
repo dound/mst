@@ -56,9 +56,10 @@ class DataSet:
         return cls(dataset)
 
     @classmethod
-    def add_data_to_log_file(cls, data):
+    def add_data_to_log_file(cls, data, logfn=None):
         """Adds data to the appropriate log file."""
-        logfn = data.get_path()
+        if logfn is None:
+            logfn = data.get_path()
         ds = cls.read_from_file(data.__class__, logfn)
         if ds.add_data(data):
             ds.save_to_file(logfn)
