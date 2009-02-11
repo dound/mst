@@ -13,15 +13,15 @@ import os, sys
 # include-with-submit get_path_to_tools_root = lambda : './'
 
 def print_benchmark(input_graph, out, rev, trial_num, for_time):
-    str = "benchmarking %s (rev=" % input_graph
-    str += 'current' if rev == '' else rev
-    str += ', '
+    msg = "benchmarking %s (rev=" % input_graph
+    msg += 'current' if rev == '' else rev
+    msg += ', '
     if trial_num is None or trial_num < 0:
-        str += 'not logging result'
+        msg += 'not logging result'
     else:
         what = 'time' if for_time else 'weight'
-        str += 'logging %s for trial %u' % (what, trial_num)
-    print str + ', out=%s)' % out
+        msg += 'logging %s for trial %u' % (what, trial_num)
+    print msg + ', out=%s)' % out
 
 def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
     rel_input_graph = ppinput(input_graph)

@@ -411,7 +411,7 @@ def ppinput(path):
         try:
             inpt = extract_input_footer(path)
             return 'I(%s)' % inpt.make_args_for_generate_input()
-        except ExtractInputFooterError, e:
+        except ExtractInputFooterError:
             return ppinput_fast(path)
 
 def get_tracked_revs():
