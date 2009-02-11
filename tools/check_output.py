@@ -45,7 +45,7 @@ def __compute_mst_weight(input_graph, corr_file):
     else:
         raise CheckerError("checker error: failed to generate output for " + input_graph)
 
-def get_and_log_mst_weight_from_checker(input_graph, force_recompute=False, corrlogfn=None):
+def get_and_log_mst_weight_from_checker(input_graph, force_recompute=False, inputslogfn=None):
     """Returns the a 2-tuple of (input, weight).  If force_recompute is not
     True, then it will check the input log cache to see if we already know the
     answer first.  Logs the result."""
@@ -55,10 +55,10 @@ def get_and_log_mst_weight_from_checker(input_graph, force_recompute=False, corr
         raise CheckerError("checker error: unable to extract the input footer for %s: %s" % (input_graph, e))
 
     # load in the inputs in the category of input_graph
-    if corrlogfn is None:
+    if inputslogfn is None:
         logfn = InputSolution.get_path_to(ti.prec, ti.dims, ti.min, ti.max)
     else:
-        logfn = corrlogfn
+        logfn = inputslogfn
     ds = DataSet.read_from_file(InputSolution, logfn)
     if ds.dataset.has_key(ti):
         input_soln = ds.dataset[ti]
@@ -79,16 +79,16 @@ def get_and_log_mst_weight_from_checker(input_graph, force_recompute=False, corr
             ds.save_to_file(logfn)
     return (ti, w)
 
-def check(input_graph, output_to_test, tolerance, force_recompute, rev=None, run=None, corrlogfn=None):
+def check(input_graph, output_to_test, tolerance, force_recompute, rev=None, run=None, inputslogfn=None):
     """Checks whether the MST weight of input_graph matches output_to_test to
     the specified tolerance.
     @param force_recompute  whether the checker's MST weight can come from cache
     @param rev              what revision to log this result under
     @param run              what run number to log this result under
-    @param corrlogfn        filename of the correctness log (if not provided, it is inferred)
+    @param inputslogfn      filename of the correctness log (if not provided, it is inferred)
     """
     ans_out = extract_answer(output_to_test)
-    (ti, ans_corr) = get_and_log_mst_weight_from_checker(input_graph, force_recompute, corrlogfn)
+    (ti, ans_corr) = get_and_log_mst_weight_from_checker(input_graph, force_recompute, inputslogfn)
 
     # are they the same?
     fmt = '%.' + str(tolerance) + 'f'
