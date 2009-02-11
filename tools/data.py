@@ -192,7 +192,7 @@ class InputSolution(AbstractData):
     def from_list(lst):
         if(len(lst) != 8):
             raise DataError('InputSolution expected 8 args, got %u: %s' % (len(lst), str(lst)))
-        return Input(lst[0], lst[1], lst[2], lst[3], lst[4], lst[5], lst[6], lst[7])
+        return InputSolution(lst[0], lst[1], lst[2], lst[3], lst[4], lst[5], lst[6], lst[7])
 
     @staticmethod
     def get_path_to(prec, dims, min_val, max_val):
