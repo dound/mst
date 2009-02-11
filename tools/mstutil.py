@@ -32,9 +32,13 @@ def get_path_to_project_root():
     """Gets the path to the root of the MST project."""
     return get_path_to_tools_root()[:-6] # strip off 'tools/'
 
-def get_path_to_mst_binary():
+def get_path_to_mst_binary(make_sure_it_exists=False):
     """Gets the path to the mst solver binary."""
-    return get_path_to_project_root() + 'src/mst'
+    d = get_path_to_project_root() + 'src/'
+    path = d + 'mst'
+    if make_sure_it_exists:
+        os.system('make -C %s > /dev/null' % d)
+    return path
 
 def get_path_to_checker_binary(make_sure_it_exists=False):
     """Gets the path to our correctness checker."""
