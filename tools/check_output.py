@@ -110,7 +110,7 @@ def check(input_graph, output_to_test, tolerance, force_recompute, rev=None, run
             fmt = "Unable to log result to file %s (correct is %s, output had %s): %s"
             print >> sys.stderr, fmt % (ppinput(input_graph), str_ans_corr, str_ans_out, e)
 
-    return (0 if outcome==CORRECT else -1)
+    return outcome
 
 def main(argv=sys.argv[1:]):
     usage = """usage: %prog [options] INPUT_GRAPH OUTPUT_TO_CHECK
@@ -132,7 +132,8 @@ prints an error message and exits with a non-zero code.  Does not log the result
 
     input_graph = args[0]
     output_to_test = args[1]
-    return check(input_graph, output_to_test, options.tolerance, options.force_recompute)
+    outcome = check(input_graph, output_to_test, options.tolerance, options.force_recompute)
+    return (0 if outcome==CORRECT else -1)
 
 if __name__ == "__main__":
     sys.exit(main())
