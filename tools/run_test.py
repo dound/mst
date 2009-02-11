@@ -53,7 +53,7 @@ def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
 
     # check to see if we are supposed to log the result
     if trial_num < 0:
-        print ('%s ===> time=%.2f'+str_mst_weight) % (cmd, time_sec)
+        print ('benchmark result ===> time=%.2f'+str_mst_weight) % time_sec
         return
 
     # extract properties of the graph
