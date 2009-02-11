@@ -139,7 +139,7 @@ def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos
     return "m=%d n=%d d=%d min=%.1f max=%.1f prec=%d seed=%s" % (num_verts, num_edges, num_dims,
                                                                  min_pos, max_pos, precision, str(__RND_SEED))
 
-def main(argv=sys.argv[1:]):
+def main(argv=sys.argv[1:], get_output_name_only=False):
     usage = """usage: %prog [options] NUM_VERTICES
 Generates a connected graph with no self-loops or parallel edges.  Output is
 sent to the default filename (""" + get_path_to_generated_inputs() + """/with
@@ -241,6 +241,10 @@ used.)"""
             options.output_file = path + 'other-' + str(__RND_SEED) + '.g'
         else:
             options.output_file = path + '%s%u-%u-%s.g' % (style_str, num_verts, num_edges, str(__RND_SEED))
+
+    # special use of the method ... just return the name we would use
+    if get_output_name_only:
+        return options.output_file
 
     # open the desired output file
     if options.output_file == 'stdout':
