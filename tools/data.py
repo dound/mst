@@ -148,7 +148,7 @@ class AbstractData:
 class InputSolution(AbstractData):
     """Data about about how to generate an input and the MST weight of that input (if known)."""
     def __init__(self, prec, dims, min_val, max_val, num_verts, num_edges, seed, mst_weight='-1'):
-        AbstractData.__init__(prec, dims, min_val, max_val, num_verts, num_edges, seed)
+        AbstractData.__init__(self, prec, dims, min_val, max_val, num_verts, num_edges, seed)
         self.mst_weight = float(mst_weight)
 
     def get_path(self):
@@ -168,14 +168,14 @@ class InputSolution(AbstractData):
             return False
 
     def __cmp__(self, other):
-        ret = AbstractData.__cmp__(other)
+        ret = AbstractData.__cmp__(self, other)
         if ret != 0:
             return ret
         else:
             return compare_float(self.mst_weight, other.mst_weight)
 
     def __str__(self):
-        return AbstractData.__str__() + ' ' + str(self.mst_weight)
+        return AbstractData.__str__(self) + ' ' + str(self.mst_weight)
 
     @staticmethod
     def header_row():
@@ -211,7 +211,7 @@ class InputSolution(AbstractData):
 class AbstractResult(AbstractData):
     """Data about an input and a revision on which we ran a test on it."""
     def __init__(self, prec, dims, min_val, max_val, num_verts, num_edges, seed, rev, run_num):
-        AbstractData.__init__(prec, dims, min_val, max_val, num_verts, num_edges, seed)
+        AbstractData.__init__(self, prec, dims, min_val, max_val, num_verts, num_edges, seed)
         self.rev = str(rev)
         self.run_num = run_num
 
@@ -222,7 +222,7 @@ class AbstractResult(AbstractData):
         return (self.__input, self.run_num)
 
     def __cmp__(self, other):
-        ret = AbstractData.__cmp__(other)
+        ret = AbstractData.__cmp__(self, other)
         if ret != 0:
             return ret
         elif self.rev < other.rev:
@@ -241,7 +241,7 @@ INCORRECT = int(False)
 class CorrResult(AbstractResult):
     """Data about an input, a revision, and whether mst correctly found the MST."""
     def __init__(self, dims, min_val, max_val, num_verts, num_edges, seed, rev, run_num, corr):
-        AbstractResult.__init__(1, dims, min_val, max_val, num_verts, num_edges, seed, rev, run_num)
+        AbstractResult.__init__(self, 1, dims, min_val, max_val, num_verts, num_edges, seed, rev, run_num)
         corr = int(corr)
         if corr!=CORRECT and corr!=INCORRECT:
             raise ValueError('invalid corr value: ' + str(corr))
@@ -251,7 +251,7 @@ class CorrResult(AbstractResult):
         return self.corr == CORRECT
 
     def __cmp__(self, other):
-        ret = AbstractResult.__cmp__(other)
+        ret = AbstractResult.__cmp__(self, other)
         if ret != 0:
             return ret
         else:
@@ -283,11 +283,11 @@ class CorrResult(AbstractResult):
 class PerfResult(AbstractResult):
     """Data about an input, a revision, and how quickly it found the MST."""
     def __init__(self, num_verts, num_edges, seed, rev, run_num, time_sec):
-        AbstractResult.__init__(1, 0, 0, 100000, num_verts, num_edges, seed, rev, run_num)
+        AbstractResult.__init__(self, 1, 0, 0, 100000, num_verts, num_edges, seed, rev, run_num)
         self.time_sec = float(time_sec)
 
     def __cmp__(self, other):
-        ret = AbstractResult.__cmp__(other)
+        ret = AbstractResult.__cmp__(self, other)
         if ret != 0:
             return ret
         else:
@@ -318,14 +318,14 @@ class PerfResult(AbstractResult):
 class WeightResult(AbstractResult):
     """Data about an input, a revision, and the weight of the MST."""
     def __init__(self, dims, num_verts, seed, rev, run_num, mst_weight):
-        AbstractResult.__init__(15, dims, 0.0, 1.0, num_verts, num_verts*(num_verts-1)/2, seed, rev, run_num)
+        AbstractResult.__init__(self, 15, dims, 0.0, 1.0, num_verts, num_verts*(num_verts-1)/2, seed, rev, run_num)
         self.mst_weight = float(mst_weight)
 
     def get_path(self):
         return self.get_path_to(self.input().get_wtype())
 
     def __cmp__(self, other):
-        ret = AbstractResult.__cmp__(other)
+        ret = AbstractResult.__cmp__(self, other)
         if ret != 0:
             return ret
         else:
