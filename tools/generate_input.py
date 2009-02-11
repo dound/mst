@@ -47,7 +47,7 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
     if edges_in_complete_undirected_graph(num_verts) == num_edges:
         for i in range(0, num_verts):
             for j in range(i+1, num_verts):
-                print >> out, fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
+                print >> out, fmt % (i+1, j+1, __rnd.uniform(min_edge_len, max_edge_len))
         return about
 
     # handle the non-complete graph case
@@ -62,7 +62,7 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
         # pick a random vertex in the connected part of the graph to connect to
         j = __rnd.randint(0, i-1)
         spanning_tree[(i,j)] = True
-        print >> out, fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
+        print >> out, fmt % (i+1, j+1, __rnd.uniform(min_edge_len, max_edge_len))
 
     # account for the edges we just added
     num_edges -= (num_verts - 1)
@@ -93,7 +93,6 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
     # algorithm when the density is quite high (empirically measured).
     density = get_density(num_verts, num_edges)
     if density > 0.5 and False:
-        print 'here'
         heap = []
 
         # put all edges in the heap with some random key
@@ -106,7 +105,7 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
             (_, i, j) = heapq.heappop(heap)
             if not spanning_tree.has_key((i, j)):
                 num_edges -= 1
-                print >> out, fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
+                print >> out, fmt % (i+1, j+1, __rnd.uniform(min_edge_len, max_edge_len))
     else:
         while num_edges > 0:
             # choose random vertices for an edge to connect
@@ -121,7 +120,7 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
             # add the edge if it is new
             if i!=j and not spanning_tree.has_key((i, j)):
                 spanning_tree[(i, j)] = True
-                print >> out, fmt % (i, j, __rnd.uniform(min_edge_len, max_edge_len))
+                print >> out, fmt % (i+1, j+1, __rnd.uniform(min_edge_len, max_edge_len))
                 num_edges -= 1
 
     return about
@@ -141,7 +140,7 @@ def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos
         io = i * num_dims
         for j in range(i+1, num_verts):
             jo = j * num_dims
-            print >> out, fmt % (i, j, sqrt(sum([(coords[io+o]-coords[jo+o])*(coords[io+o]-coords[jo+o]) for o in range(num_dims)])))
+            print >> out, fmt % (i+1, j+1, sqrt(sum([(coords[io+o]-coords[jo+o])*(coords[io+o]-coords[jo+o]) for o in range(num_dims)])))
 
     return "m=%d n=%d d=%d min=%.1f max=%.1f prec=%d seed=%s" % (num_verts, num_edges, num_dims,
                                                                  min_pos, max_pos, precision, str(__RND_SEED))
