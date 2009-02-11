@@ -150,6 +150,9 @@ used.)"""
     parser.add_option("-c", "--correctness",
                       action="store_true", default=False,
                       help="compute and log the correct output")
+    parser.add_option("-l", "--inputs-list-file",
+                      metavar="FILE",
+                      help="set the file to store info about the new input to (default is usually fine)")
     parser.add_option("-m", "--may-use-existing",
                       action="store_true", default=False,
                       help="will not generate a new graph if the output file already exists")
@@ -309,7 +312,7 @@ used.)"""
     # record this new input in our input log
     if not options.dont_track:
         data = InputSolution(options.precision, dimensionality, min_val, max_val, num_verts, num_edges, __RND_SEED, mst_weight)
-        DataSet.add_data_to_log_file(data)
+        DataSet.add_data_to_log_file(data, options.inputs_list_file)
         print_if_not_quiet('logged to ' + data.get_path())
 
     return 0
