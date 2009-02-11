@@ -45,14 +45,17 @@ def __compute_mst_weight(input_graph, corr_file):
     else:
         raise CheckerError("checker error: failed to generate output for " + ppinput(input_graph))
 
+def __get_ti(input_graph):
+    try:
+        return extract_input_footer(input_graph)
+    except ExtractInputFooterError, e:
+        raise CheckerError("checker error: unable to extract the input footer for %s: %s" % (ppinput(input_graph), e))
+
 def get_and_log_mst_weight_from_checker(input_graph, force_recompute=False, inputslogfn=None):
     """Returns the a 2-tuple of (input, weight).  If force_recompute is not
     True, then it will check the input log cache to see if we already know the
     answer first.  Logs the result."""
-    try:
-        ti = extract_input_footer(input_graph)
-    except ExtractInputFooterError, e:
-        raise CheckerError("checker error: unable to extract the input footer for %s: %s" % (ppinput(input_graph), e))
+    ti = __get_ti(input_graph)
 
     # load in the inputs in the category of input_graph
     if inputslogfn is None:
@@ -87,21 +90,34 @@ def check(input_graph, output_to_test, tolerance, force_recompute, rev=None, run
     @param run              what run number to log this result under
     @param inputslogfn      filename of the correctness log (if not provided, it is inferred)
     """
-    ans_out = extract_answer(output_to_test)
-    (ti, ans_corr) = get_and_log_mst_weight_from_checker(input_graph, force_recompute, inputslogfn)
+    try:
+        ans_out = extract_answer(output_to_test)
+    except CheckerError, e:
+        print >> sys.stderr, 'INCORRECT (due to crash?): ' + str(e)
+        ans_out = None
+        outcome = INCORRECT
+
+    if ans_out is not None:
+        (ti, ans_corr) = get_and_log_mst_weight_from_checker(input_graph, force_recompute, inputslogfn)
+    else:
+        ti = None
 
     # are they the same?
-    fmt = '%.' + str(tolerance) + 'f'
-    str_ans_corr = fmt % ans_corr
-    str_ans_out = fmt % ans_out
-    if str_ans_corr == str_ans_out:
-        outcome = CORRECT
-    else:
-        print >> sys.stderr, "correctness FAILED: %s (correct is %s, output had %s)" % (ppinput(input_graph), str_ans_corr, str_ans_out)
-        outcome = INCORRECT
+    if ans_out is not None:
+        fmt = '%.' + str(tolerance) + 'f'
+        str_ans_corr = fmt % ans_corr
+        str_ans_out = fmt % ans_out
+        if str_ans_corr == str_ans_out:
+            outcome = CORRECT
+        else:
+            print >> sys.stderr, "correctness FAILED: %s (correct is %s, output had %s)" % (ppinput(input_graph), str_ans_corr, str_ans_out)
+            outcome = INCORRECT
 
     # log the result of the correctness check
     if rev is not None and run is not None:
+        if ti is None:
+            ti = __get_ti(input_graph)
+
         data = CorrResult(ti.dims, ti.min, ti.max, ti.num_verts, ti.num_edges, ti.seed, rev, run, outcome)
         try:
             DataSet.add_data_to_log_file(data)
