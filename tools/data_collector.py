@@ -164,6 +164,7 @@ Searches for missing results and uses run_test.py to collect it."""
 def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_runs, weight_test):
     root_len = len(get_path_to_project_root())
     missing_none = True
+    out = ""
     for rev in revs:
         # load info about the results we have to far for this rev
         try:
@@ -189,16 +190,17 @@ def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_ru
                 if collect_missing_data is None:
                     msg = 'missing'
                 elif not collect_missing_data(i, rev, num_runs-n, n):
-                    msg = 'failed to collect'
+                    msg = 'fail'
                 if msg is not None:
                     if missing_none:
-                        print 'What\tRev\tLeft\t' + i.header_row()[1:]
+                        out = 'What\tRev\tLeft\t' + i.header_row()[1:]
                         missing_none = False
                     if rev is None:
-                        print '%s\tn/a\t%u\t%s' % (msg, n, str(i))
+                        out += '\n%s\tn/a\t%u\t%s' % (msg, n, str(i))
                     else:
-                        print '%s\t%s\t%u\t%s' % (msg, rev, n, str(i))
-
+                        out += '\n%s\t%s\t%u\t%s' % (msg, rev, n, str(i))
+    if out != '':
+        print out
     return missing_none
 
 if __name__ == "__main__":
