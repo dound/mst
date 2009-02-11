@@ -85,7 +85,6 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
     # Assume the loose upper-bound is correct and switch over to the dense
     # algorithm when the density is quite high (empirically measured).
     density = num_edges / float(edges_in_complete_undirected_graph(num_verts))
-    print 'density=%s' % str(density)
     if density > 0.5 and False:
         print 'here'
         heap = []
@@ -291,6 +290,7 @@ used.)"""
             min_edge_len = 0
             max_edge_len = 100000
 
+        print_if_not_quiet('density=%s' % str(num_edges / float(edges_in_complete_undirected_graph(num_verts))))
         about = gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, options.precision, out)
         dimensionality = 0
         min_val = min_edge_len
