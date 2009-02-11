@@ -52,7 +52,7 @@ Searches for missing results and uses run_test.py to collect it."""
                       type="int", default="5",
                       help="number of desired runs per revision-input combination [default: %default]")
     parser.add_option("-r", "--rev",
-                      help="restrict the missing data check to the specified revision")
+                      help="restrict the missing data check to the specified revision, or 'all' [default: current]")
 
     group = OptionGroup(parser, "Data Collection Options")
     group.add_option("-p", "--performance",
@@ -144,9 +144,12 @@ Searches for missing results and uses run_test.py to collect it."""
 
         # prepare the revisions to collect data for
         if options.rev is not None:
-            revs = [options.rev]
+            if options.rev.lower() == 'all':
+                revs = get_tracked_revs()
+            else:
+                revs = [options.rev]
         else:
-            revs = get_tracked_revs()
+            revs = [None] # just use the current revision
 
     # pull out just the Input object (results are keyed on these, not InputSolution)
     inputs = [i.input() for i in input_solns.dataset.values()]
