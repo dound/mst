@@ -247,9 +247,12 @@ used.)"""
     if options.output_file == 'stdout':
         out = sys.stdout
     else:
-        if options.may_use_existing and os.path.exists(options.output_file):
-            print_if_not_quiet('skipping input generation: %s already exists' % options.output_file)
-            return 0
+        if options.may_use_existing:
+            if os.path.exists(options.output_file):
+                print_if_not_quiet('skipping input generation: %s already exists' % options.output_file)
+                return 0
+            else:
+                print_if_not_quiet('generating input: %s' % options.output_file)
         try:
             out = open(options.output_file, 'w')
         except IOError, errstr:
