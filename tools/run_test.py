@@ -206,12 +206,16 @@ computation only):
         run = None if options.trial_num < 0 else options.trial_num
         try:
             ret = check(input_graph, out, 0.1, False, rev, run)
+            errmsg = ''
         except CheckerError, e:
             ret = INCORRECT
+            errmsg = ': ' + str(e)
 
         if ret != CORRECT:
-            print "run_test error: check failed: " + e
+            print '%s ===> INCORRECT *** CORRECTNESS FAILED'
             __cleanup_and_exit(-1)
+        else:
+            print '%s ===> CORRECT'
 
     # remaining runs, if any
     for _ in range(options.num_runs-1):
