@@ -315,8 +315,9 @@ used.)"""
     # record this new input in our input log
     if not options.dont_track:
         data = InputSolution(options.precision, dimensionality, min_val, max_val, num_verts, num_edges, __RND_SEED, mst_weight)
-        DataSet.add_data_to_log_file(data, options.inputs_list_file)
-        print_if_not_quiet('logged to ' + data.get_path())
+        path = data.get_path() if options.inputs_list_file is None else options.inputs_list_file
+        DataSet.add_data_to_log_file(data, path)
+        print_if_not_quiet('logged to ' + path)
 
     return 0
 
