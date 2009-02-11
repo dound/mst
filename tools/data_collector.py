@@ -10,10 +10,13 @@ import os, sys
 REV_SEP   = '**************************************************\n****************** NEW REVISION ******************'
 INPUT_SEP = '--------------------------------------------------'
 
-def get_num_runs_missing_for_data(results, inpt, num_desired_runs):
+def get_num_runs_missing_for_data(results, inpt, num_desired_runs, weight_test):
     """Returns the number of values left to be collected."""
     for i in range(num_desired_runs):
-        key = (inpt, i)
+        if weight_test:
+            key = (inpt, -1)
+        else:
+            key = (inpt, i)
         if not results.has_key(key):
             return num_desired_runs - i
     return 0
@@ -28,7 +31,7 @@ def collect_missing_correctness_data(inpt, rev, first_run_id, num_runs, inputs_l
     for i in range(num_runs):
         if i != 0:
             print ''
-        cmd = 'run_test.py -g "%s" -r %s -n 1 -C -x -t %u%s' % (gen, rev, first_run_id+1, inputs_list_file_arg)
+        cmd = 'run_test.py -g "%s" -r %s -n %u -C -x -t %u%s' % (gen, rev, num_runs, first_run_id+1, inputs_list_file_arg)
         ret = os.system(get_path_to_tools_root() + cmd)
     return ret == 0
 
@@ -38,9 +41,9 @@ def collect_missing_performance_data(inpt, rev, first_run_id, num_runs):
     ret = os.system(get_path_to_tools_root() + cmd)
     return ret == 0
 
-def collect_missing_weight_data(inpt, _, first_run_id, num_runs):
+def collect_missing_weight_data(inpt, _, first_run_id, __):
     gen = collect_missing_prep(inpt)
-    cmd = 'run_test.py -g "%s" -n %u -t %u' % (gen, num_runs, first_run_id)
+    cmd = 'run_test.py -g "%s" -n 1 -t %u' % (gen, first_run_id)
     ret = os.system(get_path_to_tools_root() + cmd)
     return ret == 0
 
@@ -208,7 +211,7 @@ def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_ru
         # for each input, make sure we have run it on this rev
         for i in inputs: # inputs is an [Input]
             total_results_needed += num_runs
-            n = get_num_runs_missing_for_data(results, i, num_runs)
+            n = get_num_runs_missing_for_data(results, i, num_runs, weight_test)
             if n > 0:
                 msg = None
                 if collect_missing_data is None:
