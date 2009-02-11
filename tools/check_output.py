@@ -105,6 +105,7 @@ def check(input_graph, output_to_test, tolerance, force_recompute, rev=None, run
         data = CorrResult(ti.dims, ti.min, ti.max, ti.num_verts, ti.num_edges, ti.seed, rev, run, outcome)
         try:
             DataSet.add_data_to_log_file(data)
+            print_if_not_quiet('logged correctness result to ' + data.path())
         except DataError, e:
             fmt = "Unable to log result to file %s (correct is %s, output had %s): %s"
             print >> sys.stderr, fmt % (input_graph, str_ans_corr, str_ans_out, e)
