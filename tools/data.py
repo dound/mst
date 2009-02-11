@@ -24,7 +24,7 @@ class DataSet:
 
     def save_to_file(self, logfn):
         """Saves the dataset to the specified log file in sorted order"""
-        sorted_data = sorted(self.dataset.keys())
+        sorted_data = sorted(self.dataset.values())
         try:
             fh = open(logfn, "w")
             if len(sorted_data) > 0:
