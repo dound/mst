@@ -40,10 +40,11 @@ def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
 
     # run mst (and time it)
     time_file = random_tmp_filename(10, 'time')
-    cmd = '/usr/bin/time -f %%U -o %s %s %s > %s' % (time_file, mst_binary, input_graph, out)
+    cmd = '/usr/bin/time -f %%U -o %s %s %s %s' % (time_file, mst_binary, input_graph, save_cmd)
     ret = os.system(cmd)
     if ret != 0:
         print >> sys.stderr, "mst exited with error: " + cmd
+        quiet_remove(time_file)
         return
     try:
         time_sec = extract_answer(time_file)
