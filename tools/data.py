@@ -1,5 +1,8 @@
-from mstutil import compare_float, get_path_to_project_root, get_path_to_tools_root
+from mstutil import compare_float, get_path_to_generated_inputs, get_path_to_project_root, get_path_to_tools_root
 import os, re
+
+# whether to return pretty-printed input paths quickly or with more helpful info
+FAST_INPUT_PATH_PRETTY_PRINT = False
 
 class DataError(Exception):
     def __init__(self, msg):
@@ -88,12 +91,12 @@ class Input:
 
     def make_args_for_generate_input(self):
         """Returns a string which can  be used to make generate_input.py generate this input."""
-        argstr = '-p %u -n %u -r %s ' % (self.prec, self.num_edges, str(self.seed))
+        argstr = '-p %u -n %u %u -r %s' % (self.prec, self.num_edges, self.num_verts, str(self.seed))
         if self.dims == 0 and (self.min!=0 or self.max!=100000):
-            argstr += '-e %.1f,%.1f' % (self.min, self.max)
+            argstr += ' -e %.1f,%.1f' % (self.min, self.max)
         elif self.dims > 0:
-            argstr += '-v %u,%.1f,%.1f' % (self.dims, self.min, self.max)
-        return argstr + ' --may-use-existing ' + str(self.num_verts)
+            argstr += ' -v %u,%.1f,%.1f' % (self.dims, self.min, self.max)
+        return argstr
 
     def __cmp__(self, other):
         """Provides some ordering on Input"""
@@ -390,6 +393,26 @@ def extract_input_footer(input_graph):
     precision = int(__re_get_group(r' prec=(\d*)', about))
     seed = int(__re_get_group(r' seed=(\d*)', about))
     return Input(precision, num_dims, min_val, max_val, num_verts, num_edges, seed)
+
+def ppinput_fast(path):
+    """Returns the path to an input_graph in 'printy-printed' string."""
+    root_path = get_path_to_generated_inputs()
+    n = len(root_path)
+    if path[:n] == root_path:
+        return path[n:]
+    else:
+        return path
+
+def ppinput(path):
+    """Returns the path to an input_graph in 'printy-printed' string."""
+    if FAST_INPUT_PATH_PRETTY_PRINT:
+        return ppinput_fast(path)
+    else:
+        try:
+            inpt = extract_input_footer(path)
+            return 'I(%s)' % inpt.make_args_for_generate_input()
+        except ExtractInputFooterError, e:
+            return ppinput_fast(path)
 
 def get_tracked_revs():
     """Returns revisions we are tracking as an array of SHA1 revision IDs"""

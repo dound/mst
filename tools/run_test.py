@@ -2,7 +2,7 @@
 
 from check_output import check, CheckerError, extract_answer
 from data import DataError, DataSet, PerfResult, WeightResult, CORRECT, INCORRECT
-from data import extract_input_footer, ExtractInputFooterError
+from data import extract_input_footer, ExtractInputFooterError, ppinput
 from generate_input import main as generate_input
 from mstutil import get_path_to_mst_binary, get_path_to_tools_root, quiet_remove, random_tmp_filename
 from optparse import OptionParser
@@ -12,8 +12,20 @@ import os, sys
 # include-with-submit #       on functionality not strictly needed for the 'random' binary to work
 # include-with-submit get_path_to_tools_root = lambda : './'
 
+def print_benchmark(input_graph, out, rev, trial_num, for_time):
+    str = "benchmarking %s (rev=" % input_graph
+    str += 'current' if rev == '' else rev
+    str += ', '
+    if trial_num is None or trial_num < 0:
+        str += 'not logging result'
+    else:
+        what = 'time' if for_time else 'weight'
+        str += 'logging %s for trial %u' % (what, trial_num)
+    print str + ', out=%s)' % out
+
 def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
-    print "benchmarking '%s' (rev=%s, trial=%u, out=%s)" % (input_graph, rev, trial_num, out)
+    rel_input_graph = ppinput(input_graph)
+    print_benchmark(rel_input_graph, out, rev, trial_num, for_time)
 
     # run mst (and time it)
     time_file = random_tmp_filename(10, 'time')
@@ -42,14 +54,14 @@ def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
 
     # check to see if we are supposed to log the result
     if trial_num < 0:
-        print ('%s ===> time=%.2f'+str_mst_weight) % (cmd, time_sec)
+        print ('benchmark result ===> time=%.2f'+str_mst_weight) % time_sec
         return
 
     # extract properties of the graph
     try:
         ti = extract_input_footer(input_graph)
     except ExtractInputFooterError, e:
-        raise CheckerError("run test error: unable to extract the input footer for %s: %s" % (input_graph, e))
+        raise CheckerError("run test error: unable to extract the input footer for %s: %s" % (rel_input_graph, e))
 
     # log the result
     if for_time:
@@ -78,14 +90,20 @@ def __cleanup_and_exit(code=0):
         quiet_remove(__input_graph_to_cleanup)
     sys.exit(code)
 
-def __generate_input_graph(argstr):
+def __generate_input_graph(argstr, cleanup_generated_input):
     """Generate a graph from the specified string of arguments and return the file it is saved in."""
     global __input_graph_to_cleanup
-    input_graph = random_tmp_filename(10, 'input')
-    __input_graph_to_cleanup = input_graph
-    args = (argstr + ' -mqto ' + input_graph).split()
 
     try:
+        if cleanup_generated_input:
+            input_graph = random_tmp_filename(10, 'input')
+            args = (argstr + ' -mqto ' + input_graph).split()
+            __input_graph_to_cleanup = input_graph
+        else:
+            args = (argstr + ' -mqt').split()
+            input_graph = generate_input(args, get_output_name_only=True)
+            __input_graph_to_cleanup = None
+
         errstr = "unknown error"
         ret = generate_input(args)
     except Exception, errstr:
@@ -112,6 +130,9 @@ computation only):
     parser.add_option("-g", "--generate-input",
                       metavar="GEN_ARGS",
                       help="generate (and use as input) a graph from generate_input.py GEN_ARGS (one for each run); -mqt will also be passed")
+    parser.add_option("-G", "--generate-temp-input",
+                      metavar="GEN_ARGS",
+                      help="same as -g, but delete the graph after this script is done")
     parser.add_option("-i", "--input-file",
                       metavar="FILE",
                       help="FILE which describes the graph to use as input")
@@ -140,6 +161,15 @@ computation only):
     if len(args) > 0:
         parser.error("too many arguments: none expected")
 
+    # reconcile -g and -G
+    cleanup_generated_input = False
+    if options.generate_temp_input is not None:
+        if options.generate_input is not None:
+            parser.error('only one of -g or -G may be supplied')
+        else:
+            options.generate_input = options.generate_temp_input
+            cleanup_generated_input = True
+
     # get the input file
     is_test_perf = True
     gen_input_args = None
@@ -166,7 +196,7 @@ computation only):
         else:
             is_test_perf = False
 
-        input_graph = __generate_input_graph(gen_input_args)
+        input_graph = __generate_input_graph(gen_input_args, cleanup_generated_input)
     else:
         parser.error("at least one of -g and -i must be used to specify the input graph")
 
@@ -230,8 +260,9 @@ computation only):
         if options.trial_num >= 0:
             options.trial_num += 1
         if gen_input_args is not None:
-            quiet_remove(__input_graph_to_cleanup)
-            input_graph = __generate_input_graph(gen_input_args)
+            if __input_graph_to_cleanup is not None:
+                quiet_remove(__input_graph_to_cleanup)
+            input_graph = __generate_input_graph(gen_input_args, cleanup_generated_input)
         test_mst(is_test_perf, mst_binary, input_graph, "/dev/null", not options.dont_log, options.rev, options.trial_num)
 
     __cleanup_and_exit()

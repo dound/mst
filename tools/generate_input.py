@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from check_output import CheckerError, compute_mst_weight
-from data import DataSet, InputSolution
+from data import DataSet, InputSolution, ppinput
 from math import sqrt
 from mstutil import die, get_path_to_generated_inputs
 from optparse import OptionGroup, OptionParser
@@ -139,7 +139,7 @@ def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos
     return "m=%d n=%d d=%d min=%.1f max=%.1f prec=%d seed=%s" % (num_verts, num_edges, num_dims,
                                                                  min_pos, max_pos, precision, str(__RND_SEED))
 
-def main(argv=sys.argv[1:]):
+def main(argv=sys.argv[1:], get_output_name_only=False):
     usage = """usage: %prog [options] NUM_VERTICES
 Generates a connected graph with no self-loops or parallel edges.  Output is
 sent to the default filename (""" + get_path_to_generated_inputs() + """/with
@@ -242,16 +242,18 @@ used.)"""
         else:
             options.output_file = path + '%s%u-%u-%s.g' % (style_str, num_verts, num_edges, str(__RND_SEED))
 
+    # special use of the method ... just return the name we would use
+    if get_output_name_only:
+        return options.output_file
+
     # open the desired output file
     if options.output_file == 'stdout':
         out = sys.stdout
     else:
         if options.may_use_existing:
             if os.path.exists(options.output_file):
-                print_if_not_quiet('skipping input generation: %s already exists' % options.output_file)
+                print_if_not_quiet('skipping input generation: %s already exists' % ppinput(options.output_file))
                 return 0
-            else:
-                print_if_not_quiet('generating input: %s' % options.output_file)
         try:
             out = open(options.output_file, 'w')
         except IOError, errstr:
@@ -297,7 +299,7 @@ used.)"""
         max_val = max_edge_len
 
     print_input_footer(num_verts, num_edges, about, out)
-    print_if_not_quiet('graph saved to ' + options.output_file)
+    print_if_not_quiet('graph saved to ' + ppinput(options.output_file))
     if out != sys.stdout:
         out.close()
 

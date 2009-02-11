@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from data import DataError, DataSet, InputSolution, CorrResult, CORRECT, INCORRECT
-from data import extract_input_footer, ExtractInputFooterError
+from data import extract_input_footer, ExtractInputFooterError, ppinput
 from mstutil import get_path_to_checker_binary, random_tmp_filename
 from optparse import OptionParser
 import os, sys
@@ -43,22 +43,22 @@ def __compute_mst_weight(input_graph, corr_file):
     if ret == 0:
         return extract_answer(corr_file)
     else:
-        raise CheckerError("checker error: failed to generate output for " + input_graph)
+        raise CheckerError("checker error: failed to generate output for " + ppinput(input_graph))
 
-def get_and_log_mst_weight_from_checker(input_graph, force_recompute=False, corrlogfn=None):
+def get_and_log_mst_weight_from_checker(input_graph, force_recompute=False, inputslogfn=None):
     """Returns the a 2-tuple of (input, weight).  If force_recompute is not
     True, then it will check the input log cache to see if we already know the
     answer first.  Logs the result."""
     try:
         ti = extract_input_footer(input_graph)
     except ExtractInputFooterError, e:
-        raise CheckerError("checker error: unable to extract the input footer for %s: %s" % (input_graph, e))
+        raise CheckerError("checker error: unable to extract the input footer for %s: %s" % (ppinput(input_graph), e))
 
     # load in the inputs in the category of input_graph
-    if corrlogfn is None:
+    if inputslogfn is None:
         logfn = InputSolution.get_path_to(ti.prec, ti.dims, ti.min, ti.max)
     else:
-        logfn = corrlogfn
+        logfn = inputslogfn
     ds = DataSet.read_from_file(InputSolution, logfn)
     if ds.dataset.has_key(ti):
         input_soln = ds.dataset[ti]
@@ -79,16 +79,16 @@ def get_and_log_mst_weight_from_checker(input_graph, force_recompute=False, corr
             ds.save_to_file(logfn)
     return (ti, w)
 
-def check(input_graph, output_to_test, tolerance, force_recompute, rev=None, run=None, corrlogfn=None):
+def check(input_graph, output_to_test, tolerance, force_recompute, rev=None, run=None, inputslogfn=None):
     """Checks whether the MST weight of input_graph matches output_to_test to
     the specified tolerance.
     @param force_recompute  whether the checker's MST weight can come from cache
     @param rev              what revision to log this result under
     @param run              what run number to log this result under
-    @param corrlogfn        filename of the correctness log (if not provided, it is inferred)
+    @param inputslogfn      filename of the correctness log (if not provided, it is inferred)
     """
     ans_out = extract_answer(output_to_test)
-    (ti, ans_corr) = get_and_log_mst_weight_from_checker(input_graph, force_recompute, corrlogfn)
+    (ti, ans_corr) = get_and_log_mst_weight_from_checker(input_graph, force_recompute, inputslogfn)
 
     # are they the same?
     fmt = '%.' + str(tolerance) + 'f'
@@ -97,7 +97,7 @@ def check(input_graph, output_to_test, tolerance, force_recompute, rev=None, run
     if str_ans_corr == str_ans_out:
         outcome = CORRECT
     else:
-        print >> sys.stderr, "correctness FAILED: %s (correct is %s, output had %s)" % (input_graph, str_ans_corr, str_ans_out)
+        print >> sys.stderr, "correctness FAILED: %s (correct is %s, output had %s)" % (ppinput(input_graph), str_ans_corr, str_ans_out)
         outcome = INCORRECT
 
     # log the result of the correctness check
@@ -105,9 +105,10 @@ def check(input_graph, output_to_test, tolerance, force_recompute, rev=None, run
         data = CorrResult(ti.dims, ti.min, ti.max, ti.num_verts, ti.num_edges, ti.seed, rev, run, outcome)
         try:
             DataSet.add_data_to_log_file(data)
+            print 'logged correctness result to ' + data.get_path()
         except DataError, e:
             fmt = "Unable to log result to file %s (correct is %s, output had %s): %s"
-            print >> sys.stderr, fmt % (input_graph, str_ans_corr, str_ans_out, e)
+            print >> sys.stderr, fmt % (ppinput(input_graph), str_ans_corr, str_ans_out, e)
 
     return (0 if outcome==CORRECT else -1)
 
