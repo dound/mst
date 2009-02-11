@@ -36,10 +36,12 @@ class DataSet:
             raise DataError("I/O error while writing to %s: %s" % (logfn, e))
 
     @classmethod
-    def read_from_file(cls, cls_data, logfn):
+    def read_from_file(cls, cls_data, logfn, mustExist=False):
         """Factory method which populates a DataSet composed of cls_data
         type objects with the contents of a file."""
         dataset = {}
+        if not mustExist and not os.path.exists(logfn):
+            return cls(dataset)
         try:
             fh = open(logfn, "r")
             lines = fh.readlines()
