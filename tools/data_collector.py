@@ -42,7 +42,10 @@ Searches for missing results and uses run_test.py to collect it."""
     parser.add_option("-i", "--input_graph",
                       metavar="FILE",
                       help="restrict the missing data check to the specified input graph")
-    parser.add_option("-l", "--list-only",
+    parser.add_option("-l", "--inputs-list-file",
+                      metavar="FILE",
+                      help="collect data for all inputs in the specified log file")
+    parser.add_option("--list-only",
                       action="store_true", default=False,
                       help="only list missing data (do not collect it)")
     parser.add_option("-n", "--num-runs",
@@ -80,8 +83,8 @@ Searches for missing results and uses run_test.py to collect it."""
     # prepare for a weight data collection
     num_on = 0
     if options.num_vertices > 0:
-        if options.input_graph:
-            parser.error('-i and -v are mutually exclusive')
+        if options.input_graph or options.inputs_list_file:
+            parser.error('-i, -l, and -v are mutually exclusive')
 
         if options.dimensionality > 0:
             num_on += 1
@@ -102,13 +105,17 @@ Searches for missing results and uses run_test.py to collect it."""
     elif options.dimensionality > 0 or options.edge:
         parser.error('-v is required whenever -d or -e is used')
 
-    # handle -i: collect data for a particular graph
+    # handle -i, -l: collect data for a particular graph(s)
+    if options.input_graph and options.inputs_list_file:
+        parser.error('-i and -l are mutually exclusive')
     if options.input_graph is not None:
         try:
             i = extract_input_footer(options.input_graph)
         except ExtractInputFooterError, e:
             parser.error(e)
-        input_solns = [InputSolution(i.prec,i.dims,i.min,i.max,i.num_verts,i.num_edges,i.seed)]
+        input_solns = DataSet({0:InputSolution(i.prec,i.dims,i.min,i.max,i.num_verts,i.num_edges,i.seed)})
+    elif options.inputs_list_file is not None:
+        input_solns = DataSet.read_from_file(InputSolution, options.inputs_list_file)
 
     # prepare for a correctness data collection
     if options.correctness:
@@ -138,7 +145,7 @@ Searches for missing results and uses run_test.py to collect it."""
             revs = get_tracked_revs()
 
     # pull out just the Input object (results are keyed on these, not InputSolution)
-    inputs = [i.input() for i in input_solns]
+    inputs = [i.input() for i in input_solns.dataset.values()]
 
     # collect the data!
     what_to_do = None if options.list_only else collect_missing_data
