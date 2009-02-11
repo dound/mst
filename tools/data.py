@@ -302,7 +302,10 @@ class CorrResult(AbstractResult):
 
     @staticmethod
     def get_path_to(rev):
-        return get_path_to_project_root() + 'result/corr/' + rev
+        path = get_path_to_project_root() + 'result/corr/'
+        if not os.path.exists(path):
+            os.makedirs(path)
+        return path + rev
 
 class PerfResult(AbstractResult):
     """Data about an input, a revision, and how quickly it found the MST."""
@@ -345,7 +348,10 @@ class PerfResult(AbstractResult):
 
     @staticmethod
     def get_path_to(rev):
-        return get_path_to_project_root() + 'result/perf/' + rev
+        path = get_path_to_project_root() + 'result/perf/'
+        if not os.path.exists(path):
+            os.makedirs(path)
+        return path + rev
 
 class WeightResult(AbstractResult):
     """Data about an input, a revision, and the weight of the MST."""
@@ -394,7 +400,10 @@ class WeightResult(AbstractResult):
 
     @staticmethod
     def get_path_to(wtype):
-        return get_path_to_project_root() + 'result/weight/' + wtype
+        path = get_path_to_project_root() + 'result/weight/'
+        if not os.path.exists(path):
+            os.makedirs(path)
+        return path + wtype
 
 class ExtractInputFooterError(Exception):
     def __init__(self, msg):
