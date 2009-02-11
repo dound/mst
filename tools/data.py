@@ -230,7 +230,7 @@ class AbstractResult(AbstractData):
         return self.get_path_to(self.rev)
 
     def mykey(self):
-        return (self.__input, self.run_num)
+        return (self.input(), self.run_num)
 
     def __cmp__(self, other):
         ret = AbstractData.__cmp__(self, other)
