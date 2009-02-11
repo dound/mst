@@ -87,7 +87,7 @@ def check(input_graph, output_to_test, tolerance, force_recompute, rev=None, run
     (ti, ans_corr) = get_and_log_mst_weight_from_checker(input_graph, force_recompute)
 
     # are they the same?
-    fmt = '%.' + tolerance + 'f'
+    fmt = '%.' + str(tolerance) + 'f'
     str_ans_corr = fmt % ans_corr
     str_ans_out = fmt % ans_out
     if str_ans_corr == str_ans_out:
