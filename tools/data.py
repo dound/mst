@@ -224,7 +224,7 @@ class AbstractResult(AbstractData):
     def __init__(self, prec, dims, min_val, max_val, num_verts, num_edges, seed, rev, run_num):
         AbstractData.__init__(self, prec, dims, min_val, max_val, num_verts, num_edges, seed)
         self.rev = str(rev)
-        self.run_num = run_num
+        self.run_num = int(run_num)
 
     def get_path(self):
         return self.get_path_to(self.rev)
