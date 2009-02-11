@@ -367,7 +367,7 @@ def __re_get_group(pattern, haystack, group_num=0):
     from re.search, or raises an ExtractInputFooterError if it does not match"""
     x = re.search(pattern, haystack)
     if x is None:
-        return None
+        raise ExtractInputFooterError('pattern match failed for ' + pattern + ' in ' + haystack)
     else:
         return x.groups()[group_num]
 
@@ -379,16 +379,16 @@ def extract_input_footer(input_graph):
     about = lines[0]
 
     try:
-        num_dims = int(__re_get_group(r'd=(\d*)', about))
+        num_dims = int(__re_get_group(r' d=(\d*)', about))
     except ExtractInputFooterError:
         num_dims = 0
 
-    num_verts = int(__re_get_group(r'm=(\d*)', about))
-    num_edges = int(__re_get_group(r'n=(\d*)', about))
-    min_val = float(__re_get_group(r'min=(\d*.\d*)', about))
-    max_val = float(__re_get_group(r'max=(\d*.\d*)', about))
-    precision = int(__re_get_group(r'prec=(\d*)', about))
-    seed = int(__re_get_group(r'seed=(\d*)', about))
+    num_verts = int(__re_get_group(r' m=(\d*)', about))
+    num_edges = int(__re_get_group(r' n=(\d*)', about))
+    min_val = float(__re_get_group(r' min=(\d*.\d*)', about))
+    max_val = float(__re_get_group(r' max=(\d*.\d*)', about))
+    precision = int(__re_get_group(r' prec=(\d*)', about))
+    seed = int(__re_get_group(r' seed=(\d*)', about))
     return Input(precision, num_dims, min_val, max_val, num_verts, num_edges, seed)
 
 def get_tracked_revs():
