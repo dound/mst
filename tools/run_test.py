@@ -48,7 +48,7 @@ def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
     try:
         time_sec = extract_answer(time_file)
     except CheckerError, e:
-        print >> sys.stderr, "failed to read time file: " + e
+        print >> sys.stderr, "failed to read time file: " + str(e)
         return
     quiet_remove(time_file)
 
@@ -57,7 +57,7 @@ def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
         try:
             mst_weight = extract_answer(out)
         except CheckerError, e:
-            print >> sys.stderr, "failed to read weight file: " + e
+            print >> sys.stderr, "failed to read weight file: " + str(e)
             return
         str_mst_weight = '  mst_weight=' + str(mst_weight)
         if kill_out:
@@ -74,7 +74,7 @@ def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
     try:
         ti = extract_input_footer(input_graph)
     except ExtractInputFooterError, e:
-        raise CheckerError("run test error: unable to extract the input footer for %s: %s" % (rel_input_graph, e))
+        raise CheckerError("run test error: unable to extract the input footer for %s: %s" % (rel_input_graph, str(e)))
 
     # log the result
     if for_time:
@@ -82,13 +82,13 @@ def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
         try:
             DataSet.add_data_to_log_file(data)
         except DataError, e:
-            print >> sys.stderr, "Unable to log result to file %s (was trying to log %s): %s" % (str(data), e)
+            print >> sys.stderr, "Unable to log result to file %s (was trying to log %s): %s" % (data.get_path(), str(data), str(e))
     else:
         data = WeightResult(ti.dims, ti.num_verts, ti.seed, rev, trial_num, mst_weight)
         try:
             DataSet.add_data_to_log_file(data)
         except DataError, e:
-            print >> sys.stderr, "Unable to log result to file %s (was trying to log %s): %s" % (str(data), e)
+            print >> sys.stderr, "Unable to log result to file %s (was trying to log %s): %s" % (data.get_path(), str(data), str(e))
 
 def test_mst(is_test_perf, mst_binary, input_graph, out, do_log, rev, trial_num):
     trial_num = -1 if not do_log else trial_num
@@ -122,7 +122,7 @@ def __generate_input_graph(argstr, cleanup_generated_input):
     except Exception, errstr:
         ret = -1
     if ret != 0:
-        print 'error: aborting test (input generation failed): %s: %s' % (errstr, argstr)
+        print 'error: aborting test (input generation failed): %s: %s' % (str(errstr), argstr)
         __cleanup_and_exit(ret)
     return input_graph
 
