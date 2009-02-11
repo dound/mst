@@ -14,6 +14,15 @@ import heapq, os, sys
 __RND_SEED = None
 __rnd = None
 
+def get_density(num_verts, num_edges):
+    """Returns the 'density' of the edges in a graph"""
+    if num_verts == 1:
+        return 1.0
+    min_edges = num_verts - 1
+    num_edges_scaled = num_edges - min_edges
+    num_edge_choices = edges_in_complete_undirected_graph(num_verts) - min_edges
+    return float(num_edges_scaled) / num_edge_choices
+
 def print_input_header(num_verts, num_edges, out):
     print >> out, '%u' % num_verts
     print >> out, '%u' % num_edges
@@ -21,10 +30,7 @@ def print_input_header(num_verts, num_edges, out):
 def print_input_footer(num_verts, num_edges, about, out):
     """End with a comment in the input file describing it.  It should not be
     read by mst since it doesn't expect lines after the last edge."""
-    min_edges = num_verts - 1
-    num_edges_scaled = num_edges - min_edges
-    num_edge_choices = edges_in_complete_undirected_graph(num_verts) - min_edges
-    density = float(num_edges_scaled) / num_edge_choices
+    density = get_density(num_verts, num_edges)
     print >> out, '# %s: %s density=%.2f' % (strftime('%A %Y-%b-%d at %H:%M:%S'), about, density)
 
 def edges_in_complete_undirected_graph(num_verts):
@@ -84,7 +90,7 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
 
     # Assume the loose upper-bound is correct and switch over to the dense
     # algorithm when the density is quite high (empirically measured).
-    density = num_edges / float(edges_in_complete_undirected_graph(num_verts))
+    density = get_density(num_verts, num_edges)
     if density > 0.5 and False:
         print 'here'
         heap = []
@@ -292,7 +298,7 @@ used.)"""
             min_edge_len = 0
             max_edge_len = 100000
 
-        print_if_not_quiet('density=%s' % str(num_edges / float(edges_in_complete_undirected_graph(num_verts))))
+        print_if_not_quiet('density=%s' % get_density(num_verts, num_edges))
         about = gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, options.precision, out)
         dimensionality = 0
         min_val = min_edge_len
