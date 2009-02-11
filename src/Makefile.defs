@@ -7,7 +7,13 @@ ifeq ($(BUILD_TYPE),debug)
 BUILD_TYPE_FLAGS = -g -D_DEBUG_
 else
 MATH_OPTS = -ffast-math -fno-math-errno -ffinite-math-only -fno-trapping-math -fsingle-precision-constant
-BUILD_TYPE_FLAGS = -O3 -fwhole-program -mtune=nocana $(MATH_OPTS) -fprefetch-loop-arrays
+BUILD_TYPE_FLAGS = -O3 -fwhole-program $(MATH_OPTS)
+HOSTNAME_WO_DIGITS = $(shell echo $(HOSTNAME) | sed -re 's/[0-9]+//')
+ifeq ($(HOSTNAME),myth)
+BUILD_TYPE_FLAGS += -mtune=nocana -fprefetch-loop-arrays
+else
+$(warning disabling myth-specific optimizations since you are not compiling on myth)
+endif
 endif
 
 # compiler choices
