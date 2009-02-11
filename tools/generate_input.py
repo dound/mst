@@ -145,7 +145,10 @@ def gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos
     return "m=%d n=%d d=%d min=%.1f max=%.1f prec=%d seed=%s" % (num_verts, num_edges, num_dims,
                                                                  min_pos, max_pos, precision, str(__RND_SEED))
 
-def main(argv=sys.argv[1:], get_output_name_only=False):
+def is_input_for_part2(argv):
+    return main(argv, False, True)
+
+def main(argv=sys.argv[1:], get_output_name_only=False, get_is_for_part2=False):
     usage = """usage: %prog [options] NUM_VERTICES
 Generates a connected graph with no self-loops or parallel edges.  Output is
 sent to the default filename (""" + get_path_to_generated_inputs() + """/with
@@ -194,6 +197,10 @@ used.)"""
         parser.error("missing NUM_VERTICES")
     elif len(args) > 1:
         parser.error("too many arguments")
+
+    # just return whether the input specified would be for part 2
+    if get_is_for_part2:
+        return options.edge_weight_range is not None or options.vertex_pos_range is not None
 
     # initialize the random number generator
     global __RND_SEED
