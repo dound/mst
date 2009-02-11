@@ -329,7 +329,7 @@ class PerfResult(AbstractResult):
 class WeightResult(AbstractResult):
     """Data about an input, a revision, and the weight of the MST."""
     def __init__(self, dims, num_verts, seed, rev, run_num, mst_weight):
-        AbstractResult.__init__(self, 15, dims, 0.0, 1.0, num_verts, num_verts*(num_verts-1)/2, seed, rev, run_num)
+        AbstractResult.__init__(self, 15, dims, 0.0, 1.0, num_verts, int(num_verts)*(int(num_verts)-1)/2, seed, rev, run_num)
         self.mst_weight = float(mst_weight)
 
     def get_path(self):
