@@ -193,11 +193,14 @@ computation only):
     # prepare the output file
     if options.output_file:
         out = options.output_file
-    elif options.check:
-        out = random_tmp_filename(10)
-        __files_to_cleanup.append(out)
+        out_is_temporary = False
     else:
-        out = "/dev/null"
+        if options.check:
+            out = random_tmp_filename(10)
+            __files_to_cleanup.append(out)
+            out_is_temporary = True
+        else:
+            out = "/dev/null"
 
     # do the first run (and check the output if requested)
     test_mst(is_test_perf, mst_binary, input_graph, out, not options.dont_log, options.rev, options.trial_num)
@@ -211,6 +214,8 @@ computation only):
             ret = INCORRECT
             errmsg = ': ' + str(e)
 
+        if out_is_temporary:
+            quiet_remove(out)
         if ret != CORRECT:
             print '%s ===> INCORRECT *** CORRECTNESS FAILED'
             __cleanup_and_exit(-1)
