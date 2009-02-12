@@ -109,8 +109,8 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
     else:
         while num_edges > 0:
             # choose random vertices for an edge to connect
-            r1 = __rnd.randint(0, num_verts)
-            r2 = __rnd.randint(0, num_verts)
+            r1 = __rnd.randint(0, num_verts - 1)
+            r2 = __rnd.randint(0, num_verts - 1)
             if r1 > r2:
                 i = r1
                 j = r2
