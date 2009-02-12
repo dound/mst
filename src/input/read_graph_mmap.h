@@ -3,9 +3,8 @@
 #include <sys/stat.h> /* fstat */
 #include <stdlib.h> /* malloc */
 #include <string.h> /* strchr */
-
-#include <sys/types.h>
-#include <fcntl.h>
+#include <fcntl.h> /* O_RDONLY */
+#include <mst.h> /* edge */
 
 // read input file, store results in n, m, and G
 int read_graph_mmap(char *filename, int *n, int *m, edge **G)

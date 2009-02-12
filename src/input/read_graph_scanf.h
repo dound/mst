@@ -1,5 +1,6 @@
 #include <stdio.h>  /* fopen, fscanf */
 #include <stdlib.h> /* malloc */
+#include <mst.h> /* edge */
 
 // read input file, store results in n, m, and G
 int read_graph_scanf(char *filename, int *n, int *m, edge **G)

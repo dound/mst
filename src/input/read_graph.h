@@ -29,6 +29,8 @@
  * vertices (n), number edges (m), and edges in the graph (G).
  *
  * The implementation of this method depends on the INPUT_TYPE macro.
+ *
+ * @return 1 on success, 0 on failure
  */
 int read_graph(char *filename, int *n, int *m, edge **G);
 
