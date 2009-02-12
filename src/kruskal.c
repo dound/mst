@@ -4,12 +4,19 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <math.h>
 #include "mst.h"
 
+// the EXPLICIT_SET version maintains the set of elements in the connected
+// component while the other version maintains an implicit set in
+// the chained parent pointers
+#define EXPLICIT_SET
 
+// in EXPLICIT_SET version, initial size of each set to malloc
 #define INIT_CC_CAP 2
 
 
+#ifdef EXPLICIT_SET
 // set of vertices
 typedef struct
 {
@@ -21,19 +28,29 @@ typedef struct
     int size;
 } UFSet;
 
+#else
 // a node in the tree that represents the connected component
 typedef struct
 {
     int size;
     int parent;
 } UFCCNode;
+#endif
 
 
-// parent of each vertex
-int *parents;
-//UFCCNode *parents;
+#ifdef EXPLICIT_SET
 // sets of connected components
 UFSet *CCs;
+// parents of vertices
+int *parents;
+
+#else
+// parents of vertices
+UFCCNode *parents;
+// list and count of nodes whose parents pointers need to be updated
+int *toUpdate;
+int numToUpdate;
+#endif
 
 
 void makeUnionFind(int n);
@@ -48,6 +65,7 @@ void quickSort(edge *edges, int left, int right);
 // main function that algorithm must implement from mst.h
 void calculateMst(int n, int m, edge *G)
 {
+    n++; // dpi - todo remove
     T = (edge *)malloc((n-1)*sizeof(edge));
 
     makeUnionFind(n);
@@ -91,20 +109,13 @@ void runKruskals(int n, int m, edge *G)
 }
 
 /*** union find functions ***/
-inline void makeUnionFind(int n)
+void makeUnionFind(int n)
 {
-    // init parents
-    /*parents = (UFCCNode *)malloc((n+1)*sizeof(UFCCNode));
-    for (int i = 0; i < n+1; i++)
-    {
-        parents[i].parent = i;
-        parents[i].size = 0;
-        }*/
+#ifdef EXPLICIT_SET
     parents = (int *)malloc((n+1)*sizeof(int));
     for (int i = 0; i < n+1; i++)
     parents[i] = i;
     
-    /* todo dpi remove */
     CCs = (UFSet *)malloc((n+1)*sizeof(UFSet));
     for (int i = 0; i < n+1; i++)
     {
@@ -113,40 +124,31 @@ inline void makeUnionFind(int n)
         CCs[i].capacity = INIT_CC_CAP;
         CCs[i].size = 1;
         CCs[i].vertices[0] = i;
-        }
-    
+    }
+
+#else
+    parents = (UFCCNode *)malloc((n+1)*sizeof(UFCCNode));
+    for (int i = 0; i < n+1; i++)
+    {
+        parents[i].parent = i;
+        parents[i].size = 0;
+    }
+    toUpdate = (int *)malloc((sqrt(n)+1)*sizeof(int));
+#endif
 }
-/*
+
+/***** union-find code *****/
+#ifdef EXPLICIT_SET
 void unionCCs(int a, int b)
-{
-    if (parents[a].size <= parents[b].size)
-        setParent(a, b);
-    else
-        setParent(b, a);
-}
-// union helper func
-inline void setParent(int a, int b)
-{
-    parents[a].parent = b;
-    parents[b].size += parents[a].size;
-}
-inline int find(int u)
-{
-    while (parents[u].parent != u)
-        u = parents[u].parent;
-    return u;
-
-}*/
-
-inline void unionCCs(int a, int b)
 {
     if (CCs[a].size <= CCs[b].size)
         setParent(a, b);
     else
         setParent(b, a);
 }
+
 // union helper func
-inline void setParent(int a, int b)
+void setParent(int a, int b)
 {
     // grow array if necessary
       if (CCs[b].capacity < CCs[a].size + CCs[b].size)
@@ -169,11 +171,41 @@ inline void setParent(int a, int b)
     CCs[b].size += CCs[a].size;
 }
 
-inline int find(int u)
+int find(int u)
 {
     return parents[u];
-    }
+}
 
+#else
+void unionCCs(int a, int b)
+{
+    if (parents[a].size <= parents[b].size)
+        setParent(a, b);
+    else
+        setParent(b, a);
+}
+
+// union helper func
+void setParent(int a, int b)
+{
+    parents[a].parent = b;
+    parents[b].size += parents[a].size;
+    for (int i = 0; i < numToUpdate; i++)
+        parents[toUpdate[i]].parent = b;
+}
+
+int find(int u)
+{
+    numToUpdate = 0;
+    while (parents[u].parent != u)
+    {
+        toUpdate[numToUpdate] = u;
+        numToUpdate++;
+        u = parents[u].parent;
+    }
+    return u;
+}
+#endif
 
 void quickSort(edge *edges, int left, int right)
 {
