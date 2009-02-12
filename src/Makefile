@@ -6,9 +6,12 @@
 # make clean  -- clean up byproducts
 
 include Makefile.defs
+VPATH = input
 
 # define names of our build targets
 MST = mst
+IC = input_checker
+APPS = $(MST) $(IC)
 
 # compiler and its directives
 CC     = $(DEFAULT_CC)
@@ -16,13 +19,19 @@ LIBS   =
 CFLAGS = -c -Wall $(BUILD_TYPE_FLAGS)
 
 # project sources
-SRCS = mst.c kruskal.c
-OBJS = $(patsubst %.c,%.o,$(SRCS))
-DEPS = $(patsubst %.c,.%.d,$(SRCS))
+SRCS_MST = mst.c kruskal.c
+OBJS_MST = $(patsubst %.c,%.o,$(SRCS_MST))
+DEPS_MST = $(patsubst %.c,.%.d,$(SRCS_MST))
+
+# other helper sub-projects
+SRCS_IC = input_checker.c
+OBJS_IC = $(patsubst %.c,%.o,$(SRCS_IC))
+DEPS_IC = $(patsubst %.c,.%.d,$(SRCS_IC))
 
 # include the dependencies once we've built them
+DEPS_ALL = $(shell echo $(DEPS_MST) $(DEPS_IC) | sed -e 's/ /\n/g' | sort -u)
 ifdef INCLUDE_DEPS
-include $(DEPS)
+include $(DEPS_ALL)
 endif
 
 #########################
@@ -32,8 +41,9 @@ endif
 .PHONY: all check-cflags clean clean-all clean-deps debug release deps $(MST).ir
 
 # build our apps
-all: $(MST)
+all: $(APPS)
 
+# cleans out built objects if the compiler or flags have changed since the last build
 check-cflags:
 	@echo $(CC) $(CFLAGS) > .cflags_tmp; \
 	diff -q .cflags_prev .cflags_tmp > /dev/null && ok=1 || ok=0; \
@@ -63,17 +73,20 @@ debug release:
 	@$(MAKE) BUILD_TYPE=$@ all
 
 # build the dependency files
-deps: $(DEPS)
+deps: $(DEPS_ALL)
 
-# includes are ready build commands for client, server, and lib
-$(MST).ir: check-cflags $(OBJS)
-	$(CC) -o $(MST) $(OBJS) $(LIBS)
+# includes are ready build commands for the apps
+$(MST).ir: check-cflags $(OBJS_MST)
+	$(CC) -o $(MST) $(OBJS_MST) $(LIBS)
+
+$(IC).ir: check-cflags $(OBJS_IC)
+	$(CC) -o $(IC) $(OBJS_IC) $(LIBS)
 
 #########################
 ## REAL TARGETS
 #########################
-$(MST): deps
+$(APPS): deps
 	@$(MAKE) BUILD_TYPE=$(BUILD_TYPE) INCLUDE_DEPS=1 $@.ir
 
-$(DEPS): .%.d: %.c
+$(DEPS_ALL): .%.d: %.c
 	$(CC) -MM $(CFLAGS) $< > $@

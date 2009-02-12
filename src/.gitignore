@@ -1,4 +1,5 @@
 mst
+input_checker
 *.o
 .*.d
 .cflags_prev
