@@ -13,10 +13,15 @@ MST = mst
 IC = input_checker
 APPS = $(MST) $(IC)
 
+# handle custom defines
+ifneq ($(DEF), )
+CUSTOM_DEFS = $(shell echo -D$(DEF) | sed -e 's/,/ -D/g')
+endif
+
 # compiler and its directives
 CC     = $(DEFAULT_CC)
 LIBS   =
-CFLAGS = -c -Wall $(BUILD_TYPE_FLAGS)
+CFLAGS = -c -Wall $(BUILD_TYPE_FLAGS) $(CUSTOM_DEFS)
 
 # project sources
 SRCS_MST = mst.c kruskal.c
