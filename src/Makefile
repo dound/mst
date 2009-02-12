@@ -20,8 +20,9 @@ endif
 
 # compiler and its directives
 CC     = $(DEFAULT_CC)
+INCS   = -I.
 LIBS   =
-CFLAGS = -c -Wall $(BUILD_TYPE_FLAGS) $(CUSTOM_DEFS)
+CFLAGS = -c -Wall $(INCS) $(BUILD_TYPE_FLAGS) $(CUSTOM_DEFS)
 
 # project sources
 SRCS_MST = mst.c kruskal.c
