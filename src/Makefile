@@ -21,7 +21,7 @@ endif
 # compiler and its directives
 CC     = $(DEFAULT_CC)
 INCS   = -I.
-LIBS   =
+LIBS   = -lm
 CFLAGS = -c -Wall -std=gnu99 $(INCS) $(BUILD_TYPE_FLAGS) $(CUSTOM_DEFS)
 
 # project sources
