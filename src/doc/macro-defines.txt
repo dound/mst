@@ -1,0 +1,15 @@
+This is a simple list of #defines we have in our code.  The macro name has an
+underscore on either side if it is a toggle macro - e.g. define it to turn it
+on, and otherwise it is off.  Macro names not in this form have some value
+associated with them.
+
+#define _DEBUG_
+  Enables extra debugging code.  Enabled by default for debug builds.
+
+#define _NO_FLOATS_
+  Enables integer-only mode.
+
+#define INPUT_TYPE {SCANF, MMAP}
+  Sets which input reader to use (default is SCANF):
+    SCANF: a simple scanf reader
+    MMAP:  memory-mapped reader
