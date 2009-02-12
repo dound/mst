@@ -51,8 +51,8 @@ void calculateMst(int n, int m, edge *G)
     T = (edge *)malloc((n-1)*sizeof(edge));
 
     makeUnionFind(n);
-    //qsort(G, m, sizeof(edge), compareEdges);
-    quickSort(G, 0, m-1);
+    qsort(G, m, sizeof(edge), compareEdges);
+    //quickSort(G, 0, m-1);
     runKruskals(n, m, G);
 }
 
