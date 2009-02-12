@@ -1,6 +1,8 @@
 /**
  * Wrapper for the read_graph function.
  */
+#ifndef READ_GRAPH_H
+#define READ_GRAPH_H
 
 /* types of INPUT_TYPE */
 #define SCANF 0
@@ -8,7 +10,7 @@
 
 /* use the default value for INPUT_TYPE if one is not specified */
 #ifndef INPUT_TYPE
-#  define INPUT_TYPE SCANF
+#  define INPUT_TYPE MMAP
 #endif
 
 /* apply INPUT_TYPE */
@@ -29,3 +31,5 @@
  * The implementation of this method depends on the INPUT_TYPE macro.
  */
 int read_graph(char *filename, int *n, int *m, edge **G);
+
+#endif /* READ_GRAPH_H */
