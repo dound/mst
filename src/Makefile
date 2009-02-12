@@ -67,7 +67,7 @@ clean-all: clean clean-deps
 # clean up by-products (except dependency files)
 clean:
 	@echo -n "object and binary cleanup: "
-	rm -f *.o $(MST)
+	rm -f *.o $(APPS)
 
 # clean up dependency files
 clean-deps:
