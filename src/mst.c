@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
 
     int n, m;
     edge *G;
-    read_graph(argv[1], &n, &m, &G);
+    read_graph_to_edge_list(argv[1], &n, &m, &G);
     calculateMst(n, m, G);
     printGraph(T, n-1, mstWeight);
 

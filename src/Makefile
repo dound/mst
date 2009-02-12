@@ -25,12 +25,14 @@ LIBS   =
 CFLAGS = -c -Wall -std=gnu99 $(INCS) $(BUILD_TYPE_FLAGS) $(CUSTOM_DEFS)
 
 # project sources
-SRCS_MST = mst.c kruskal.c
+SRCS_COMMON = adj_matrix.c initialize_graph.c read_graph.c
+
+SRCS_MST = mst.c kruskal.c $(SRCS_COMMON)
 OBJS_MST = $(patsubst %.c,%.o,$(SRCS_MST))
 DEPS_MST = $(patsubst %.c,.%.d,$(SRCS_MST))
 
 # other helper sub-projects
-SRCS_IC = input_checker.c
+SRCS_IC = input_checker.c $(SRCS_COMMON)
 OBJS_IC = $(patsubst %.c,%.o,$(SRCS_IC))
 DEPS_IC = $(patsubst %.c,.%.d,$(SRCS_IC))
 
