@@ -22,7 +22,7 @@ endif
 CC     = $(DEFAULT_CC)
 INCS   = -I.
 LIBS   =
-CFLAGS = -c -Wall $(INCS) $(BUILD_TYPE_FLAGS) $(CUSTOM_DEFS)
+CFLAGS = -c -Wall -std=gnu99 $(INCS) $(BUILD_TYPE_FLAGS) $(CUSTOM_DEFS)
 
 # project sources
 SRCS_MST = mst.c kruskal.c

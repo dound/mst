@@ -11,7 +11,7 @@ include ../../src/Makefile.defs
 BCMW = boost_compute_mst_weight
 
 # compiler and its directives
-CC     = $(DEFAULT_CC)
+CC     = g++
 INC    = /afs/ir/users/d/g/dgu/lib  # include boost
 LIBS   =
 CPPFLAGS = -c -Wall $(BUILD_TYPE_FLAGS)
