@@ -65,7 +65,6 @@ void quickSort(edge *edges, int left, int right);
 // main function that algorithm must implement from mst.h
 void calculateMst(int n, int m, edge *G)
 {
-    n++; // dpi - todo remove
     T = (edge *)malloc((n-1)*sizeof(edge));
 
     makeUnionFind(n);
