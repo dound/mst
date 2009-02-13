@@ -1,4 +1,4 @@
-#include <input/adj_matrix.h>
+#include <input/adj_matrix.h> /* AM_INDEX */
 #include <input/initialize_graph.h> /* initialize_* */
 #include <stdio.h>  /* fopen, fscanf */
 #include <mst.h> /* edge */

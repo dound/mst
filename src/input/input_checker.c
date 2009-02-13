@@ -2,7 +2,7 @@
 #include <stdlib.h> /* system */
 #include <string.h> /* strcmp */
 #include <unistd.h> /* unlink */
-#include <input/adj_matrix.h> /* AM_INDEX_FAST */
+#include <input/adj_matrix.h> /* AM_WEIGHT_FAST, AM_NO_EDGE */
 #include <input/read_graph.h> /* read_graph */
 
 /* where checker will store temporary outputs */
@@ -118,8 +118,8 @@ int check_input(char* fn, int read_only, int graph_type) {
         float w;
         for(int i=1; i<=n; i++) {
             for(int j=i+1; j<=n; j++) {
-                w = weights[AM_INDEX_FAST(n, i, j)];
-                if(w >= 0.0f)
+                w = AM_WEIGHT_FAST(weights, n, i, j);
+                if(w != AM_NO_EDGE)
                     fprintf(out, "%d %d %.1f\n", i, j, w);
             }
         }

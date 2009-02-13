@@ -3,7 +3,7 @@
 #include <sys/mman.h> /* mmap */
 #include <sys/stat.h> /* fstat */
 #include <string.h> /* strchr */
-#include <input/adj_matrix.h>
+#include <input/adj_matrix.h> /* AM_INDEX */
 #include <input/initialize_graph.h>
 #include <mst.h> /* edge */
 

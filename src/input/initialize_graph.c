@@ -1,4 +1,5 @@
 #include <stdlib.h> /* malloc */
+#include <input/adj_matrix.h> /* AM_NO_EDGE */
 #include <input/initialize_graph.h>
 
 void initialize_edge_list(edge **G, int num_edges) {
@@ -12,5 +13,5 @@ void initialize_adjacency_list(void **G, int num_verts) {
 void initialize_adjacency_matrix(float **G, int num_verts) {
     float *weights = *G = (float*)malloc(num_verts * num_verts * sizeof(float));
     for(int i=0; i<num_verts*num_verts; i++)
-        weights[i] = -1.0f;
+        weights[i] = AM_NO_EDGE;
 }
