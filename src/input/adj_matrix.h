@@ -3,7 +3,7 @@
 
 #define FLOAT_NEG_1 0xbf800000
 #define FLOAT_MAX   0x7f7fffff
-#define AM_NO_EDGE  FLOAT_NEG_1
+#define AM_NO_EDGE  FLOAT_MAX
 
 /**
  * Returns the index of an edge in an adjacency matrix between edge u,v
