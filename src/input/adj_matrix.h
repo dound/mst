@@ -8,6 +8,6 @@
 int AM_INDEX(int num_verts, int u, int v);
 
 /* index to edge u, v in an adjacency matrix; u <= v must hold */
-#define AM_INDEX_FAST(num_verts, u, v) (u * num_verts + v)
+#define AM_INDEX_FAST(num_verts, u, v) ((u-1) * num_verts + (v-1))
 
 #endif /* ADJ_MATRIX_H */

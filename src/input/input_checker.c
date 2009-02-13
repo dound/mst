@@ -116,8 +116,8 @@ int check_input(char* fn, int read_only, int graph_type) {
     case ADJACENCY_MATRIX: {
         float *weights = (float*)VG;
         float w;
-        for(int i=0; i<n; i++) {
-            for(int j=0; i<n; i++) {
+        for(int i=1; i<=n; i++) {
+            for(int j=i+1; j<=n; j++) {
                 w = weights[AM_INDEX_FAST(n, i, j)];
                 if(w >= 0.0f)
                     fprintf(out, "%d %d %.1f\n", i, j, w);
