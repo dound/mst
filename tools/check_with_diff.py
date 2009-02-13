@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
-from mstutil import die, get_path_to_checker_binary, get_path_to_mst_binary, quiet_remove, random_tmp_filename
+from check_output import extract_answer
+from mstutil import get_path_to_checker_binary, get_path_to_mst_binary, get_path_to_project_root
+from mstutil import die, quiet_remove, random_tmp_filename
 import os, sys
 
 def main(argv=sys.argv):
@@ -31,10 +33,33 @@ so it will be recomputed every time this is run.
         quiet_remove(checker_out)
         die("failed to run checker (or exited with an error code)")
 
+    # check just the MST weight first
+    mst_w = extract_answer(mst_out)
+    checker_w = extract_answer(checker_out)
+    fmt = '%.1f' # tolerance to 1 decimal place
+    str_mst_w = fmt % mst_w
+    str_checker_w = fmt % checker_w
+    if str_mst_w == str_checker_w:
+        print 'Weights match!'
+        quiet_remove(mst_out)
+        quiet_remove(checker_out)
+        return 0
+    else:
+        print 'Weight mistmatch, comparing vertices!!'
+
+    # sort them
+    mst_out2 = random_tmp_filename(10)
+    checker_out2 = random_tmp_filename(10)
+    sort_and_order = get_path_to_project_root() + 'src/input/sort_and_order.py '
+    os.system(sort_and_order + mst_out + ' 1 > ' + mst_out2)
+    os.system(sort_and_order + checker_out + ' 1 > ' + checker_out2)
+
     # compare them
-    os.system('diff %s %s && echo No difference!' % (checker_out, mst_out))
+    os.system('diff %s %s && echo Edges are the same!' % (checker_out2, mst_out2))
     quiet_remove(mst_out)
+    quiet_remove(mst_out2)
     quiet_remove(checker_out)
+    quiet_remove(checker_out2)
     return 0
 
 if __name__ == "__main__":
