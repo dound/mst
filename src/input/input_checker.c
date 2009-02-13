@@ -134,13 +134,13 @@ int check_input(char* fn, int read_only, int graph_type) {
     if(graph_type != EDGE_LIST) { /* order will be fine for edge list */
         snprintf(cmd, 1024, "sort %s > .tmp", TMP_OUT);
         ret = (system(cmd)==0);
-        snprintf(cmd, 1024, "mv .tmp .%s", TMP_OUT);
+        snprintf(cmd, 1024, "mv .tmp %s", TMP_OUT);
         ret = (system(cmd)==0);
 
         snprintf(cmd, 1024, "sort %s > .tmp", fn);
         ret = (ret && system(cmd)==0);
         fn_to_diff = TMP_OUT2;
-        snprintf(cmd, 1024, "mv .tmp .%s", fn_to_diff);
+        snprintf(cmd, 1024, "mv .tmp %s", fn_to_diff);
         ret = (ret && system(cmd)==0);
 
         if(!ret) {
