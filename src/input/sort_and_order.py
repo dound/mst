@@ -12,17 +12,23 @@ def main(argv=sys.argv[1:]):
         print 'Unable to find', fn
         return -1
 
-    lines = fh.readlines()
-    for line in lines[:2]:
-        print int(line)
-
     cmts = ''
     edges = []
-    for line in lines[2:]:
+    lines = fh.readlines()
+    for line in lines:
+        # ignore comments until the end
         if line[0] == '#':
             cmts += line.rstrip()
             continue
+
         s = line.split()
+
+        # just print header lines back out as-is
+        if len(s) == 1:
+            print line.rstrip()
+            continue
+
+        # save vertex-vertex-weight lines for later, with u < v
         u = int(s[0])
         v = int(s[1])
         if u < v:
@@ -31,6 +37,8 @@ def main(argv=sys.argv[1:]):
             edges.append((v, u, s[2]))
 
     fh.close()
+
+    # print the vertex-vertex-weight lines in sorted order
     edges.sort()
     for (u, v, w) in edges:
         print u, v, w
