@@ -6,7 +6,7 @@
 #include <assert.h>
 #include <math.h>
 #include <input/read_graph.h> /* read_graph */
-#include "mst.h"
+#include <mst.h> /* edge, foi */
 
 // the EXPLICIT_SET version maintains the set of elements in the connected
 // component while the other version maintains an implicit set in
@@ -93,7 +93,7 @@ int compareEdges(const void *a, const void*b)
 void runKruskals(int n, int m, edge *G)
 {
     // total weight of mst
-    float mstWeight;
+    foi mstWeight;
     // array of edges in mst, T
     edge *T;
     T = (edge *)malloc((n-1)*sizeof(edge));
@@ -115,7 +115,7 @@ void runKruskals(int n, int m, edge *G)
         nextEdge++;
     }
 
-    printf("%f\n", mstWeight);
+    printf("%f\n", FOI_TO_OUTPUT_WEIGHT(mstWeight));
     for (int i = 0; i < n-1; i++)
         printf("%d %d\n", T[i].u, T[i].v);
 }

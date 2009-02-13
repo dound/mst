@@ -1,7 +1,7 @@
 #include <input/adj_matrix.h> /* AM_INDEX */
 #include <input/initialize_graph.h> /* initialize_* */
 #include <stdio.h>  /* fopen, fscanf */
-#include <mst.h> /* edge */
+#include <mst.h> /* edge, foi */
 
 // read input file, store results in n, m, and G
 #if   GRAPH_TYPE == EDGE_LIST
@@ -9,7 +9,7 @@ int read_graph_to_edge_list_scanf(char *filename, int *n, int *m, edge **G)
 #elif GRAPH_TYPE == ADJACENCY_LIST
 int read_graph_to_adjacency_list_scanf(char *filename, int *n, int *m, void **G)
 #elif GRAPH_TYPE == ADJACENCY_MATRIX
-int read_graph_to_adjacency_matrix_scanf(char *filename, int *n, int *m, float **weights)
+int read_graph_to_adjacency_matrix_scanf(char *filename, int *n, int *m, foi **weights)
 #else
 #  error unknown GRAPH_TYPE
 #endif
@@ -25,20 +25,34 @@ int read_graph_to_adjacency_matrix_scanf(char *filename, int *n, int *m, float *
 #elif GRAPH_TYPE == ADJACENCY_MATRIX
     initialize_adjacency_matrix(weights, *n);
     int u, v;
-    float w;
+    foi w;
+#endif
+#ifdef _NO_FLOATS_
+    int tmp;
 #endif
 
     int i = 0;
     int charsRead = 1;
     for (i = 0; i < *m; i++)
     {
-#if   GRAPH_TYPE == EDGE_LIST
+#if GRAPH_TYPE == EDGE_LIST
+#   ifdef _NO_FLOATS_
+        charsRead = fscanf(input, "%d %d %d.%d",
+                           &(*G)[i].u, &(*G)[i].v, &(*G)[i].weight, &tmp);
+        (*G)[i].weight = (*G)[i].weight * 10 + tmp;
+#   else
         charsRead = fscanf(input, "%d %d %f",
                            &(*G)[i].u, &(*G)[i].v, &(*G)[i].weight);
+#   endif
 #elif GRAPH_TYPE == ADJACENCY_LIST
-                           /* not yet implemented */
+        tmp = 0; /* not yet implemented */
 #elif GRAPH_TYPE == ADJACENCY_MATRIX
+#   ifdef _NO_FLOATS_
+        charsRead = fscanf(input, "%d %d %d.%d", &u, &v, &w, &tmp);
+        w = w * 10 + tmp;
+#   else
         charsRead = fscanf(input, "%d %d %f", &u, &v, &w);
+#   endif
         (*weights)[AM_INDEX(*n,u,v)] = w;
 #endif
 

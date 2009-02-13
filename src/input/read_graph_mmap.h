@@ -5,7 +5,7 @@
 #include <string.h> /* strchr */
 #include <input/adj_matrix.h> /* AM_INDEX */
 #include <input/initialize_graph.h>
-#include <mst.h> /* edge */
+#include <mst.h> /* edge, foi */
 
 // read input file, store results in n, m, and G
 #if   GRAPH_TYPE == EDGE_LIST
@@ -13,7 +13,7 @@ int read_graph_to_edge_list_mmap(char *filename, int *n, int *m, edge **G)
 #elif GRAPH_TYPE == ADJACENCY_LIST
 int read_graph_to_adjacency_list_mmap(char *filename, int *n, int *m, void **G)
 #elif GRAPH_TYPE == ADJACENCY_MATRIX
-int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, float **weights)
+int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **weights)
 #else
 #  error unknown GRAPH_TYPE
 #endif
@@ -49,7 +49,10 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, float **
 #elif GRAPH_TYPE == ADJACENCY_MATRIX
     initialize_adjacency_matrix(weights, *n);
     int u, v;
-    float w;
+    foi w;
+#endif
+#ifdef _NO_FLOATS_
+    int tmp;
 #endif
 
     int i = 0;
@@ -89,6 +92,9 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, float **
             digit--;
         }
         /*** parse weight ***/
+#ifdef _NO_FLOAT_
+#   error _NO_FLOAT_ is not yet supported by read_graph_*_mmap()
+#endif
         pwr = 1;
         input = delim+1;
         delim = strchr(input, '\n');

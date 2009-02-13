@@ -4,6 +4,7 @@
 #include <unistd.h> /* unlink */
 #include <input/adj_matrix.h> /* AM_WEIGHT_FAST, AM_NO_EDGE */
 #include <input/read_graph.h> /* read_graph */
+#include <mst.h> /* edge, foi */
 
 /* where checker will store temporary outputs */
 #define TMP_OUT ".input_checker_out.tmp"
@@ -83,7 +84,7 @@ int check_input(char* fn, int read_only, int graph_type) {
         break;
     case ADJACENCY_MATRIX:
         str_graph_type = "AM";
-        if(!read_graph_to_adjacency_matrix(fn, &n, &m, (float**)&VG)) {
+        if(!read_graph_to_adjacency_matrix(fn, &n, &m, (foi**)&VG)) {
             fprintf(stderr, "%s ERROR: failed to read in graph: %s\n", str_graph_type, fn);
             return -1;
         }
@@ -109,20 +110,20 @@ int check_input(char* fn, int read_only, int graph_type) {
     case EDGE_LIST: {
         edge *G = (edge*)VG;
         for(int i=0; i<m; i++)
-            fprintf(out, "%d %d %.1f\n", G[i].u, G[i].v, G[i].weight);
+            fprintf(out, "%d %d %.1f\n", G[i].u, G[i].v, FOI_TO_OUTPUT_WEIGHT(G[i].weight));
         break;
     }
     case ADJACENCY_LIST: {
         break;
     }
     case ADJACENCY_MATRIX: {
-        float *weights = (float*)VG;
-        float w;
+        foi *weights = (foi*)VG;
+        foi w;
         for(int i=1; i<=n; i++) {
             for(int j=i+1; j<=n; j++) {
                 w = AM_WEIGHT_FAST(weights, n, i, j);
                 if(w != AM_NO_EDGE)
-                    fprintf(out, "%d %d %.1f\n", i, j, w);
+                    fprintf(out, "%d %d %.1f\n", i, j, FOI_TO_OUTPUT_WEIGHT(w));
             }
         }
         break;

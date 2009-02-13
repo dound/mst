@@ -3,7 +3,14 @@
 
 #define FLOAT_NEG_1 0xbf800000
 #define FLOAT_MAX   0x7f7fffff
-#define AM_NO_EDGE  FLOAT_MAX
+#define UINT32_MAX  0xffffffff
+
+#ifndef _NO_FLOATS_
+#define EDGE_MAX UINT32_MAX
+#else
+#define EDGE_MAX FLOAT_MAX
+#endif
+#define AM_NO_EDGE EDGE_MAX
 
 /**
  * Returns the index of an edge in an adjacency matrix between edge u,v (u,v in

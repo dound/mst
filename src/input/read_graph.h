@@ -4,7 +4,7 @@
 #ifndef READ_GRAPH_H
 #define READ_GRAPH_H
 
-#include <mst.h>
+#include <mst.h> /* edge, foi */
 
 /* INPUT_TYPE: ways to read in a graph */
 #define SCANF 1
@@ -64,7 +64,7 @@ int read_graph_to_adjacency_list(char *filename, int *n, int *m, void **G);
  *
  * @return 1 on success, 0 on failure
  */
-int read_graph_to_adjacency_matrix(char *filename, int *n, int *m, float **weights);
+int read_graph_to_adjacency_matrix(char *filename, int *n, int *m, foi **weights);
 
 #endif /* READ_GRAPH_H */
 
