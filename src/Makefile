@@ -85,10 +85,10 @@ deps: $(DEPS_ALL)
 
 # includes are ready build commands for the apps
 $(MST).ir: check-cflags $(OBJS_MST)
-	$(CC) -o $(MST) $(OBJS_MST) $(LIBS)
+	$(CC) -o $(MST) $(OBJS_MST) $(LIBS) $(LINKER_CFLAGS)
 
 $(IC).ir: check-cflags $(OBJS_IC)
-	$(CC) -o $(IC) $(OBJS_IC) $(LIBS)
+	$(CC) -o $(IC) $(OBJS_IC) $(LIBS) $(LINKER_CFLAGS)
 
 #########################
 ## REAL TARGETS
