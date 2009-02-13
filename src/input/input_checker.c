@@ -88,6 +88,8 @@ int check_input(char* fn, int read_only, int graph_type) {
             return -1;
         }
         break;
+    default:
+        str_graph_type = "???";
     }
 
     /* stop if we were only supposed to read the graph */
