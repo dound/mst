@@ -77,7 +77,7 @@ void run_prim_dense(int sz_v, float *weights) {\
     /* print the MST */
     printf("%f\n", mst_weight);
     for(int i=1; i<sz_v; i++)
-        printf("%d %d\n", i, mst_edges[i]);
+        printf("%d %d\n", i+1, mst_edges[i]+1);
 
 #ifdef _DEBUG_
     /* be nice and free memory when we aren't going for performance */
