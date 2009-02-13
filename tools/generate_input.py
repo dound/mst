@@ -15,7 +15,11 @@ __RND_SEED = None
 __rnd = None
 
 def get_density(num_verts, num_edges):
-    """Returns the 'density' of the edges in a graph"""
+    """Returns the edge to vertex ratio (float)"""
+    return num_edges / float(num_verts)
+
+def get_percent_of_max(num_verts, num_edges):
+    """Returns the percent completeness of the graph (0 is a spanning tree, 1 is a complete graph)"""
     min_edges = num_verts - 1
     num_edges_scaled = num_edges - min_edges
     num_edge_choices = edges_in_complete_undirected_graph(num_verts) - min_edges
@@ -32,7 +36,8 @@ def print_input_footer(num_verts, num_edges, about, out):
     """End with a comment in the input file describing it.  It should not be
     read by mst since it doesn't expect lines after the last edge."""
     density = get_density(num_verts, num_edges)
-    print >> out, '# %s: %s density=%.2f' % (strftime('%A %Y-%b-%d at %H:%M:%S'), about, density)
+    pom = get_percent_of_max(num_verts, num_edges)
+    print >> out, '# %s: %s density=%.2f pom=%.2f' % (strftime('%A %Y-%b-%d at %H:%M:%S'), about, density, pom)
 
 def edges_in_complete_undirected_graph(num_verts):
     return (num_verts * (num_verts - 1)) / 2
@@ -91,7 +96,7 @@ def gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, pr
 
     # Assume the loose upper-bound is correct and switch over to the dense
     # algorithm when the density is quite high (empirically measured).
-    density = get_density(num_verts, num_edges)
+    density = get_percent_of_max(num_verts, num_edges)
     if density > 0.5 and False:
         heap = []
 
@@ -305,7 +310,7 @@ used.)"""
             min_edge_len = 0
             max_edge_len = 100000
 
-        print_if_not_quiet('density=%s' % get_density(num_verts, num_edges))
+        print_if_not_quiet('density=%s pom=%s' % (str(get_density(num_verts, num_edges)), str(get_percent_of_max(num_verts, num_edges))))
         about = gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, options.precision, out)
         dimensionality = 0
         min_val = min_edge_len
