@@ -5,6 +5,7 @@
 #include <string.h>
 #include <assert.h>
 #include <math.h>
+#include <input/read_graph.h> /* read_graph */
 #include "mst.h"
 
 // the EXPLICIT_SET version maintains the set of elements in the connected
@@ -63,9 +64,11 @@ void quickSort(edge *edges, int left, int right);
 
 
 // main function that algorithm must implement from mst.h
-void calculateMst(int n, int m, edge *G)
+void kruskal(char* fn)
 {
-    T = (edge *)malloc((n-1)*sizeof(edge));
+    int n, m;
+    edge *G;
+    read_graph_to_edge_list(fn, &n, &m, &G);
 
     makeUnionFind(n);
     //qsort(G, m, sizeof(edge), compareEdges);
@@ -89,6 +92,12 @@ int compareEdges(const void *a, const void*b)
 // runs kruskal's algorithm
 void runKruskals(int n, int m, edge *G)
 {
+    // total weight of mst
+    float mstWeight;
+    // array of edges in mst, T
+    edge *T;
+    T = (edge *)malloc((n-1)*sizeof(edge));
+
     int nextEdge = 0;
     mstWeight = 0;
     for (int i = 0; i < m && nextEdge < n-1; i++)
@@ -105,6 +114,10 @@ void runKruskals(int n, int m, edge *G)
         mstWeight += G[i].weight;
         nextEdge++;
     }
+
+    printf("%f\n", mstWeight);
+    for (int i = 0; i < n-1; i++)
+        printf("%d %d\n", T[i].u, T[i].v);
 }
 
 /*** union find functions ***/
@@ -114,7 +127,7 @@ void makeUnionFind(int n)
     parents = (int *)malloc((n+1)*sizeof(int));
     for (int i = 0; i < n+1; i++)
     parents[i] = i;
-    
+
     CCs = (UFSet *)malloc((n+1)*sizeof(UFSet));
     for (int i = 0; i < n+1; i++)
     {
