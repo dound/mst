@@ -59,8 +59,11 @@ Generates input for evaluating performance at different edge densities for a giv
     while True:
         for _ in range(options.num_per_step):
             num_edges = int(d * num_verts)
-            if num_edges > max_edges:
+            # stay within a complete graph, but round up to one if we get very close
+            if num_edges > max_edges or (num_edges/float(max_edges)) > 0.995:
                 num_edges = max_edges
+                d = options.max + 1 # stop after this iteration
+
             args = '-p1 -l %s -n %u %u' % (inputs_list_file, num_edges, num_verts)
             try:
                 print 'generating new input: ' + args
