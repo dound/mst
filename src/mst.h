@@ -13,4 +13,7 @@ typedef struct
 /** run Kruskal's algorithm */
 void kruskal(char* fn);
 
+/** run a version of Prim's algorithm optimized for dense-graphs */
+void prim_dense(char* fn);
+
 #endif

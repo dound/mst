@@ -12,8 +12,6 @@ LINKER_CFLAGS = -fwhole-program
 HOSTNAME_WO_DIGITS = $(shell echo $(HOSTNAME) | sed -re 's/[0-9]+//')
 ifeq ($(HOSTNAME),myth)
 BUILD_TYPE_FLAGS += -mtune=nocana -fprefetch-loop-arrays
-else
-$(warning disabling myth-specific optimizations since you are not compiling on myth)
 endif
 endif
 
