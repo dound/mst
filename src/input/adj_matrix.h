@@ -6,9 +6,13 @@
 #define AM_NO_EDGE  FLOAT_MAX
 
 /**
- * Returns the index of an edge in an adjacency matrix between edge u,v
+ * Returns the index of an edge in an adjacency matrix between edge u,v (u,v in
+ * range [1,n]).
  */
 int AM_INDEX(int num_verts, int u, int v);
+
+/* AM_INDEX but u,v in range [0, n-1] */
+int AM_INDEX_NO_ADJ(int num_verts, int u, int v);
 
 /* index of edge u, v in an adjacency matrix; u <= v must hold (u,v in range [0,n-1]) */
 #define AM_INDEX_FAST_NO_ADJ(num_verts, u, v) ((u) * (num_verts) + (v))
