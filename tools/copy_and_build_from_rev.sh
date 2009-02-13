@@ -44,11 +44,18 @@ if [ $# -eq 3 ]; then
     tmpBranch=tmp$rev
     git branch $tmpBranch $rev
     git checkout -q $tmpBranch
+
+    # build the binary
+    name=`basename $src`
+    make -C $dir BUILD_TYPE=release $name > /dev/null
 fi
 
-# build and copy the binary
-name=`basename $src`
-make -C $dir BUILD_TYPE=release $name > /dev/null
+# for current revision tests, only build if not already built
+if [ ! -f $src ]; then
+    make -C $dir BUILD_TYPE=release $name > /dev/null
+fi
+
+# copy the existing binary
 cp $src $dst
 
 if [ $# -eq 3 ]; then
