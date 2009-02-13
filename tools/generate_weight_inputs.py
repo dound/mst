@@ -4,7 +4,7 @@ from generate_input import main as generate_input
 from optparse import OptionParser
 import sys
 
-def main(argv=sys.argv):
+def main(argv=sys.argv[1:]):
     usage = """usage: %prog [options]
 Generates input for part 2 of the project en masse.
 
@@ -36,6 +36,8 @@ Examples:
                       type="int", default=1024,
                       help="maximum number of vertices to generate a graph for [default: %default]")
     (options, args) = parser.parse_args(argv)
+    if len(args) > 1:
+        parser.error("too many arguments")
 
     if options.dims == 0:
         what = '-e 0.0,1.0'
