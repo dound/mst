@@ -4,12 +4,16 @@
 #include <string.h>
 
 #define USE_DOUBLES 0
+#define USE_FLOATS 0
 #if USE_DOUBLES == 1
 #   define FP_TYPE double
 #   define SCANF_FP_STR "%d %d %lf"
-#else
+#elif USE_FLOATS == 1
 #   define FP_TYPE float
 #   define SCANF_FP_STR "%d %d %f"
+#else
+#   define FP_TYPE int
+#   define SCANF_FP_STR "%d %d %d.%d"
 #endif
 
 int main(int argc, char** argv) {
@@ -46,7 +50,14 @@ int main(int argc, char** argv) {
   FP_TYPE* weights = new FP_TYPE[num_edges];
   int u, v;
   for(unsigned i=0; i<num_edges; i++){
+#if USE_DOUBLES!=0 || USE_FLOATS!=0
       if(fscanf(fp, SCANF_FP_STR, &u, &v, &weights[i]) != 3) {
+#else
+      int tmp;
+      if(fscanf(fp, SCANF_FP_STR, &u, &v, &weights[i], &tmp) == 4)
+          weights[i] = weights[i] * 10 + tmp;
+      else {
+#endif
           fprintf(stderr, "checker: bad line in input %s\n", argv[1]);
           exit(1);
       }
@@ -68,7 +79,11 @@ int main(int argc, char** argv) {
        ei != spanning_tree.end(); ++ei) {
       total_weight += weight[*ei];
   }
+#if USE_DOUBLES!=0 || USE_FLOATS!=0
   printf("%.15f\n", total_weight);
+#else
+  printf("%.15f\n", total_weight / 10.0f);
+#endif
 
   // print edges if desired
   if(print_mst_edges) {
