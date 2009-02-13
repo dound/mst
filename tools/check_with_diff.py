@@ -45,7 +45,7 @@ so it will be recomputed every time this is run.
         quiet_remove(checker_out)
         return 0
     else:
-        print 'Weight mistmatch, comparing vertices!! (checker_mst - our_mst = %s)' % str(checker_w - mst_w)
+        print 'Weight mistmatch, comparing vertices!! (checker_mst (%s) - our_mst (%s) = %s)' % (str(checker_w), str(mst_w), str(checker_w - mst_w))
 
     # sort them
     mst_out2 = random_tmp_filename(10)
