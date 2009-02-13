@@ -61,8 +61,8 @@ Searches for missing results and uses run_test.py to collect it."""
                       action="store_true", default=False,
                       help="only list missing data (do not collect it)")
     parser.add_option("-n", "--num-runs",
-                      type="int", default="5",
-                      help="number of desired runs per revision-input combination [default: %default]")
+                      type="int", default="1",
+                      help="number of desired runs per revision-input combination [default: 1]")
     parser.add_option("-r", "--rev",
                       help="restrict the missing data check to the specified revision, or 'all' [default: current]")
 
