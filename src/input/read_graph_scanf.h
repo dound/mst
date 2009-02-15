@@ -45,7 +45,9 @@ int read_graph_to_adjacency_matrix_scanf(char *filename, int *n, int *m, foi **w
                            &(*G)[i].u, &(*G)[i].v, &(*G)[i].weight);
 #   endif
 #elif GRAPH_TYPE == ADJACENCY_LIST
+#   ifdef _NO_FLOATS_
         tmp = 0; /* not yet implemented */
+#   endif
 #elif GRAPH_TYPE == ADJACENCY_MATRIX
 #   ifdef _NO_FLOATS_
         charsRead = fscanf(input, "%d %d %d.%d", &u, &v, &w, &tmp);
