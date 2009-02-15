@@ -10,7 +10,7 @@ int main(int argc, char **argv) {
     }
 #endif
 
-#ifdef PRIM_DENSE
+#if 1
     prim_dense(argv[1]);
 #else
     kruskal(argv[1]);
