@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
 from generate_input import main as generate_input
+from mstutil import get_path_to_tools_root
 from optparse import OptionParser
-import sys
+import os, sys
 
 def main(argv=sys.argv[1:]):
     usage = """usage: %prog [options]
@@ -23,6 +24,9 @@ Examples:
     parser.add_option("-d", "--dims",
                       type="int", default=0,
                       help="number of dimensions to use; 0 => use random edge weights [default: %default]")
+    parser.add_option("-g", "--go",
+                      action="store_true", default=False,
+                      help="run right away rather than generating inputs")
     parser.add_option("-l", "--min",
                       type="int", default=1,
                       help="minimum number of vertices to generate a graph for [default: %default]")
@@ -59,16 +63,23 @@ Examples:
     v = options.min
     while True:
         for _ in range(options.num_per_step):
-            args = '-p15 %s %u' % (what, int(v))
-            try:
-                print 'generating new input: ' + args
-                ret = generate_input(args.split())
-            except Exception, errstr:
-                print >> sys.stderr, 'generate_weight_inputs failed for: ' + args + ': ' + str(errstr)
-                return -1
-            if ret != 0:
-                print >> sys.stderr, 'generate_weight_inputs failed for: ' + args
-                return -1
+            if not options.go:
+                args = '-p15 %s %u' % (what, int(v))
+                try:
+                    print 'generating new input: ' + args
+                    ret = generate_input(args.split())
+                except Exception, errstr:
+                    print >> sys.stderr, 'generate_weight_inputs failed for: ' + args + ': ' + str(errstr)
+                    return -1
+                if ret != 0:
+                    print >> sys.stderr, 'generate_weight_inputs failed for: ' + args
+                    return -1
+            else:
+                cmd = get_path_to_tools_root() + 'run_test.py'
+                cmd += " -G '-p15 %s %u' -n1" % (what, int(v))
+                if os.system(cmd) != 0:
+                    print >> sys.stderr, 'generate_weight_inputs GO mode failed for: ' + cmd
+                    return -1
 
         if v >= options.max:
             break
