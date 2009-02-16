@@ -1,4 +1,5 @@
 from math import sqrt
+import sys
 
 # t-distribution values for 90, 95, and 99% confidence intervals for degrees of freedom up to 100 (inclusive)
 MAX_DF = 100
@@ -45,7 +46,11 @@ class ResultAccumulator:
 
         self.mean = self.tot / n
         dev_sq = [(v - self.mean)*(v - self.mean) for v in self.values]
-        self.var = sum(dev_sq) / (n - 1)
+        if n > 1:
+            self.var = sum(dev_sq) / (n - 1)
+        else:
+            self.sdev = self.sdev_mean = self.lower99 = self.upper99 = -1.0
+            return
         self.sdev = sqrt(self.var)
         self.sdev_mean = self.sdev / sqrt(n)
         (self.lower99, self.upper99) = self.conf(99)

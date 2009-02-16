@@ -30,7 +30,8 @@ def gather_weight_data(wtype):
         for num_verts in keys:
             r = results[num_verts]
             r.compute_stats()
-            print >> fh, '%u\t%.3f\t%.3f\t%.3f' % (num_verts, r.lower99, r.mean, r.upper99)
+            if len(r.values) > 1:
+                print >> fh, '%u\t%.3f\t%.3f\t%.3f\t%u' % (num_verts, r.lower99, r.mean, r.upper99, len(r.values))
         fh.close()
         return 0
     except IOError, e:
