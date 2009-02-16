@@ -14,6 +14,13 @@ associated with them.
     SCANF: a simple scanf reader
     MMAP:  memory-mapped reader
 
+#define ALG {BEST_ALG, KRUSKAL, PRIM_DENSE, PRIM_BHEAP, KKT}
+  Sets which algorithm to use (default is BEST_ALG):
+    BEST_ALG: choose the algorithm based on empircal density results
+    KRUSKAL: use kruskal's algorithm
+    PRIM_DENSE: Prim's algorithm for dense graphs
+    PRIM_BHEAP: Prim's algorithm with binary heaps
+    KKT: Karger-Klein-Tarjan randomized algorithm
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------

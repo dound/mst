@@ -2,6 +2,18 @@
 #ifndef MST_H
 #define MST_H
 
+/** MST algorithms */
+#define BEST_ALG   1
+#define KRUSKAL    2
+#define PRIM_DENSE 3
+#define PRIM_BHEAP 4
+#define KKT        5
+
+/* use the default value for ALG if one is not specified */
+#ifndef ALG
+#  define ALG BEST_ALG
+#endif
+
 /** whether to use ints instead of floats wherever possible */
 #ifdef _NO_FLOATS_
     typedef int foi;
