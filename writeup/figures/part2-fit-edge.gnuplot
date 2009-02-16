@@ -40,12 +40,12 @@ loglin2fit(x)  = loglin2fit_m  * x**loglin2fit_e * log2(x)  + loglin2fit_c
 exp2fit(x)     = exp2fit_m     * exp2fit_b**x               + exp2fit_c
 
 # fit them
-fit const2fit(x)   fitdata using 1:3 via const2fit_c
-fit log2fit(x)     fitdata using 1:3 via log2fit_m, log2fit_c
-fit lindlog2fit(x) fitdata using 1:3 via lindlog2fit_m, lindlog2fit_e, lindlog2fit_c
-fit lin2fit(x)     fitdata using 1:3 via lin2fit_m, lin2fit_e, lin2fit_c
-fit loglin2fit(x)  fitdata using 1:3 via loglin2fit_m, loglin2fit_e, loglin2fit_c
-fit exp2fit(x)     fitdata using 1:3 via exp2fit_m, exp2fit_b, exp2fit_c
+fit const2fit(x)   fitdata using 1:3:2:4 via const2fit_c
+fit log2fit(x)     fitdata using 1:3:2:4 via log2fit_m, log2fit_c
+fit lindlog2fit(x) fitdata using 1:3:2:4 via lindlog2fit_m, lindlog2fit_e, lindlog2fit_c
+fit lin2fit(x)     fitdata using 1:3:2:4 via lin2fit_m, lin2fit_e, lin2fit_c
+fit loglin2fit(x)  fitdata using 1:3:2:4 via loglin2fit_m, loglin2fit_e, loglin2fit_c
+fit exp2fit(x)     fitdata using 1:3:2:4 via exp2fit_m, exp2fit_b, exp2fit_c
 
 plot fitdata using 1:3 title 'Data: random edge lengths' with linespoints, \
      const2fit(x)   title sprintf('%1.f: constant', const2fit_c)                                                               ls 1, \
