@@ -1,0 +1,52 @@
+unset title
+unset label
+set autoscale
+set key bottom right
+set size 0.7, 0.7
+
+set xlabel "Number of Vertices"
+set grid x
+set xr [2:7481]
+set logscale x 2
+
+set ylabel "Average MST Weight"
+set grid y
+set format y "%G"
+set yr [1:252]
+set logscale y 2
+
+set terminal postscript eps color enhanced linewidth 3 dashed
+set output "part2-fit-loc3.eps"
+
+set style line 1 lt 1 lc rgb "#000000" pt 1
+set style line 2 lt 2 lc rgb "#CC0000" pt 2
+set style line 3 lt 3 lc rgb "#00CC00" pt 3
+set style line 4 lt 1 lc rgb "#0000CC" pt 4
+set style line 5 lt 2 lc rgb "#00CC00" pt 5
+set style line 6 lt 3 lc rgb "#0000CC" pt 6
+
+# data to fit
+fitdata = "../data/weight/loc3.dat"
+
+log2(x) = log(x) / log(2)
+
+#functions to fit
+# vars:  m=multiplier, c=additive constant, e=exponentiation power, b=exponentiation base
+#function        multiplier      growth rate                  additive const
+const2fit(x)   = const2fit_c
+log2fit(x)     = log2fit_m     * log2(x)                    + log2fit_c
+lindlog2fit(x) = lindlog2fit_m * x**lindlog2fit_e / log2(x) + lindlog2fit_c
+lin2fit(x)     = lin2fit_m     * x**lin2fit_e               + lin2fit_c
+loglin2fit(x)  = loglin2fit_m  * x**loglin2fit_e * log2(x)  + loglin2fit_c
+exp2fit(x)     = exp2fit_m     * exp2fit_b**x               + exp2fit_c
+
+# fit them
+fit const2fit(x)   fitdata using 1:3 via const2fit_c
+fit log2fit(x)     fitdata using 1:3 via log2fit_m, log2fit_c
+fit lindlog2fit(x) fitdata using 1:3 via lindlog2fit_m, lindlog2fit_e, lindlog2fit_c
+fit lin2fit(x)     fitdata using 1:3 via lin2fit_m, lin2fit_e, lin2fit_c
+fit loglin2fit(x)  fitdata using 1:3 via loglin2fit_m, loglin2fit_e, loglin2fit_c
+fit exp2fit(x)     fitdata using 1:3 via exp2fit_m, exp2fit_b, exp2fit_c
+
+plot fitdata using 1:3 title '3D' with linespoints, const2fit(x) ls 1, log2fit(x)    ls 2, lindlog2fit(x) ls 3, \
+                                                    lin2fit(x)   ls 4, loglin2fit(x) ls 5, exp2fit(x)     ls 6
