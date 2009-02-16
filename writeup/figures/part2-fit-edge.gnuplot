@@ -6,7 +6,7 @@ set size 0.7, 0.7
 
 set xlabel "Number of Vertices"
 set grid x
-set xr [2:7481]
+set xr [64:7481]
 set logscale x
 
 set ylabel "Average MST Weight"
@@ -48,9 +48,10 @@ fit loglin2fit(x)  fitdata using 1:3:2:4 via loglin2fit_m, loglin2fit_e, loglin2
 fit exp2fit(x)     fitdata using 1:3:2:4 via exp2fit_m, exp2fit_b, exp2fit_c
 
 plot fitdata using 1:3 title 'Data: random edge lengths' with linespoints, \
+     fitdata using 1:3:2:4 title 'Edge'    with yerrorbars, \
      const2fit(x)   title sprintf('%1.f: constant', const2fit_c)                                                               ls 1, \
-     log2fit(x)     title sprintf('%.1f * log2(x) + %.1f: log', log2fit_m, log2fit_c)                                          ls 2, \
-     lindlog2fit(x) title sprintf('%.1f * x^{%.1f} / log2(x) + %.1f: linear/log', lindlog2fit_m, lindlog2fit_e, lindlog2fit_c) ls 3, \
-     lin2fit(x)     title sprintf('%.1f * x^{%.1f} + %.1f: linear', lin2fit_m, lin2fit_e, lin2fit_c)                           ls 4, \
-     loglin2fit(x)  title sprintf('%.1f * x^{%.1f} * log2(x) + %.1f: linear*log', loglin2fit_m, loglin2fit_e, loglin2fit_c)    ls 5, \
-     exp2fit(x)     title sprintf('%.1f * %.1f^x + %.1f: exponential', exp2fit_m, exp2fit_b, exp2fit_c)                        ls 6
+     lindlog2fit(x) title sprintf('%.3f * x^{%.2f} / log2(x) + %.1f: linear/log', lindlog2fit_m, lindlog2fit_e, lindlog2fit_c) ls 3, \
+     lin2fit(x)     title sprintf('%.3f * x^{%.2f} + %.1f: linear', lin2fit_m, lin2fit_e, lin2fit_c)                           ls 4, \
+     loglin2fit(x)  title sprintf('%.3f * x^{%.2f} * log2(x) + %.1f: linear*log', loglin2fit_m, loglin2fit_e, loglin2fit_c)    ls 5, \
+     exp2fit(x)     title sprintf('%.1f * %.1f^x + %.1f: exponential', exp2fit_m, exp2fit_b, exp2fit_c)                        ls 6, \
+     log2fit(x)     title sprintf('%.4f * log2(x) + %.1f: log', log2fit_m, log2fit_c)                                          ls 2
