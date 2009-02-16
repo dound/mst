@@ -48,5 +48,10 @@ fit lin2fit(x)     fitdata using 1:3 via lin2fit_m, lin2fit_e, lin2fit_c
 fit loglin2fit(x)  fitdata using 1:3 via loglin2fit_m, loglin2fit_e, loglin2fit_c
 fit exp2fit(x)     fitdata using 1:3 via exp2fit_m, exp2fit_b, exp2fit_c
 
-plot fitdata using 1:3 title '3D' with linespoints, const2fit(x) ls 1, log2fit(x)    ls 2, lindlog2fit(x) ls 3, \
-                                                    lin2fit(x)   ls 4, loglin2fit(x) ls 5, exp2fit(x)     ls 6
+plot fitdata using 1:3 title 'Data: random points in 3D-space' with linespoints, \
+     const2fit(x)   title sprintf('%1.f: constant', const2fit_c)                                                               ls 1, \
+     log2fit(x)     title sprintf('%.1f * log2(x) + %.1f: log', log2fit_m, log2fit_c)                                          ls 2, \
+     lindlog2fit(x) title sprintf('%.1f * x^{%.1f} / log2(x) + %.1f: linear/log', lindlog2fit_m, lindlog2fit_e, lindlog2fit_c) ls 3, \
+     lin2fit(x)     title sprintf('%.1f * x^{%.1f} + %.1f: linear', lin2fit_m, lin2fit_e, lin2fit_c)                           ls 4, \
+     loglin2fit(x)  title sprintf('%.1f * x^{%.1f} * log2(x) + %.1f: linear*log', loglin2fit_m, loglin2fit_e, loglin2fit_c)    ls 5, \
+     exp2fit(x)     title sprintf('%.1f * %.1f^x + %.1f: exponential', exp2fit_m, exp2fit_b, exp2fit_c)                        ls 6
