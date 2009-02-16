@@ -8,30 +8,38 @@ MAX_COMMIT_MSG_LEN=50
 
 # build the new file by iterating through all revisions in chrono order
 function rebuildCONF {
+    mytags=$1
+    shift
+
     newCONF=$CONF.new
-    echo -e "#Line#\tRev#\tSHA1      \tFirst Line of Commit Message" > $newCONF
+    echo -e "#Line#\tRev#\tSHA1      \tTags\tFirst Line of Commit Message" > $newCONF
     git-rev-list --reverse --pretty=oneline HEAD > .tmp
     i=0
     j=0
     while read line; do
         sha1=`echo $line | cut -d\  -f1`
         sha1="${sha1:0:$MAX_SHA1_LEN}"
-        
+
         for tsha1 in $@; do
             if [ "$sha1" = "$tsha1" ]; then
-                msg=`echo $line | cut -d\  -f2-`
+                if [ $1 = $tsha1 ]; then
+                    tags=$mytags
+                else
+                    tags=`fgrep $sha1 $CONF | cut -f4`
+                fi
+                msg=`echo $line | cut -d\  -f3-`
 
                 if [ ${#msg} -gt $MAX_COMMIT_MSG_LEN ]; then
                     msg="${msg:0:$MAX_COMMIT_MSG_LEN}..."
                 fi
 
-                echo -e "$j\t$i\t$sha1\t$msg" >> $newCONF
+                echo -e "$j\t$i\t$sha1\t$tags\t$msg" >> $newCONF
                 j=$(($j + 1))
                 break
             fi
         done
-        
-        i=$(($i + 1))               
+
+        i=$(($i + 1))
     done < .tmp
     rm -f .tmp
     mv $newCONF $CONF
@@ -54,6 +62,12 @@ if [ $1 = "add" -o $1 = "del" ]; then
     else
         rev="$2"
     fi
+    if [ $# -lt 3 ]; then
+        tags=
+    else
+        tags=`echo $3 | sed -e 's# #_#g'`
+    fi
+
     mysha1=`git log $rev | head -n 1 | sed -e 's#commit ##'`
     mysha1="${mysha1:0:$MAX_SHA1_LEN}"
 
@@ -64,7 +78,7 @@ if [ $1 = "add" -o $1 = "del" ]; then
         if [ $exist -eq 1 ]; then
             echo "$mysha1 is already being tracked"
         else
-            rebuildCONF $mysha1 `cat $CONF | cut -f3`
+            rebuildCONF "$tags" $mysha1 `cat $CONF | cut -f3`
             msg=`fgrep $mysha1 $CONF | cut -f4-`
             echo "$mysha1 is now being tracked: $msg"
         fi
