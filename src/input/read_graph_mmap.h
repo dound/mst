@@ -2,7 +2,7 @@
 #include <stdio.h>  /* fopen, sscanf */
 #include <sys/mman.h> /* mmap */
 #include <sys/stat.h> /* fstat */
-#include <string.h> /* strchr */
+#include <string.h> /* memset, strchr */
 #include <input/adj_matrix.h> /* AM_INDEX */
 #include <input/initialize_graph.h>
 #include <mst.h> /* edge, foi */
@@ -44,6 +44,7 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
 
 #if   GRAPH_TYPE == EDGE_LIST
     initialize_edge_list(G, *m);
+    memset(*G, 0, (*m)*sizeof(edge));
 #elif GRAPH_TYPE == ADJACENCY_LIST
     initialize_adjacency_list(G, *n);
 #elif GRAPH_TYPE == ADJACENCY_MATRIX
