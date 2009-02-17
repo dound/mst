@@ -14,11 +14,13 @@ associated with them.
     SCANF: a simple scanf reader
     MMAP:  memory-mapped reader
 
-#define ALG {BEST_ALG, KRUSKAL, PRIM_DENSE, PRIM_BHEAP, KKT}
+#define ALG {BEST_ALG, KRUSKAL_*, PRIM_DENSE, PRIM_BHEAP, KKT}
   Sets which algorithm to use (default is BEST_ALG):
     BEST_ALG: choose the algorithm based on empircal density results
-    KRUSKAL_EXPLICIT: use kruskal's algorithm with explicit sets
-    KRUSKAL_IMPLICIT: use kruskal's algorithm with implicit sets
+    KRUSKAL_EXPLICIT_FS: use kruskal's algorithm with explicit sets and full sort
+    KRUSKAL_EXPLICIT_PS: use kruskal's algorithm with explicit sets and partial sort
+    KRUSKAL_IMPLICIT_FS: use kruskal's algorithm with implicit sets and full sort
+    KRUSKAL_IMPLICIT_PS: use kruskal's algorithm with implicit sets and partial sort
     PRIM_DENSE: Prim's algorithm for dense graphs
     PRIM_BHEAP: Prim's algorithm with binary heaps
     KKT: Karger-Klein-Tarjan randomized algorithm
