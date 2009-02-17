@@ -7,7 +7,7 @@ ifeq ($(BUILD_TYPE),debug)
 BUILD_TYPE_FLAGS = -g -D_DEBUG_
 else
 MATH_OPTS = -ffast-math -fno-math-errno -ffinite-math-only -fno-trapping-math -fsingle-precision-constant
-BUILD_TYPE_FLAGS = -O3 $(MATH_OPTS)
+BUILD_TYPE_FLAGS = -O3 -DNDEBUG $(MATH_OPTS)
 LINKER_CFLAGS = -fwhole-program
 HOSTNAME_WO_DIGITS = $(shell echo $(HOSTNAME) | sed -re 's/[0-9]+//')
 ifeq ($(HOSTNAME),myth)
