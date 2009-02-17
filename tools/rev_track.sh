@@ -50,9 +50,9 @@ if [ $# -lt 1 ]; then
     echo "Simple interface to which revisions we are tracking for performance reasons."
     echo ""
     echo "Commands:"
-    echo "  add REV - starts tracking git revision REV"
-    echo "  del REV - stops tracking git revision REV"
-    echo "  list - lists revisions being tracked"
+    echo "  add REV [tags] - starts tracking git revision REV"
+    echo "  del REV [tags] - stops tracking git revision REV"
+    echo "  list [tag_re]  - lists revisions being tracked with (if specified) tags matching the regular expression tag_re"
     exit 1
 fi
 
@@ -92,7 +92,19 @@ if [ $1 = "add" -o $1 = "del" ]; then
         fi
     fi
 elif [ $1 = "list" ]; then
-    cat $CONF
+    if [ $# -lt 2 ]; then
+        cat $CONF
+    else
+        # tag filtering
+        tf=$2
+        while read line; do
+            tags=`echo $line | cut -f4`
+            echo $tags | egrep -q "$tf" > /dev/null 2> /dev/null && exist=1 || exist=0
+            if [ $exist -eq 1 ]; then
+                echo "$line"
+            fi
+        done < $CONF
+    fi
 else
     echo "unknown command: $1"
     exit 1
