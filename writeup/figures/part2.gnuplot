@@ -8,6 +8,7 @@ set xlabel "Number of Vertices"
 set grid x
 set xr [2:8192]
 set logscale x 2
+set xtics (2,8,32,128,512,2048,8192)
 
 set ylabel "Average MST Weight"
 set grid y
