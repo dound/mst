@@ -3,11 +3,12 @@
 #define MST_H
 
 /** MST algorithms */
-#define BEST_ALG   1
-#define KRUSKAL    2
-#define PRIM_DENSE 3
-#define PRIM_BHEAP 4
-#define KKT        5
+#define BEST_ALG         1
+#define KRUSKAL_EXPLICIT 2
+#define KRUSKAL_IMPLICIT 3
+#define PRIM_DENSE       4
+#define PRIM_BHEAP       5
+#define KKT              6
 
 /* use the default value for ALG if one is not specified */
 #ifndef ALG
@@ -32,7 +33,8 @@ typedef struct
 } edge;
 
 /** run Kruskal's algorithm */
-void kruskal(char* fn);
+void kruskal_explicit_set(char* fn);
+void kruskal_implicit_set(char* fn);
 
 /** run a version of Prim's algorithm optimized for dense-graphs */
 void prim_dense(char* fn);

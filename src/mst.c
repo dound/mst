@@ -30,11 +30,13 @@ int main(int argc, char **argv) {
     int density = num_edges / num_verts;
     float packing = get_packing_percent(num_verts, num_edges);
     if(density<100 && packing<=0.75f)
-        kruskal(argv[1]);
+        kruskal_explicit_set(argv[1]);
     else
         prim_dense(argv[1]);
-#elif ALG == KRUSKAL
-    kruskal(argv[1]);
+#elif ALG == KRUSKAL_EXPLICIT
+    kruskal_explicit_set(argv[1]);
+#elif ALG == KRUSKAL_IMPLICIT
+    kruskal_implicit_set(argv[1]);
 #elif ALG == PRIM_DENSE
     prim_dense(argv[1]);
 #elif ALG == PRIM_BHEAP
