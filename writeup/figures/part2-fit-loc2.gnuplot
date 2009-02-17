@@ -6,13 +6,13 @@ set size 0.7, 0.7
 
 set xlabel "Number of Vertices"
 set grid x
-set xr [2:7481]
+set xr [2:8192]
 set logscale x 2
 
 set ylabel "Average MST Weight"
 set grid y
 set format y "%G"
-set yr [1:57]
+set yr [1:60]
 set logscale y 2
 
 set terminal postscript eps color enhanced linewidth 3 dashed
