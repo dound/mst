@@ -23,19 +23,12 @@ int check_input(char* fn, int read_only, int graph_type);
 int main(int argc, char **argv) {
     int read_only=0;
     int edge_list=0, heapified_edge_list=0, adjacency_list=0, adjacency_matrix=0;
-    int argc_on = -1;
 
     if(argc < 2 || argc > 6) {
         fprintf(stderr, "usage: %s <inputfile> [-r] [el] [hel] [al] [am]\n", argv[0]);
         return -1;
     }
-    else if(argc == 3) {
-        read_only = (strcmp("-r", argv[2])==0);
-        if(!read_only)
-            argc_on = 2; /* try again */
-        else
-            argc_on = 3;
-    }
+    int argc_on = 2;
     while(argc_on > 0 && argc_on < argc) {
         if(strcmp("el", argv[argc_on])==0)
             edge_list = 1;
@@ -45,6 +38,8 @@ int main(int argc, char **argv) {
             adjacency_list = 1;
         else if(strcmp("am", argv[argc_on])==0)
             adjacency_matrix = 1;
+        else if(strcmp("-r", argv[argc_on])==0)
+            read_only = 1;
         else {
             fprintf(stderr, "unknown argument %s\n", argv[argc_on]);
             return -1;
