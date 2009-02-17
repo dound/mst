@@ -1,11 +1,15 @@
 #include <input/adj_matrix.h> /* AM_INDEX */
 #include <input/initialize_graph.h> /* initialize_* */
+#include <input/pq_edge.h> /* pq_* */
+#include <input/read_graph.h>
 #include <stdio.h>  /* fopen, fscanf */
 #include <mst.h> /* edge, foi */
 
 // read input file, store results in n, m, and G
 #if   GRAPH_TYPE == EDGE_LIST
 int read_graph_to_edge_list_scanf(char *filename, int *n, int *m, edge **G)
+#elif GRAPH_TYPE == HEAPIFIED_EDGE_LIST
+int read_graph_to_heapified_edge_list_scanf(char *filename, int *n, int *m, edge **G)
 #elif GRAPH_TYPE == ADJACENCY_LIST
 int read_graph_to_adjacency_list_scanf(char *filename, int *n, int *m, void **G)
 #elif GRAPH_TYPE == ADJACENCY_MATRIX
@@ -20,6 +24,9 @@ int read_graph_to_adjacency_matrix_scanf(char *filename, int *n, int *m, foi **w
 
 #if   GRAPH_TYPE == EDGE_LIST
     initialize_edge_list(G, *m);
+#elif GRAPH_TYPE == HEAPIFIED_EDGE_LIST
+    pq_init(*m);
+    *G = pq;
 #elif GRAPH_TYPE == ADJACENCY_LIST
     initialize_adjacency_list(G, *n);
 #elif GRAPH_TYPE == ADJACENCY_MATRIX
@@ -33,9 +40,13 @@ int read_graph_to_adjacency_matrix_scanf(char *filename, int *n, int *m, foi **w
 
     int i = 0;
     int charsRead = 1;
+#if GRAPH_TYPE == HEAPIFIED_EDGE_LIST
+    for (i = 1; i < *m+1; i++)
+#else
     for (i = 0; i < *m; i++)
+#endif
     {
-#if GRAPH_TYPE == EDGE_LIST
+#if GRAPH_TYPE == EDGE_LIST || GRAPH_TYPE == HEAPIFIED_EDGE_LIST
 #   ifdef _NO_FLOATS_
         charsRead = fscanf(input, "%d %d %d.%d",
                            &(*G)[i].u, &(*G)[i].v, &(*G)[i].weight, &tmp);
@@ -43,6 +54,9 @@ int read_graph_to_adjacency_matrix_scanf(char *filename, int *n, int *m, foi **w
 #   else
         charsRead = fscanf(input, "%d %d %f",
                            &(*G)[i].u, &(*G)[i].v, &(*G)[i].weight);
+#   endif
+#   if GRAPH_TYPE == HEAPIFIED_EDGE_LIST
+        pq_heapify_insertion(); /* maintain the heap property */
 #   endif
 #elif GRAPH_TYPE == ADJACENCY_LIST
 #   ifdef _NO_FLOATS_

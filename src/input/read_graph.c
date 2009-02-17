@@ -5,6 +5,9 @@
 #  define GRAPH_TYPE EDGE_LIST
 #  include "read_graph_scanf.h"
 #  undef  GRAPH_TYPE
+#  define GRAPH_TYPE HEAPIFIED_EDGE_LIST
+#  include "read_graph_scanf.h"
+#  undef  GRAPH_TYPE
 #  define GRAPH_TYPE ADJACENCY_LIST
 #  include "read_graph_scanf.h"
 #  undef  GRAPH_TYPE
@@ -12,6 +15,9 @@
 #  include "read_graph_scanf.h"
 #elif INPUT_TYPE == MMAP
 #  define GRAPH_TYPE EDGE_LIST
+#  include "read_graph_mmap.h"
+#  undef  GRAPH_TYPE
+#  define GRAPH_TYPE HEAPIFIED_EDGE_LIST
 #  include "read_graph_mmap.h"
 #  undef  GRAPH_TYPE
 #  define GRAPH_TYPE ADJACENCY_LIST

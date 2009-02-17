@@ -3,6 +3,7 @@
 #include <string.h> /* strcmp */
 #include <unistd.h> /* unlink */
 #include <input/adj_matrix.h> /* AM_WEIGHT_FAST, AM_NO_EDGE */
+#include <input/pq_edge.h> /* pq_* */
 #include <input/read_graph.h> /* read_graph */
 #include <mst.h> /* edge, foi */
 
@@ -21,11 +22,11 @@ int check_input(char* fn, int read_only, int graph_type);
 
 int main(int argc, char **argv) {
     int read_only=0;
-    int edge_list=0, adjacency_list=0, adjacency_matrix=0;
+    int edge_list=0, heapified_edge_list=0, adjacency_list=0, adjacency_matrix=0;
     int argc_on = -1;
 
     if(argc < 2 || argc > 6) {
-        fprintf(stderr, "usage: %s <inputfile> [-r] [el] [al] [am]\n", argv[0]);
+        fprintf(stderr, "usage: %s <inputfile> [-r] [el] [hel] [al] [am]\n", argv[0]);
         return -1;
     }
     else if(argc == 3) {
@@ -38,6 +39,8 @@ int main(int argc, char **argv) {
     while(argc_on > 0 && argc_on < argc) {
         if(strcmp("el", argv[argc_on])==0)
             edge_list = 1;
+        else if(strcmp("hel", argv[argc_on])==0)
+            heapified_edge_list = 1;
         else if(strcmp("al", argv[argc_on])==0)
             adjacency_list = 1;
         else if(strcmp("am", argv[argc_on])==0)
@@ -49,10 +52,12 @@ int main(int argc, char **argv) {
         argc_on += 1;
     }
 
-    int do_all = (!edge_list && !adjacency_list && !adjacency_matrix);
+    int do_all = (!edge_list && !heapified_edge_list && !adjacency_list && !adjacency_matrix);
     int ret = 1;
     if(do_all || edge_list)
         ret = ret && check_input(argv[1], read_only, EDGE_LIST)==0;
+    else if(do_all || heapified_edge_list)
+        ret = ret && check_input(argv[1], read_only, HEAPIFIED_EDGE_LIST)==0;
     else if(do_all || adjacency_list)
         ret = ret && check_input(argv[1], read_only, ADJACENCY_LIST)==0;
     else if(do_all || adjacency_matrix)
@@ -71,6 +76,13 @@ int check_input(char* fn, int read_only, int graph_type) {
     case EDGE_LIST:
         str_graph_type = "EL";
         if(!read_graph_to_edge_list(fn, &n, &m, (edge**)&VG)) {
+            fprintf(stderr, "%s ERROR: failed to read in graph: %s\n", str_graph_type, fn);
+            return -1;
+        }
+        break;
+    case HEAPIFIED_EDGE_LIST:
+        str_graph_type = "HEL";
+        if(!read_graph_to_heapified_edge_list(fn, &n, &m, (edge**)&VG)) {
             fprintf(stderr, "%s ERROR: failed to read in graph: %s\n", str_graph_type, fn);
             return -1;
         }
@@ -111,6 +123,14 @@ int check_input(char* fn, int read_only, int graph_type) {
         edge *G = (edge*)VG;
         for(int i=0; i<m; i++)
             fprintf(out, "%d %d %.1f\n", G[i].u, G[i].v, FOI_TO_OUTPUT_WEIGHT(G[i].weight));
+        break;
+    }
+    case HEAPIFIED_EDGE_LIST: {
+        edge e;
+        for(int i=0; i<m; i++) {
+            e = pq_pop_min();
+            fprintf(out, "%d %d %.1f\n", e.u, e.v, FOI_TO_OUTPUT_WEIGHT(e.weight));
+        }
         break;
     }
     case ADJACENCY_LIST: {

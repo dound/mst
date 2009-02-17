@@ -16,17 +16,20 @@
 #endif
 
 /* GRAPH_TYPE: types of graph outputs */
-#define EDGE_LIST        1
-#define ADJACENCY_LIST   2
-#define ADJACENCY_MATRIX 3
+#define EDGE_LIST           1
+#define HEAPIFIED_EDGE_LIST 2
+#define ADJACENCY_LIST      3
+#define ADJACENCY_MATRIX    4
 
 /* apply INPUT_TYPE */
 #if INPUT_TYPE == SCANF
 #  define read_graph_to_edge_list read_graph_to_edge_list_scanf
+#  define read_graph_to_heapified_edge_list read_graph_to_heapified_edge_list_scanf
 #  define read_graph_to_adjacency_list read_graph_to_adjacency_list_scanf
 #  define read_graph_to_adjacency_matrix read_graph_to_adjacency_matrix_scanf
 #elif INPUT_TYPE == MMAP
 #  define read_graph_to_edge_list read_graph_to_edge_list_mmap
+#  define read_graph_to_heapified_edge_list read_graph_to_heapified_edge_list_mmap
 #  define read_graph_to_adjacency_list read_graph_to_adjacency_list_mmap
 #  define read_graph_to_adjacency_matrix read_graph_to_adjacency_matrix_mmap
 #else
@@ -43,6 +46,17 @@
  * @return 1 on success, 0 on failure
  */
 int read_graph_to_edge_list(char *filename, int *n, int *m, edge **G);
+
+/**
+ * Reads in a graph from filename into a heap data structure.  Returns via
+ * passed arguments the number of vertices (n), number edges (m), and edges in
+ * the graph (G).
+ *
+ * The implementation of this method depends on the INPUT_TYPE macro.
+ *
+ * @return 1 on success, 0 on failure
+ */
+int read_graph_to_heapified_edge_list(char *filename, int *n, int *m, edge **G);
 
 /**
  * Reads in a graph from filename into an adjancency list representation.
