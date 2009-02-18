@@ -47,7 +47,7 @@ bound.
 \subsection{Empirical results}
 \paragraph{}
 Figure~\ref{fig:part2} shows empirical MST weight data. For each type of
-graph and for all values of $|V|$ 
+graph and for all values of $|V|$
 between $2$ and $8192$ (inclusive) which are powers of $1.5$ or $2$ it
 plots the average MST weight.  For each type of graph, the
 weights for each of these 34 $|V|$ values is determined by
@@ -73,14 +73,14 @@ We compared several curves to the MST data for each graph type. We used the
 Marquardt-Levenberg algorithm to fit a range of growth rates, from constant
 to exponential, to each set of data.
 Figure~\ref{fig:part2-fit} shows how each of these fits performs for each case.
-The equations we fit are ($x = |V|$):
+The equations we fit are ($n = |V|$):
 \begin{eqnarray*}
 constant&:& c \\
-log&:& m \cdot log_2(x) + c \\
-polynomial / log&:& m \cdot \frac{x^p}{log_2(x)} + c \\
-polynomial&:& m \cdot x^p + c \\
-polynomial \cdot log&:& m \cdot x^p \cdot log_2(x) + c \\
-exponential&:& m \cdot b^x + c
+log&:& m \cdot log_2(n) + c \\
+polynomial / log&:& m \cdot \frac{n^p}{log_2(n)} + c \\
+polynomial&:& m \cdot n^p + c \\
+polynomial \cdot log&:& m \cdot n^p \cdot log_2(n) + c \\
+exponential&:& m \cdot b^n + c
 \end{eqnarray*}
 
 \begin{figure*}[htb!]
@@ -106,10 +106,10 @@ exponential&:& m \cdot b^x + c
 For each graph type we found that a sublinear polynomial best fit
 the data. Very close to that line were also the polynomial/log and
 polynomial*log lines. The reasoning for these other two functions being
-similar is that $\log x$ and $x^\epsilon$ both grow very slowly and look
-very similar over a significant range of values. Therefore $x^y \approx
-x^y * \frac{x^\epsilon}{\log x}$ and $x^y \approx x^y * \frac{\log
-  x}{x^\epsilon}$ over a certain range. The functions that are clearly not
+similar is that $\log n$ and $n^\epsilon$ both grow very slowly and look
+very similar over a significant range of values. Therefore $n^y \approx
+n^y * \frac{n^\epsilon}{\log n}$ and $n^y \approx n^y * \frac{\log
+  n}{n^\epsilon}$ over a certain range. The functions that are clearly not
 close are constant, log, and exponential.
 
 --Describe our best guesses for how each grows (show the best best-fit equations
@@ -135,9 +135,9 @@ list the derived upper bound.
 Dimension&Empirical best fit&Theoretical upper limit\\
 \hline
 1&$1$&$1$\\
-2&$0.8*x^{0.5} + -0.5$&$n^{\frac{1}{2}}-1$\\
-3&$0.8*x^{0.6} + -0.6$&$n^{\frac{2}{3}} + n^{\frac{1}{3}} + 1$\\
-4&$0.9*x^{0.7} + -0.7$&$n^{\frac{3}{4}} + n^{\frac{2}{4}} + n^{\frac{1}{4}} + 1$\\
+2&$0.8*n^{0.5} + -0.5$&$n^{\frac{1}{2}}-1$\\
+3&$0.8*n^{0.6} + -0.6$&$n^{\frac{2}{3}} + n^{\frac{1}{3}} + 1$\\
+4&$0.9*n^{0.7} + -0.7$&$n^{\frac{3}{4}} + n^{\frac{2}{4}} + n^{\frac{1}{4}} + 1$\\
 \hline
 \end{tabular}
 
