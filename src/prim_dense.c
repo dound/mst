@@ -18,7 +18,7 @@
  */
 void run_prim_dense(int sz_v, foi *weights) {\
     /* IMPORTANT: all vertices are 0 indexed (i.e., one off from actual input #s) */
-    foi mst_weight = 0;
+    foi_big mst_weight = 0;
 
     /** Whether a vertex is NOT in the MST.  Offset 0 unused. */
     char *vertex_not_done = (char*)malloc(sz_v * sizeof(char));
