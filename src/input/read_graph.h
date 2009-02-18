@@ -4,6 +4,7 @@
 #ifndef READ_GRAPH_H
 #define READ_GRAPH_H
 
+#include <input/adj_list.h> /* edge_list */
 #include <mst.h> /* edge, foi */
 
 /* INPUT_TYPE: ways to read in a graph */
@@ -67,7 +68,7 @@ int read_graph_to_heapified_edge_list(char *filename, int *n, int *m, edge **G);
  *
  * @return 1 on success, 0 on failure
  */
-int read_graph_to_adjacency_list(char *filename, int *n, int *m, void **G);
+int read_graph_to_adjacency_list(char *filename, int *n, int *m, edge_list **el);
 
 /**
  * Reads in a graph from filename into an adjancency matrix representation.
