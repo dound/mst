@@ -3,6 +3,7 @@
 #include <sys/mman.h> /* mmap */
 #include <sys/stat.h> /* fstat */
 #include <string.h> /* memset, strchr */
+#include <input/adj_list.h> /* edge_list, AL_EDGE_LIST_* */
 #include <input/adj_matrix.h> /* AM_INDEX */
 #include <input/initialize_graph.h> /* initialize_* */
 #include <input/pq_edge.h> /* pq_* */
@@ -15,7 +16,7 @@ int read_graph_to_edge_list_mmap(char *filename, int *n, int *m, edge **G)
 #elif   GRAPH_TYPE == HEAPIFIED_EDGE_LIST
 int read_graph_to_heapified_edge_list_mmap(char *filename, int *n, int *m, edge **G)
 #elif GRAPH_TYPE == ADJACENCY_LIST
-int read_graph_to_adjacency_list_mmap(char *filename, int *n, int *m, void **G)
+int read_graph_to_adjacency_list_mmap(char *filename, int *n, int *m, edge_list **el)
 #elif GRAPH_TYPE == ADJACENCY_MATRIX
 int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **weights)
 #else
@@ -54,14 +55,13 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
     *G = pq;
     memset(*G, 0, (*m + 1)*sizeof(edge));
 #elif GRAPH_TYPE == ADJACENCY_LIST
-    initialize_adjacency_list(G, *n);
+    initialize_adjacency_list(el, *n, *m);
 #elif GRAPH_TYPE == ADJACENCY_MATRIX
     initialize_adjacency_matrix(weights, *n);
+#endif
+#if GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
     int u, v;
     foi w;
-#endif
-#ifdef _NO_FLOATS_
-    int tmp;
 #endif
 
     int i = 0;
@@ -71,7 +71,7 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
     for (i = 0; i < *m; i++)
 #endif
     {
-#if GRAPH_TYPE == ADJACENCY_MATRIX
+#if GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
         u = v = 0;
         w = 0.0f;
 #endif
@@ -83,7 +83,7 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
         {
 #if   GRAPH_TYPE == EDGE_LIST || GRAPH_TYPE == HEAPIFIED_EDGE_LIST
             (*G)[i].u += pwr*((*digit)-'0');
-#elif GRAPH_TYPE == ADJACENCY_MATRIX
+#elif GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
             u += pwr*((*digit)-'0');
 #endif
             pwr *= 10;
@@ -98,7 +98,7 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
         {
 #if   GRAPH_TYPE == EDGE_LIST || GRAPH_TYPE == HEAPIFIED_EDGE_LIST
             (*G)[i].v += pwr*((*digit)-'0');
-#elif GRAPH_TYPE == ADJACENCY_MATRIX
+#elif GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
             v += pwr*((*digit)-'0');
 #endif
             pwr *= 10;
@@ -119,7 +119,7 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
         {
 #if   GRAPH_TYPE == EDGE_LIST || GRAPH_TYPE == HEAPIFIED_EDGE_LIST
             (*G)[i].weight += pwr*((*digit)-'0');
-#elif GRAPH_TYPE == ADJACENCY_MATRIX
+#elif GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
             w += pwr*((*digit)-'0');
 #endif
             pwr *= 10;
@@ -131,18 +131,20 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
         {
 #if   GRAPH_TYPE == EDGE_LIST || GRAPH_TYPE == HEAPIFIED_EDGE_LIST
             (*G)[i].weight += pwr2*((*digit)-'0');
-#elif GRAPH_TYPE == ADJACENCY_MATRIX
+#elif GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
             w += pwr2*((*digit)-'0');
 #endif
             pwr2 /= 10;
             digit++;
         }
         input = delim+1;
-#if GRAPH_TYPE == ADJACENCY_MATRIX
-        (*weights)[AM_INDEX(*n, u, v)] = w;
-#endif
 #if GRAPH_TYPE == HEAPIFIED_EDGE_LIST
         pq_heapify_insertion(); /* maintain the heap property */
+#elif GRAPH_TYPE == ADJACENCY_LIST
+        AL_EDGE_LIST_ADD(&(*el)[u], v, w);
+        AL_EDGE_LIST_ADD(&(*el)[v], u, w);
+#elif GRAPH_TYPE == ADJACENCY_MATRIX
+        (*weights)[AM_INDEX(*n, u, v)] = w;
 #endif
     }
 

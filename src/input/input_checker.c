@@ -2,6 +2,7 @@
 #include <stdlib.h> /* system */
 #include <string.h> /* strcmp */
 #include <unistd.h> /* unlink */
+#include <input/adj_list.h> /* edge_list, AL_EDGE_LIST_* */
 #include <input/adj_matrix.h> /* AM_WEIGHT_FAST, AM_NO_EDGE */
 #include <input/pq_edge.h> /* pq_* */
 #include <input/read_graph.h> /* read_graph */
@@ -51,11 +52,11 @@ int main(int argc, char **argv) {
     int ret = 1;
     if(do_all || edge_list)
         ret = ret && check_input(argv[1], read_only, EDGE_LIST)==0;
-    else if(do_all || heapified_edge_list)
+    if(do_all || heapified_edge_list)
         ret = ret && check_input(argv[1], read_only, HEAPIFIED_EDGE_LIST)==0;
-    else if(do_all || adjacency_list)
+    if(do_all || adjacency_list)
         ret = ret && check_input(argv[1], read_only, ADJACENCY_LIST)==0;
-    else if(do_all || adjacency_matrix)
+    if(do_all || adjacency_matrix)
         ret = ret && check_input(argv[1], read_only, ADJACENCY_MATRIX)==0;
     return ret;
 }
@@ -84,7 +85,7 @@ int check_input(char* fn, int read_only, int graph_type) {
         break;
     case ADJACENCY_LIST:
         str_graph_type = "AL";
-        if(!read_graph_to_adjacency_list(fn, &n, &m, &VG)) {
+        if(!read_graph_to_adjacency_list(fn, &n, &m, (edge_list**)&VG)) {
             fprintf(stderr, "%s ERROR: failed to read in graph: %s\n", str_graph_type, fn);
             return -1;
         }
@@ -129,6 +130,21 @@ int check_input(char* fn, int read_only, int graph_type) {
         break;
     }
     case ADJACENCY_LIST: {
+        edge_list *pel = ((edge_list*)VG) + 1; /* first vertex is at offset 1 */
+        edge_to *pe;
+        for(int i=1; i<=n; i++) {
+            AL_EDGE_LIST_BEGIN(pel);
+            pe = AL_EDGE_LIST_GET(pel);
+            while(pe) {
+                /* we have two copies of each edge, so just print the first copy */
+                if(pe->other > i)
+                    fprintf(out, "%d %d %.1f\n", i, pe->other, FOI_TO_OUTPUT_WEIGHT(pe->weight));
+                AL_EDGE_LIST_NEXT();
+                pe = AL_EDGE_LIST_GET(pel);
+            }
+            pel += 1; /* go to the next vertex's edge list */
+        }
+        break;
         break;
     }
     case ADJACENCY_MATRIX: {
