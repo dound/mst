@@ -44,6 +44,7 @@ def main():
     except OSError:
         pass
     gather_weight_data('edge')
+    gather_weight_data('loc1')
     gather_weight_data('loc2')
     gather_weight_data('loc3')
     gather_weight_data('loc4')
