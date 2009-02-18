@@ -51,11 +51,11 @@ int main(int argc, char **argv) {
     int ret = 1;
     if(do_all || edge_list)
         ret = ret && check_input(argv[1], read_only, EDGE_LIST)==0;
-    else if(do_all || heapified_edge_list)
+    if(do_all || heapified_edge_list)
         ret = ret && check_input(argv[1], read_only, HEAPIFIED_EDGE_LIST)==0;
-    else if(do_all || adjacency_list)
+    if(do_all || adjacency_list)
         ret = ret && check_input(argv[1], read_only, ADJACENCY_LIST)==0;
-    else if(do_all || adjacency_matrix)
+    if(do_all || adjacency_matrix)
         ret = ret && check_input(argv[1], read_only, ADJACENCY_MATRIX)==0;
     return ret;
 }
