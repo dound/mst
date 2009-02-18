@@ -32,9 +32,9 @@ set style line 44 lt 3 lc rgb "#0000CC" pt 0
 
 # theoretical upper bounds
 loc1(x) = 1
-loc2(x) = x**(0.5) - 1
-loc3(x) = x**(2/3.0) + x**(1/3.00) - 1
-loc4(x) = x**(0.75) + x**(0.5) + x**(0.25) - 1
+loc2(x) = x**(0.5) + 1
+loc3(x) = x**(2/3.0) + x**(1/3.00) + 1
+loc4(x) = x**(0.75) + x**(0.5) + x**(0.25) + 1
 
 plot "../data/weight/loc1.dat" using 1:3 title 'Empircal d=1'    with linespoints ls 1,  \
      loc1(x)                             title 'Theoretical d=1' with linespoints ls 11, \
