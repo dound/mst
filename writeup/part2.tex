@@ -3,7 +3,7 @@
 
 \paragraph{}
 We investigate the expected weight of the MST in random graphs. We begin
-with a discussion of the mathematical upper limit for MSTs for graphs
+with a discussion of the mathematical upper bound on average MST weight for graphs
 created by points in k-space. We then discuss out empirical attempts to
 estimate the expected weight.
 
@@ -12,7 +12,7 @@ estimate the expected weight.
 % (hopefully) expected MST weight (could potentially plot these alongside the
 % empircal data).
 
-\subsection{Upper limit for MSTs}
+\subsection{Upper bound on average MST weight}
 \paragraph{}
 For graphs created by points in a unit space we can derive an upper bound on
 MST weight. We begin by analyzing a graph in 2-D and generalize that to a
@@ -122,7 +122,7 @@ close are constant, log, and exponential.
 \subsection{Comparison of empirical and theoretical results}
 \paragraph{}
 We compare our empirical results for the expected MST weight with the
-mathematical upper limit we derived earlier. The intuition is that as n
+mathematical upper bound we derived earlier. The intuition is that as n
 gets larger, it will more closely resemble the k-dimensional grid. With
 many points placed at random in a limited space, the distribution of
 distances between neighboring points becomes more uniform, and more points
@@ -133,7 +133,7 @@ empirical results in Figure~\ref{fig:part2-with-theoretical}.
 
 \begin{tabular}{|c|c|c|}
 \hline
-Dimension&Empirical best fit&Theoretical upper limit\\
+Dimension&Empirical best fit&Theoretical upper bound\\
 \hline
 1&$1$&$1$\\
 2&$0.8*n^{0.5} + -0.5$&$n^{\frac{1}{2}} + 1$\\
