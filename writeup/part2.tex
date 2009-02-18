@@ -32,7 +32,7 @@ maximizes any MST will be a $\sqrt{n} \times \sqrt{n}$ grid with the
 points spaced evenly from 0 to 1 in both dimensions. The length of each
 edge is $\frac{1}{\sqrt{n}-1}$ so the total MST weight is
 $\frac{n-1}{\sqrt{n}-1}$. Performing polynomial long division on this
-fraction gives us $n^{\frac{1}{2}}-1$ as an alternate form for the MST
+fraction gives us $n^{\frac{1}{2}}+1$ as an alternate form for the MST
 weight.
 
 We can perform the exact same analysis on graphs in 3-D and 4-D and get
@@ -111,6 +111,8 @@ very similar over a significant range of values. Therefore $n^y \approx
 n^y * \frac{n^\epsilon}{\log n}$ and $n^y \approx n^y * \frac{\log
   n}{n^\epsilon}$ over a certain range. The functions that are clearly not
 close are constant, log, and exponential.
+
+See table\ref{??} below for lines that best fit each data set.
 
 % Describe our best guesses for how each grows (show the best best-fit equations
 % with values filled in as on the plots).  Describe why we chose that fit.  Try to
