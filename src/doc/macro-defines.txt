@@ -14,6 +14,11 @@ associated with them.
     SCANF: a simple scanf reader
     MMAP:  memory-mapped reader
 
+#define AL_TYPE {AL_VECTORS, AL_LL}
+  Sets which kind of data structure to store edges with in an adjacency list:
+    AL_VECTORS: array-based storage (grows as needed via realloc)
+    AL_LL: linked-list-based storage
+
 #define ALG {BEST_ALG, KRUSKAL_*, PRIM_DENSE, PRIM_BHEAP, KKT}
   Sets which algorithm to use (default is BEST_ALG):
     BEST_ALG: choose the algorithm based on empircal density results

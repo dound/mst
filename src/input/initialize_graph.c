@@ -15,7 +15,7 @@ void initialize_adjacency_list(edge_list **el, int num_verts, int num_edges) {
 #ifdef _DEBUG_
     memset(*el, 0xFF, sizeof(edge_list)); /* ensure data at index 0 is junk */
 #endif
-#ifdef ADJ_LIST_WITH_VECTORS
+#if AL_TYPE == AL_VECTORS
     /* multiply by two because we track edges in both directions */
     int num_initial_edges = (2 * num_edges) / num_verts;
     for(int i=1; i<=num_verts; i++) {
@@ -24,9 +24,11 @@ void initialize_adjacency_list(edge_list **el, int num_verts, int num_edges) {
         e->avail = num_initial_edges;
         e->a = malloc(e->avail * sizeof(edge_to));
     }
-#else
+#elif AL_TYPE == AL_LL
     for(int i=1; i<=num_verts; i++)
         (*el)[i].head = NULL;
+#else
+#   error unknown AL_TYPE
 #endif
 }
 

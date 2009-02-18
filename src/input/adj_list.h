@@ -5,12 +5,21 @@
 #include <mst.h> /* foi */
 #include <stdlib.h> /* malloc, realloc */
 
+/* AL_TYPE: ways to store edge data in an adjacency list */
+#define AL_VECTORS 1
+#define AL_LL      2
+
+/* use the default value for AL_TYPE if one is not specified */
+#ifndef AL_TYPE
+#  define AL_TYPE AL_VECTORS
+#endif
+
 typedef struct {
     int other;  /* index of the other vertex */
     foi weight; /* weight to get the other vertex */
 } edge_to;
 
-#ifdef ADJ_LIST_WITH_VECTORS
+#if AL_TYPE == AL_VECTORS
 
 typedef struct {
     edge_to *a;
@@ -37,7 +46,7 @@ typedef struct {
 /** advances the iterator to the next edge */
 #define AL_EDGE_LIST_NEXT() __itr_edge_list += 1
 
-#else /* adjacency list with linked-lists of edges */
+#elif AL_TYPE == AL_LL
 
 typedef struct edge_list_item {
     edge_to e;
@@ -61,6 +70,8 @@ typedef struct {
 
 #define AL_EDGE_LIST_NEXT() __itr_edge_list = __itr_edge_list->next
 
+#else
+#   error unknown AL_TYPE
 #endif
 
 #endif /* ADJ_LIST_H */
