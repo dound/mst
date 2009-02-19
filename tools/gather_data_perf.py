@@ -37,13 +37,17 @@ def numeric_compare(a, b):
         return 0
 
 def density_compare(a, b):
-    da = get_density(a)
-    db = get_density(b)
+    (av, ae) = a
+    (bv, be) = b
+    da = get_density(av, ae)
+    db = get_density(bv, be)
     return numeric_compare(da, db)
 
 def pom_compare(a, b):
-    da = get_percent_of_max(a)
-    db = get_percent_of_max(b)
+    (av, ae) = a
+    (bv, be) = b
+    da = get_percent_of_max(av, ae)
+    db = get_percent_of_max(bv, be)
     return numeric_compare(da, db)
 
 def gather_perf_data(alg, rev, index, latest):
