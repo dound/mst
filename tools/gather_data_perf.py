@@ -48,6 +48,7 @@ def pom_compare(a, b):
 
 def gather_perf_data(alg, rev, index, latest):
     """Gathers performance data for a single revision of an algorithm"""
+    print 'gathering perf data for %s (rev=%s index=%u latest=%s)' % (alg, rev, index, str(latest))
 
     # get the results
     results = {} # maps (|V|, |E|) to ResultAccumulator
@@ -89,6 +90,7 @@ def gather_perf_data(alg, rev, index, latest):
         for vip in IMPORTANT_VERTS:
             # open a file to output to
             dat = get_output_dat_name(xaxis, alg, rev, index, vip)
+            print 'creating ' + dat
             if latest:
                 make_latest(alg, rev, index, vip)
             try:
