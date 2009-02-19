@@ -96,7 +96,7 @@ def gather_perf_data(alg, rev, index, latest):
             dat = get_output_dat_name(xaxis, alg, rev, index, vip)
             print 'creating ' + dat
             if latest:
-                make_latest(alg, rev, index, vip)
+                make_latest(xaxis, alg, rev, index, vip)
             try:
                 fh = open(dat, 'w')
 
