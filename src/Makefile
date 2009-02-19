@@ -76,9 +76,13 @@ clean-deps:
 	@echo -n "dependency cleanup: "
 	rm -f .*.d .cflags_prev
 
-# shorthand for building the debug or release build
-debug release:
+# shorthand for building the debug build of all apps
+debug:
 	@$(MAKE) BUILD_TYPE=$@ all
+
+# build mst in release mode
+release:
+	@$(MAKE) BUILD_TYPE=$@ mst
 
 # build the dependency files
 deps: $(DEPS_ALL)
