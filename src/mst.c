@@ -27,9 +27,14 @@ int main(int argc, char **argv) {
     fscanf(input, "%d", &num_edges);
     fclose(input);
 
-    //int density = num_edges / num_verts;
-    //float packing = get_packing_percent(num_verts, num_edges);
-    kruskal_explicit_set_with_fs(argv[1]);
+    float pom = get_packing_percent(num_verts, num_edges);
+#ifdef _DEBUG_
+    fprintf(stderr, "pom=%.f%%\n", packing);
+#endif
+    if(pom < 0.8f)
+        kruskal_explicit_set_with_ps(argv[1]);
+    else
+        prim_dense(argv[1]);
 #elif ALG == KRUSKAL_EXPLICIT_FS
     fprintf(stderr, "using kruskal explicit full-sort\n");
     kruskal_explicit_set_with_fs(argv[1]);
