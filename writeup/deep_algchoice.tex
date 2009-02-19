@@ -10,3 +10,53 @@ their relative performance.
 We should probably consider one algorithm at a time, then compare the best
 version of each in a final subsubsection.  Include a little discussion as
 whether these algorithms running times mtch their asymptotic complexity.
+
+\subsubsection{Kruskal's}
+\paragraph{}
+We implemented multiple versions of Kruskal's and had surprising
+results. One major difference is in the Union-Find data structure that
+provides the fundamental abilities to find the connected component of a
+given vertex and to combine the connected components of two vertices. The
+textbook describes one implementation that maintains an explicit set of
+vertices in a connected component. When Kruskal's algorithm adds an edge,
+unioning the sets requires copying the members in the smaller connected
+component into the larger connected component's set. A second version
+maintains an implicit set through a chain of ``parent
+pointers''. On optimization on this second approach collapses this chain
+each time it is traversed by updating vertices' parent pointers.
+
+Surprisingly, the explicitly maintained set performed faster than the
+implicit version, which differs from the theoretical results in the
+book. The reason appeared to
+be that the explicit set had much better cache performance on large
+graphs. The find operation of the
+implicit set required following a chain of parent pointers that jumped
+all around the array of nodes. The explicit set did not require this
+hopping around through memory. Even with multiple optimizations of the
+second approach, the explicitly maintained set was faster.
+
+The other major tradeoff in Kruskal's we found was how much of the list of
+edges we sorted at a time. Because Kruskal's walks through edges in sorted
+order, and ends when all nodes are connected, there is no need to sort any
+edges not included in the final MST. Because sorting the edges is the
+largest expenditure of time in Kruskal's, it is a big win to eliminate
+unnecessary sorting. However, this is tricky to do because you can only
+guess at the beginning how much of the array will need to be sorted. Then
+you have to keep track of the sorted portion, and sort more if you move
+past it. We found a good solution was to sort differing percentages of the
+edge array based on the density of the graph. The optimal values found are
+listed in Table \ref{table:kruskal-sort-percent}.
+
+\begin{table}
+\begin{tabular}{|c|c|}
+\hline
+density&\% of edges to sort at a time\\
+\hline
+$\frac{m}{n} < 10$& 100\% \\
+$10 \leq \frac{m}{n} < 50$& 20\% \\
+$50 \leq \frac{m}{n}$& 10\% \\
+\hline
+\end{tabular}
+\caption{Size of a portion of the edge list we sort at a time.}
+\label{table:kruskal-sort-percent}
+\end{table}
