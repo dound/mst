@@ -186,6 +186,8 @@ def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_ru
     missing_none = True
     first = True
     out = ""
+    if len(revs) > 1:
+        print 'will collect for: ' + str(revs)
     for rev in revs:
         # load info about the results we have to far for this rev
         try:
