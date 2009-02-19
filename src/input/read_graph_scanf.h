@@ -73,6 +73,9 @@ int read_graph_to_adjacency_matrix_scanf(char *filename, int *n, int *m, foi **w
         AL_EDGE_LIST_ADD(&(*el)[v], u, w);
 #   elif GRAPH_TYPE == ADJACENCY_MATRIX
         (*weights)[AM_INDEX(*n,u,v)] = w;
+#       ifndef _HALF_ADJ_MATRIX_
+        (*weights)[AM_INDEX(*n,v,u)] = w;
+#       endif
 #   endif
 #endif
 

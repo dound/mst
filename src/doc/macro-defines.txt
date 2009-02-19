@@ -43,3 +43,9 @@ INTERNAL USE ONLY - not set from the makefile
 
 #define GRAPH_TYPE {EDGE_LIST, HEAPIFIED_EDGE_LIST, ADJACENCY_LIST, ADJACENCY_MATRIX}
   Sets which kind of data structure to use populate when reading an input graph.
+
+#define _HALF_ADJ_MATRIX_
+  Minimize adjacency matrix assignments by only using half of a full |V|^2
+  matrix.  This makes it less efficient to access the matrix since we have to
+  ensure u < v when accessing edge (u, v).  We only assign a weight once, so
+  duplicating it is mostly a tradeoff between space (worse) and time (better).

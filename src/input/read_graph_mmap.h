@@ -26,7 +26,7 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
 
     // table of values of '0' character added up - helps with parsing
     int diffs[] = {0, -48, -528, -5328, -53328, -533328, -5333328, -53333328};
-    
+
     struct stat sb;
 
     int fd = open(filename, O_RDONLY);
@@ -172,6 +172,9 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
         AL_EDGE_LIST_ADD(&(*el)[v], u, w);
 #elif GRAPH_TYPE == ADJACENCY_MATRIX
         (*weights)[AM_INDEX(*n, u, v)] = w;
+#       ifndef _HALF_ADJ_MATRIX_
+        (*weights)[AM_INDEX(*n, v, u)] = w;
+#       endif
 #endif
     }
 
