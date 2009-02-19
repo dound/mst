@@ -78,9 +78,9 @@ def gather_perf_data(alg, rev, index, latest):
     # generate dat files for each x-axis cross important vertex counts
     for xaxis in keys:
         if xaxis == 'pom':
-            computex = \lambda v e : get_percent_of_max(v, e)
-        elif xaxis = 'density':
-            computex = \lambda v e : get_density(v, e)
+            computex = lambda v, e : get_percent_of_max(v, e)
+        elif xaxis == 'density':
+            computex = lambda v, e : get_density(v, e)
         else:
             print >> sys.stderr, "unexpected x-axis value: " + str(xaxis)
             sys.exit(-1)
@@ -115,7 +115,7 @@ def main():
     for alg in TRACKED.keys():
         revs = TRACKED[alg]
         for i in range(len(revs)):
-            gather_density_data(alg, rev[i], i, i+1==len(revs))
+            gather_perf_data(alg, revs[i], i, i+1==len(revs))
 
 if __name__ == "__main__":
     sys.exit(main())
