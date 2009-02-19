@@ -40,6 +40,11 @@ def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
     # determine how to save the output
     kill_out = False
     if for_time or out != '/dev/null':
+        # disable /dev/null for performance experiments so we can get the weight for now ...
+        if out == '/dev/null':
+            out = random_tmp_filename(10, 'weight-for-time')
+            kill_out = True
+
         save_cmd = '> ' + out
     else:
         # save just the first line of output so we can get the weight
@@ -63,6 +68,7 @@ def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
     quiet_remove(time_file)
 
     # try to get the weight (if we output the result somewhere)
+    mst_weight = -1.0
     if out != "/dev/null":
         try:
             mst_weight = extract_answer(out)
@@ -88,7 +94,7 @@ def benchmark(mst_binary, input_graph, out, rev, trial_num, for_time):
 
     # log the result
     if for_time:
-        data = PerfResult(ti.num_verts, ti.num_edges, ti.seed, rev, trial_num, time_sec)
+        data = PerfResult(ti.num_verts, ti.num_edges, ti.seed, rev, trial_num, time_sec, mst_weight)
         try:
             DataSet.add_data_to_log_file(data)
         except DataError, e:

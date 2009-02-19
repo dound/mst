@@ -309,9 +309,10 @@ class CorrResult(AbstractResult):
 
 class PerfResult(AbstractResult):
     """Data about an input, a revision, and how quickly it found the MST."""
-    def __init__(self, num_verts, num_edges, seed, rev, run_num, time_sec, prec=1, dims=0, min_val=0, max_val=100000):
+    def __init__(self, num_verts, num_edges, seed, rev, run_num, time_sec, mst_weight, prec=1, dims=0, min_val=0, max_val=100000):
         AbstractResult.__init__(self, prec, dims, min_val, max_val, num_verts, num_edges, seed, rev, run_num)
         self.time_sec = float(time_sec)
+        self.mst_weight = float(mst_weight)
         i = self.input()
         if i.prec != 1:
             print >> sys.stderr, 'warning: performance result with precision %u (expected 1)' % i.prec
@@ -330,10 +331,10 @@ class PerfResult(AbstractResult):
             return compare_float(self.time_sec, other.time_sec)
 
     def __str__(self):
-        return AbstractResult.__str__(self) + ('\t%.1f' % self.time_sec)
+        return AbstractResult.__str__(self) + ('\t%.1f' % self.time_sec) + ('\t%.1f' % self.mst_weight)
 
     def header_row(self):
-        return AbstractResult.header_row(self) + '\tTime(sec)'
+        return AbstractResult.header_row(self) + '\tTime(sec)\tMSTWeight'
 
     @staticmethod
     def key(num_verts, num_edges, seed, run_num, prec=1, dims=0, min_val=0, max_val=100000):
@@ -341,10 +342,10 @@ class PerfResult(AbstractResult):
 
     @staticmethod
     def from_list(lst):
-        if(len(lst) != 10):
-            raise DataError('PerfResult expected 10 args, got %u: %s' % (len(lst), str(lst)))
+        if(len(lst) != 11):
+            raise DataError('PerfResult expected 11 args, got %u: %s' % (len(lst), str(lst)))
         return PerfResult(prec=lst[0], dims=lst[1], min_val=lst[2], max_val=lst[3], num_verts=lst[4],
-                          num_edges=lst[5], seed=lst[6], rev=lst[7], run_num=lst[8], time_sec=lst[9])
+                          num_edges=lst[5], seed=lst[6], rev=lst[7], run_num=lst[8], time_sec=lst[9], mst_weight=lst[10])
 
     @staticmethod
     def get_path_to(rev):
