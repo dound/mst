@@ -5,7 +5,7 @@
 #include <stdio.h> /* printf */
 #include <stdlib.h> /* malloc */
 
-#define _PARTIAL_QUICK_
+//#define _PARTIAL_QUICK_
 #ifdef _PARTIAL_QUICK_
 int sortAmt;
 int sortedThrough;
