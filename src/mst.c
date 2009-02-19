@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
 
     float pom = get_packing_percent(num_verts, num_edges);
 #ifdef _DEBUG_
-    fprintf(stderr, "pom=%.f%%\n", packing);
+    fprintf(stderr, "pom=%.f\n", pom);
 #endif
     if(pom < 0.8f)
         kruskal_explicit_set_with_ps(argv[1]);
