@@ -22,8 +22,8 @@ large_edges = inclusive_range(1000 * 1000, 10 * 1000 * 1000, 1000 * 1000)
 edges = small_edges + large_edges
 
 # compute which |E|/|V| ratios we want to use
-sparse_ratios = inclusive_range(5, 50, 5)
-dense_ratios = inclusive_range(150, 1500, 150)
+sparse_ratios = [5, 50] #inclusive_range(5, 50, 5)
+dense_ratios = [150, 1500] #inclusive_range(150, 1500, 150)
 ratios = sparse_ratios + dense_ratios
 
 # compute the cross-product of |E| and the ratios
@@ -63,7 +63,7 @@ print 'aggregate input size is %uGB (max input file size is %uMB)' % (int(tot_sz
 
 # generate the graphs
 for i in range(1, num_versions+1):
-    ifl = get_path_to_project_root() + 'input/perf-%u.inputs' % i
+    ifl = get_path_to_project_root() + 'input/nperf-%u.inputs' % i
     print 'generating inputs for ' + ifl
     for (e, v) in variations:
         argstr = '--dont-generate -q -l %s -n %u %u' % (ifl, e, v)
