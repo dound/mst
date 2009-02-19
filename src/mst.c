@@ -31,18 +31,25 @@ int main(int argc, char **argv) {
     //float packing = get_packing_percent(num_verts, num_edges);
     kruskal_explicit_set_with_fs(argv[1]);
 #elif ALG == KRUSKAL_EXPLICIT_FS
+    fprintf(stderr, "using kruskal explicit full-sort\n");
     kruskal_explicit_set_with_fs(argv[1]);
 #elif ALG == KRUSKAL_EXPLICIT_PS
+    fprintf(stderr, "using kruskal explicit partial-sort\n");
     kruskal_explicit_set_with_ps(argv[1]);
 #elif ALG == KRUSKAL_IMPLICIT_FS
+    fprintf(stderr, "using kruskal implicit full-sort\n");
     kruskal_implicit_set_with_fs(argv[1]);
 #elif ALG == KRUSKAL_IMPLICIT_PS
+    fprintf(stderr, "using kruskal implicit partial-sort\n");
     kruskal_implicit_set_with_ps(argv[1]);
 #elif ALG == PRIM_DENSE
+    fprintf(stderr, "using prim dense\n");
     prim_dense(argv[1]);
 #elif ALG == PRIM_BHEAP
+    fprintf(stderr, "using prim bheap\n");
 #   error PRIM_BHEAP is not yet implemented
 #elif ALG == KKT
+    fprintf(stderr, "using kkt\n");
 #   error KKT is not yet implemented
 #else
 #   error Invalid ALG type
