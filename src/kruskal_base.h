@@ -5,6 +5,12 @@
 #include <stdio.h> /* printf */
 #include <stdlib.h> /* malloc */
 
+#define PARTIAL_QUICK
+#ifdef PARTIAL_QUICK
+int sortAmt;
+int sortedThrough;
+#endif
+
 // runs kruskal's algorithm
 void runKruskals(int n, int m, edge *G)
 {
@@ -22,7 +28,25 @@ void runKruskals(int n, int m, edge *G)
 #ifndef PARTIAL_SORT
         e = G[i];
 #else
+#ifdef PARTIAL_QUICK
+        if (i >= sortedThrough)
+        {
+            int sortTo = sortedThrough + sortAmt;
+            if (sortTo > m-1) {
+                int left = sortedThrough+1;
+                sortedThrough = m-1;
+                quicksort(G, left, m-1);
+            }
+            else {
+                int left = sortedThrough+1;
+                sortedThrough += sortAmt;
+                quicksortPart(G, left, m-1, sortedThrough);
+            }
+        }
+        e = G[i];
+#else
         e = pq_pop_min();
+#endif
 #endif
         int groupA = find(e.u);
         int groupB = find(e.v);
@@ -49,7 +73,36 @@ void kruskal(char* fn)
     read_graph_to_edge_list(fn, &n, &m, &G);
     quicksort(G, 0, m-1);
 #else
+#ifdef PARTIAL_QUICK
+    read_graph_to_edge_list(fn, &n, &m, &G);
+    int density = m/n;
+    if (density >= 50)
+    {
+        float fraction = 0.1;
+        if (n < fraction*m)
+            sortAmt = fraction*m;
+        else
+            sortAmt = n;
+        sortedThrough = sortAmt;
+    }
+    else if (density >= 10)
+    {
+        float fraction = 0.2;
+        if (n < fraction*m)
+            sortAmt = fraction*m;
+        else
+            sortAmt = n;
+        sortedThrough = sortAmt;
+    }
+    else
+    {
+        sortAmt = m-1;
+        sortedThrough = m-1;
+    }
+    quicksortPart(G, 0, m-1, sortAmt);
+#else
     read_graph_to_heapified_edge_list(fn, &n, &m, &G);
+#endif
 #endif
     makeUnionFind(n);
     runKruskals(n, m, G);
