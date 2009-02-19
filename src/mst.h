@@ -14,7 +14,7 @@
 
 /* use the default value for ALG if one is not specified */
 #ifndef ALG
-#  define ALG KRUSKAL_EXPLICIT_PS
+#  define ALG KRUSKAL_IMPLICIT_PS
 #endif
 
 /** whether to use ints instead of floats wherever possible */
