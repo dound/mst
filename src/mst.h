@@ -20,9 +20,11 @@
 /** whether to use ints instead of floats wherever possible */
 #ifdef _NO_FLOATS_
     typedef int foi;
-#   define FOI_TO_OUTPUT_WEIGHT(w) ((w) / 10.0f)
+    typedef unsigned long long foi_big;
+#   define FOI_TO_OUTPUT_WEIGHT(w) ((w) / 10.0)
 #else
     typedef float foi;
+    typedef double foi_big;
 #   define FOI_TO_OUTPUT_WEIGHT(w) (w)
 #endif
 

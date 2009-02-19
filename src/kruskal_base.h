@@ -15,7 +15,7 @@ int sortedThrough;
 void runKruskals(int n, int m, edge *G)
 {
     // total weight of mst
-    foi mstWeight;
+    foi_big mstWeight;
     // array of edges in mst, T
     edge *T;
     T = (edge *)malloc((n-1)*sizeof(edge));
