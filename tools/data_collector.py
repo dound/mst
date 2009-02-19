@@ -209,7 +209,10 @@ def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_ru
             continue
 
         # for each input, make sure we have run it on this rev
+        on = 0
         for i in inputs: # inputs is an [Input]
+            on += 1
+            print 'working on input #%u' % on
             total_results_needed += num_runs
             n = get_num_runs_missing_for_data(results, i, num_runs, weight_test)
             if n > 0:
