@@ -27,6 +27,7 @@ def make_latest(xaxis, alg, rev, index, num_verts):
     linkname = DATA_PATH + 'latest/%s-%s-%s-latest' % (xaxis, alg, str(num_verts))
     quiet_remove(linkname)
     os.symlink(o, linkname)
+    return linkname
 
 def numeric_compare(a, b):
     if a < b:
@@ -96,18 +97,27 @@ def gather_perf_data(alg, rev, index, latest):
             dat = get_output_dat_name(xaxis, alg, rev, index, vip)
             print 'creating ' + dat
             if latest:
-                make_latest(xaxis, alg, rev, index, vip)
+                latest_fn = make_latest(xaxis, alg, rev, index, vip)
             try:
                 fh = open(dat, 'w')
 
                 # compute relevant stats and output them
                 print >> fh, header_txt
+                count = 0
                 for (v, e) in keys[xaxis]:
                     if vip=='all' or vip==v:
+                        count += 1
                         r = results[(v, e)]
                         x = computex(v, e)
                         print >> fh, '%u\t%u\t%.6f\t%.3f\t%.3f\t%.3f\t%u' % (v, e, x, r.lower99, r.mean, r.upper99, len(r.values))
                 fh.close()
+
+                # don't create empty files
+                if count == 0:
+                    quiet_remove(dat)
+                    if latest:
+                        quiet_remove(latest_fn)
+
             except IOError, e:
                 print sys.stderr, "failed to write file: " + str(e)
                 return -1
