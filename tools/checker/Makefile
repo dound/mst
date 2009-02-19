@@ -12,9 +12,11 @@ BCMW = boost_compute_mst_weight
 
 # compiler and its directives
 CC     = g++
-INC    = /afs/ir/users/d/g/dgu/lib  # include boost
+ifeq ($(HOSTNAME_WO_DIGITS),myth)
+INC    = -I/afs/ir/users/d/g/dgu/lib  # include boost
+endif
 LIBS   =
-CPPFLAGS = -c -Wall $(BUILD_TYPE_FLAGS)
+CPPFLAGS = -c -Wall $(BUILD_TYPE_FLAGS) $(INC)
 
 # project sources
 SRCS = boost_compute_mst_weight.cpp
