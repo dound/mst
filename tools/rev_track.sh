@@ -4,7 +4,7 @@ set -o nounset
 
 CONF="`dirname $0`/conf/tracked_revs"
 MAX_SHA1_LEN=10
-MAX_COMMIT_MSG_LEN=50
+MAX_COMMIT_MSG_LEN=100
 
 # build the new file by iterating through all revisions in chrono order
 function rebuildCONF {
