@@ -112,7 +112,8 @@ n^y * \frac{n^\epsilon}{\log n}$ and $n^y \approx n^y * \frac{\log
   n}{n^\epsilon}$ over a certain range. The functions that are clearly not
 close are constant, log, and exponential.
 
-See table\ref{??} below for lines that best fit each data set.
+See Table \ref{table:part2-comparison} for lines that best fit each
+data set.
 
 % Describe our best guesses for how each grows (show the best best-fit equations
 % with values filled in as on the plots).  Describe why we chose that fit.  Try to
@@ -128,11 +129,12 @@ mathematical upper bound we derived earlier. The intuition is that as n
 gets larger, it will more closely resemble the k-dimensional grid. With
 many points placed at random in a limited space, the distribution of
 distances between neighboring points becomes more uniform, and more points
-fill out the space to the edges. Below we
+fill out the space to the edges. In Table \ref{table:part2-comparison} we
 list the curve that best fits our empirical results, and next to it we
 list the derived upper bound.  This derived upper bound is plotted against the
 empirical results in Figure~\ref{fig:part2-with-theoretical}.
 
+\begin{table}
 \begin{tabular}{|c|c|c|}
 \hline
 k&Empirical best fit&Theoretical upper bound\\
@@ -143,6 +145,10 @@ k&Empirical best fit&Theoretical upper bound\\
 4&$0.9*n^{0.7} + -0.7$&$n^{\frac{3}{4}} + n^{\frac{2}{4}} + n^{\frac{1}{4}} + 1$\\
 \hline
 \end{tabular}
+\caption{Comparison of curve fit to data and theoretical upper MST weight
+  limit.}
+\label{table:part2-comparison}
+\end{table}
 
 We see that the best curve is lower than but follows the polynomial upper
 bound. For example, the best 4-D curve had a 0.7 degree polynomial and the

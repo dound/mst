@@ -2,7 +2,29 @@
 \label{sec:deep:io}
 
 \paragraph{}
-Briefly discuss how we read in data. Touch on our two approaches as well as
-relevant optimizations (quantify them; a graph may be overkill, but a table or
-at least quoting performance numbers in text would be great).
-\de{need to write this}
+As we implemented and optimized each MST algorithm we ran valgrind to
+profile our code. The program almost always spent more time reading the
+input file than running any other single function. It was clear that
+optimizing Kruskal's or Prim's would be of little use if we did not
+optimize the text parsing. Our original implementation was a simple loop
+that used scanf to read in the values. We reimplemented the parser and used
+the following series of optimizations
+to get a 2.5x speedup in overall running time.
+\begin{itemize}
+\item
+Use mmap to map file directly into th address space and avoid an extra
+buffer copy.
+\item
+Use custom logic to parse the numbers out of the text.
+\item
+Use fadvise() to give a hint to the kernel that the mmaped file will be
+read sequentially. That way the kernel does aggressive read ahead of the
+file.
+\item
+When compiling for part 1, use simpler logic to take advantage of the exactly
+one decimal place format of the edge weights.
+\end{itemize}
+% Briefly discuss how we read in data. Touch on our two approaches as well as
+% relevant optimizations (quantify them; a graph may be overkill, but a table or
+% at least quoting performance numbers in text would be great).
+% \de{need to write this}
