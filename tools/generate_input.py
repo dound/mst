@@ -163,6 +163,9 @@ used.)"""
     parser.add_option("-c", "--correctness",
                       action="store_true", default=False,
                       help="compute and log the correct output")
+    parser.add_option("-d", "--dont-generate",
+                      action="store_true", default=False,
+                      help="add the input to the inputs list file but do not generate it")
     parser.add_option("-l", "--inputs-list-file",
                       metavar="FILE",
                       help="set the file to store info about the new input to (default is usually fine)")
@@ -202,6 +205,15 @@ used.)"""
         parser.error("missing NUM_VERTICES")
     elif len(args) > 1:
         parser.error("too many arguments")
+
+    # make sure --dont-generate isn't specified along with mutex switches
+    if options.dont_generate:
+        if options.correctness:
+            parser.error('-c cannot be specified with --dont-generate')
+        if options.dont_track:
+            parser.error('-t cannot be specified with --dont-generate')
+        if options.output_file:
+            parser.error('-o cannot be specified with --dont-generate')
 
     # just return whether the input specified would be for part 2
     if get_is_for_part2:
@@ -267,7 +279,7 @@ used.)"""
     # open the desired output file
     if options.output_file == 'stdout':
         out = sys.stdout
-    else:
+    elif not options.dont_generate:
         if options.may_use_existing:
             if os.path.exists(options.output_file):
                 print_if_not_quiet('skipping input generation: %s already exists' % ppinput(options.output_file))
@@ -288,7 +300,8 @@ used.)"""
         if num_dims < 0:
             parser.error("option -v requires dimensionality to be a strictly positive integer")
 
-        about = gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos, options.precision, out)
+        if not options.dont_generate:
+            about = gen_random_vertex_positions(num_verts, num_edges, num_dims, min_pos, max_pos, options.precision, out)
         dimensionality = num_dims
         min_val = min_pos
         max_val = max_pos
@@ -311,26 +324,30 @@ used.)"""
             max_edge_len = 100000
 
         print_if_not_quiet('density=%s pom=%s' % (str(get_density(num_verts, num_edges)), str(get_percent_of_max(num_verts, num_edges))))
-        about = gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, options.precision, out)
+        if not options.dont_generate:
+            about = gen_random_edge_lengths(num_verts, num_edges, min_edge_len, max_edge_len, options.precision, out)
         dimensionality = 0
         min_val = min_edge_len
         max_val = max_edge_len
 
-    print_input_footer(num_verts, num_edges, about, out)
-    print_if_not_quiet('graph saved to ' + ppinput(options.output_file))
-    if out != sys.stdout:
-        out.close()
+    if options.dont_generate:
+        print_if_not_quiet('graph not saved (as requested)')
+    else:
+        print_input_footer(num_verts, num_edges, about, out)
+        print_if_not_quiet('graph saved to ' + ppinput(options.output_file))
+        if out != sys.stdout:
+            out.close()
 
-    # generate output with correctness checker, if desired
-    mst_weight = -1
-    if options.correctness:
-        if options.dont_track:
-            print >> sys.stderr, "warning: skipping correctness output (only done when -t is not specified)"
-            return 0
-        try:
-            mst_weight = compute_mst_weight(options.output_file)
-        except CheckerError, e:
-            print >> sys.stderr, e
+        # generate output with correctness checker, if desired
+        mst_weight = -1
+        if options.correctness:
+            if options.dont_track:
+                print >> sys.stderr, "warning: skipping correctness output (only done when -t is not specified)"
+                return 0
+            try:
+                mst_weight = compute_mst_weight(options.output_file)
+            except CheckerError, e:
+                print >> sys.stderr, e
 
     # record this new input in our input log
     if not options.dont_track:
