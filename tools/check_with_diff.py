@@ -40,7 +40,7 @@ so it will be recomputed every time this is run.
     str_mst_w = fmt % mst_w
     str_checker_w = fmt % checker_w
     if str_mst_w == str_checker_w:
-        print 'Weights match!'
+        print 'Weights match! %s %s' % (str_mst_w, str_checker_w)
         quiet_remove(mst_out)
         quiet_remove(checker_out)
         return 0
