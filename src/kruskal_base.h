@@ -35,7 +35,7 @@ void runKruskals(int n, int m, edge *G)
             if (sortTo > m-1) {
                 int left = sortedThrough+1;
                 sortedThrough = m-1;
-                quicksort(G, left, m-1);
+                qsort_edges(G+left, m-left);
             }
             else {
                 int left = sortedThrough+1;
@@ -71,7 +71,7 @@ void kruskal(char* fn)
     edge *G;
 #ifndef PARTIAL_SORT
     read_graph_to_edge_list(fn, &n, &m, &G);
-    quicksort(G, 0, m-1);
+    qsort_edges(G, m);
 #else
 #ifdef _PARTIAL_QUICK_
     read_graph_to_edge_list(fn, &n, &m, &G);
