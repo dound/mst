@@ -29,10 +29,7 @@ int main(int argc, char **argv) {
 
     int density = num_edges / num_verts;
     float packing = get_packing_percent(num_verts, num_edges);
-    if(density<100 && packing<=0.75f)
-        kruskal_explicit_set_with_fs(argv[1]);
-    else
-        prim_dense(argv[1]);
+    kruskal_explicit_set_with_fs(argv[1]);
 #elif ALG == KRUSKAL_EXPLICIT_FS
     kruskal_explicit_set_with_fs(argv[1]);
 #elif ALG == KRUSKAL_EXPLICIT_PS
