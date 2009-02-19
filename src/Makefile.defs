@@ -9,9 +9,9 @@ else
 MATH_OPTS = -ffast-math -fno-math-errno -ffinite-math-only -fno-trapping-math -fsingle-precision-constant
 BUILD_TYPE_FLAGS = -O3 -DNDEBUG $(MATH_OPTS)
 LINKER_CFLAGS = -fwhole-program
-HOSTNAME_WO_DIGITS = $(shell echo $(HOSTNAME) | sed -re 's/[0-9]+//')
-ifeq ($(HOSTNAME),myth)
-BUILD_TYPE_FLAGS += -mtune=nocana -fprefetch-loop-arrays
+HOSTNAME_WO_DIGITS = $(shell hostname | sed -re 's/[0-9]+//')
+ifeq ($(HOSTNAME_WO_DIGITS),myth)
+BUILD_TYPE_FLAGS += -march=nocona -fprefetch-loop-arrays
 endif
 endif
 
