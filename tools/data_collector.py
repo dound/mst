@@ -16,7 +16,7 @@ def get_num_runs_missing_for_data(results, inpt, num_desired_runs, weight_test):
         if weight_test:
             key = (inpt, -1)
         else:
-            key = (inpt, i+1)
+            key = (inpt, i)
         if not results.has_key(key):
             return num_desired_runs - i
     return 0
