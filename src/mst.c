@@ -27,8 +27,8 @@ int main(int argc, char **argv) {
     fscanf(input, "%d", &num_edges);
     fclose(input);
 
-    int density = num_edges / num_verts;
-    float packing = get_packing_percent(num_verts, num_edges);
+    //int density = num_edges / num_verts;
+    //float packing = get_packing_percent(num_verts, num_edges);
     kruskal_explicit_set_with_fs(argv[1]);
 #elif ALG == KRUSKAL_EXPLICIT_FS
     kruskal_explicit_set_with_fs(argv[1]);
