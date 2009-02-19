@@ -37,6 +37,8 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
         perror ("mmap");
         return 0;
     }
+    posix_fadvise (fd, 0, sb.st_size,
+                   POSIX_FADV_SEQUENTIAL);
     char *input = start;
     // todo dpi remove = char *end = start + sb.st_size;
     char *delim;
@@ -110,10 +112,15 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
 #endif
         pwr = 1;
         input = delim+1;
+#ifdef VARIABLE_PRECISION
         delim = strchr(input, '\n');
         char *decimal = strchr(input, '.');
         if (decimal == 0 || decimal > delim)
             decimal = delim;
+#else
+        char *decimal = strchr(input, '.');
+        delim = decimal + 2;
+#endif
         digit = decimal-1;
         while (digit >= input)
         {
@@ -127,16 +134,20 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
         }
         digit = decimal+1;
         float pwr2 = 1.0/10;
+#ifdef VARIABLE_PRECISION
         while (digit < delim)
         {
+#endif
 #if   GRAPH_TYPE == EDGE_LIST || GRAPH_TYPE == HEAPIFIED_EDGE_LIST
             (*G)[i].weight += pwr2*((*digit)-'0');
 #elif GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
             w += pwr2*((*digit)-'0');
 #endif
+#ifdef VARIABLE_PRECISION
             pwr2 /= 10;
             digit++;
         }
+#endif
         input = delim+1;
 #if GRAPH_TYPE == HEAPIFIED_EDGE_LIST
         pq_heapify_insertion(); /* maintain the heap property */
