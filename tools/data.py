@@ -469,9 +469,9 @@ def get_tracked_revs():
         lines = fh.readlines()
         for line in lines:
             if line[0:1] != '#':
-                s = line.split('\t', 4)
-                if len(s) != 4:
-                    raise DataError('line should have four columns (has %d): %s' % (len(s), line))
+                s = line.split('\t', 5)
+                if len(s) != 5:
+                    raise DataError('line should have five columns (has %d): %s' % (len(s), line))
                 ret.append(s[2])
         fh.close()
         return ret
