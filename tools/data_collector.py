@@ -215,6 +215,13 @@ def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_ru
         for i in inputs: # inputs is an [Input]
             on += 1
             print 'working on input #%u' % on
+
+            # hack to prevent us from accidentally doing a crazy prims problem
+            if rev == 'da9b46bdc0':
+                if i.num_verts > 8000:
+                    print 'refusing to do prims with |V| > 8000 (skip!): ' + str(i)
+                    continue
+
             total_results_needed += num_runs
             n = get_num_runs_missing_for_data(results, i, num_runs, weight_test)
             if n > 0:
