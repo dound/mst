@@ -6,7 +6,7 @@ associated with them.
 #define _DEBUG_
   Enables extra debugging code.  Enabled by default for debug builds.
 
-#define _NO_FLOAT_
+#define _NO_FLOATS_
   Enables integer-only mode.
 
 #define INPUT_TYPE {SCANF, MMAP}

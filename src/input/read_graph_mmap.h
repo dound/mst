@@ -40,7 +40,6 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
     posix_fadvise (fd, 0, sb.st_size,
                    POSIX_FADV_SEQUENTIAL);
     char *input = start;
-    // todo dpi remove = char *end = start + sb.st_size;
     char *delim;
     delim = strchr(input, '\n');
     sscanf(input, "%d", n);
@@ -107,9 +106,6 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
             digit--;
         }
         /*** parse weight ***/
-#ifdef _NO_FLOAT_
-#   error _NO_FLOAT_ is not yet supported by read_graph_*_mmap()
-#endif
         pwr = 1;
         input = delim+1;
 #ifdef VARIABLE_PRECISION
@@ -138,9 +134,18 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
         while (digit < delim)
         {
 #endif
+#ifdef _NO_FLOATS_
+            pwr2 = 1;
+#endif
 #if   GRAPH_TYPE == EDGE_LIST || GRAPH_TYPE == HEAPIFIED_EDGE_LIST
+#ifdef _NO_FLOATS_
+            (*G)[i].weight *= 10;
+#endif
             (*G)[i].weight += pwr2*((*digit)-'0');
 #elif GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
+#ifdef _NO_FLOATS_
+            w *= 10;
+#endif
             w += pwr2*((*digit)-'0');
 #endif
 #ifdef VARIABLE_PRECISION
