@@ -23,6 +23,10 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
 #  error unknown GRAPH_TYPE
 #endif
 {
+
+    // table of values of '0' character added up - helps with parsing
+    int diffs[] = {0, -48, -528, -5328, -53328, -533328, -5333328, -53333328};
+    
     struct stat sb;
 
     int fd = open(filename, O_RDONLY);
@@ -72,20 +76,23 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
     for (i = 0; i < *m; i++)
 #endif
     {
-#if GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
-        u = v = 0;
-        w = 0.0f;
-#endif
         /*** parse u ***/
         delim = strchr(input, ' ');
         int pwr = 1;
         char *digit = delim-1;
+        int digits = delim-input;
+#if GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
+        u = diffs[digits];
+        w = 0.0f;
+#elif   GRAPH_TYPE == EDGE_LIST || GRAPH_TYPE == HEAPIFIED_EDGE_LIST
+        (*G)[i].u = diffs[digits];
+#endif
         while (digit >= input)
         {
 #if   GRAPH_TYPE == EDGE_LIST || GRAPH_TYPE == HEAPIFIED_EDGE_LIST
-            (*G)[i].u += pwr*((*digit)-'0');
+            (*G)[i].u += pwr*((*digit));
 #elif GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
-            u += pwr*((*digit)-'0');
+            u += pwr*((*digit));
 #endif
             pwr *= 10;
             digit--;
@@ -95,12 +102,18 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
         delim = strchr(input, ' ');
         pwr = 1;
         digit = delim-1;
+        digits = delim-input;
+#if GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
+        v = diffs[digits];
+#elif   GRAPH_TYPE == EDGE_LIST || GRAPH_TYPE == HEAPIFIED_EDGE_LIST
+        (*G)[i].v = diffs[digits];
+#endif
         while (digit >= input)
         {
 #if   GRAPH_TYPE == EDGE_LIST || GRAPH_TYPE == HEAPIFIED_EDGE_LIST
-            (*G)[i].v += pwr*((*digit)-'0');
+            (*G)[i].v += pwr*((*digit));
 #elif GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
-            v += pwr*((*digit)-'0');
+            v += pwr*((*digit));
 #endif
             pwr *= 10;
             digit--;
