@@ -102,7 +102,7 @@ def gather_perf_data(alg, rev, index, latest):
 
                 # compute relevant stats and output them
                 print >> fh, header_txt
-                for (v, e) in keys:
+                for (v, e) in keys[xaxis]:
                     if vip=='all' or vip==v:
                         r = results[(v, e)]
                         x = computex(v, e)
