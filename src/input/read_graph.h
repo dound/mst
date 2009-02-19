@@ -81,5 +81,13 @@ int read_graph_to_adjacency_list(char *filename, int *n, int *m, edge_list **el)
  */
 int read_graph_to_adjacency_matrix(char *filename, int *n, int *m, foi **weights);
 
+/**
+ * custom strchr function
+ */
+char *strchr2(char *start, char val);
+
+extern int diffs[];
+extern int pwrs[];
+
 #endif /* READ_GRAPH_H */
 
