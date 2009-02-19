@@ -33,10 +33,10 @@ if [ $# -eq 3 ]; then
     set -o errexit
     if [ $numChanges -gt 0 ]; then
         trap 'echo "Warning: changed files may have been stashed away; try git stash list"; exit 1' 2
-        git stash save
+        git-stash save
 
         # try to gracefully cleanup on Ctrl-C before exiting
-        trap 'echo Warning: unstashing changes on Ctrl-C; git checkout -q $origBranch; git stash pop > /dev/null; git branch -D $tmpBranch; exit 1' 2
+        trap 'echo Warning: unstashing changes on Ctrl-C; git checkout -q $origBranch; git-stash pop > /dev/null; git branch -D $tmpBranch; exit 1' 2
     fi
 
     # create a temporary branch which includes commits up to the specified revision
@@ -65,7 +65,7 @@ if [ $# -eq 3 ]; then
 
     # restore stashed changes
     if [ $numChanges -gt 0 ]; then
-        git stash pop > /dev/null
+        git-stash pop > /dev/null
         echo "Restored stashed changes"
     fi
 fi
