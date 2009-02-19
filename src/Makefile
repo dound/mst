@@ -22,7 +22,7 @@ endif
 CC     = $(DEFAULT_CC)
 INCS   = -I.
 LIBS   = -lm
-CFLAGS = -c -Wall -std=gnu99 $(INCS) $(BUILD_TYPE_FLAGS) $(CUSTOM_DEFS)
+CFLAGS = -c -Wall -std=gnu99 $(INCS) $(BUILD_TYPE_FLAGS) $(CUSTOM_DEFS) -D_NO_FLOATS_
 
 # project sources
 SRCS_COMMON = adj_matrix.c initialize_graph.c pq_edge.c read_graph.c
