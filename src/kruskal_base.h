@@ -5,8 +5,8 @@
 #include <stdio.h> /* printf */
 #include <stdlib.h> /* malloc */
 
-#define PARTIAL_QUICK
-#ifdef PARTIAL_QUICK
+#define _PARTIAL_QUICK_
+#ifdef _PARTIAL_QUICK_
 int sortAmt;
 int sortedThrough;
 #endif
@@ -28,7 +28,7 @@ void runKruskals(int n, int m, edge *G)
 #ifndef PARTIAL_SORT
         e = G[i];
 #else
-#ifdef PARTIAL_QUICK
+#ifdef _PARTIAL_QUICK_
         if (i >= sortedThrough)
         {
             int sortTo = sortedThrough + sortAmt;
@@ -73,7 +73,7 @@ void kruskal(char* fn)
     read_graph_to_edge_list(fn, &n, &m, &G);
     quicksort(G, 0, m-1);
 #else
-#ifdef PARTIAL_QUICK
+#ifdef _PARTIAL_QUICK_
     read_graph_to_edge_list(fn, &n, &m, &G);
     int density = m/n;
     if (density >= 50)

@@ -6,7 +6,7 @@ associated with them.
 #define _DEBUG_
   Enables extra debugging code.  Enabled by default for debug builds.
 
-#define _NO_FLOATS_
+#define _NO_FLOAT_
   Enables integer-only mode.
 
 #define INPUT_TYPE {SCANF, MMAP}
@@ -29,6 +29,11 @@ associated with them.
     PRIM_DENSE: Prim's algorithm for dense graphs
     PRIM_BHEAP: Prim's algorithm with binary heaps
     KKT: Karger-Klein-Tarjan randomized algorithm
+
+#define _PARTIAL_QUICK_
+  if ALG is KRUSKAL_*_PS then _PARTIAL_QUICK_ causes it to use a partial
+  quicksort method to implement partial sorting, rather than a heap
+
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
