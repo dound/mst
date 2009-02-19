@@ -106,9 +106,13 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
             digit--;
         }
         /*** parse weight ***/
+#ifdef _NO_FLOATS_
+        pwr = 10;
+#else
         pwr = 1;
+#endif
         input = delim+1;
-#ifdef VARIABLE_PRECISION
+#ifdef _VARIABLE_PRECISION_
         delim = strchr(input, '\n');
         char *decimal = strchr(input, '.');
         if (decimal == 0 || decimal > delim)
@@ -130,7 +134,7 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
         }
         digit = decimal+1;
         float pwr2 = 1.0/10;
-#ifdef VARIABLE_PRECISION
+#ifdef _VARIABLE_PRECISION_
         while (digit < delim)
         {
 #endif
@@ -138,17 +142,11 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
             pwr2 = 1;
 #endif
 #if   GRAPH_TYPE == EDGE_LIST || GRAPH_TYPE == HEAPIFIED_EDGE_LIST
-#ifdef _NO_FLOATS_
-            (*G)[i].weight *= 10;
-#endif
             (*G)[i].weight += pwr2*((*digit)-'0');
 #elif GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
-#ifdef _NO_FLOATS_
-            w *= 10;
-#endif
             w += pwr2*((*digit)-'0');
 #endif
-#ifdef VARIABLE_PRECISION
+#ifdef _VARIABLE_PRECISION_
             pwr2 /= 10;
             digit++;
         }

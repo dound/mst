@@ -30,14 +30,16 @@ associated with them.
     PRIM_BHEAP: Prim's algorithm with binary heaps
     KKT: Karger-Klein-Tarjan randomized algorithm
 
-#define _PARTIAL_QUICK_
-  if ALG is KRUSKAL_*_PS then _PARTIAL_QUICK_ causes it to use a partial
-  quicksort method to implement partial sorting, rather than a heap
-
-
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 INTERNAL USE ONLY - not set from the makefile
+
+#define _VARIABLE_PRECISION_
+  Enables variable precision edge weight support
+
+#define _PARTIAL_QUICK_
+  If ALG is KRUSKAL_*_PS then _PARTIAL_QUICK_ causes it to use a partial
+  quicksort method to implement partial sorting, rather than a heap
 
 #define GRAPH_TYPE {EDGE_LIST, HEAPIFIED_EDGE_LIST, ADJACENCY_LIST, ADJACENCY_MATRIX}
   Sets which kind of data structure to use populate when reading an input graph.
