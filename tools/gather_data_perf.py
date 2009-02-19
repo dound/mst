@@ -23,7 +23,7 @@ def get_output_dat_name(xaxis, alg, rev, index, num_verts):
 
 def make_latest(xaxis, alg, rev, index, num_verts):
     """Updates the symlink which points to the latest data file for an algorithm"""
-    o = get_output_dat_name(xaxis, alg, rev, index, num_verts)
+    o = '../' + get_output_dat_name(xaxis, alg, rev, index, num_verts)[len(DATA_PATH):]
     linkname = DATA_PATH + 'latest/%s-%s-%s-latest' % (xaxis, alg, str(num_verts))
     quiet_remove(linkname)
     os.symlink(o, linkname)
