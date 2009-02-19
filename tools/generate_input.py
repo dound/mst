@@ -330,6 +330,7 @@ used.)"""
         min_val = min_edge_len
         max_val = max_edge_len
 
+    mst_weight = -1
     if options.dont_generate:
         print_if_not_quiet('graph not saved (as requested)')
     else:
@@ -339,7 +340,6 @@ used.)"""
             out.close()
 
         # generate output with correctness checker, if desired
-        mst_weight = -1
         if options.correctness:
             if options.dont_track:
                 print >> sys.stderr, "warning: skipping correctness output (only done when -t is not specified)"
