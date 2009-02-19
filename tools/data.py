@@ -477,3 +477,26 @@ def get_tracked_revs():
         return ret
     except IOError, e:
         raise DataError('I/O error while reading tracked revisions: ' + e)
+
+def get_tracked_algs_and_revs():
+    """Returns dict mapping algorithms we are tracking to lists of SHA1 revision IDs in which they are tested."""
+    # maps alg name to list of revisions
+    ret = {}
+    try:
+        fh = open(get_path_to_tools_root() + 'conf/tracked_revs', "r")
+        lines = fh.readlines()
+        for line in lines:
+            if line[0:1] != '#':
+                s = line.split('\t', 5)
+                if len(s) != 5:
+                    raise DataError('line should have five columns (has %d): %s' % (len(s), line))
+                rev = s[2]
+                tag = s[3]
+                if ret.has_key(tag):
+                    ret[tag].append(rev)
+                else:
+                    ret[tag] = [rev]
+        fh.close()
+        return ret
+    except IOError, e:
+        raise DataError('I/O error while reading tracked revisions: ' + e)
