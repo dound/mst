@@ -12,19 +12,19 @@ DATA_PATH = get_path_to_project_root() + 'writeup/data/perf/'
 TRACKED = get_tracked_algs_and_revs()
 
 # vertex values to create data files for
-IMPORTANT_VERTS = [250, 700, 4473, all]
+IMPORTANT_VERTS = [250, 700, 4473, 'all']
 
 # confidence interval to use
 DEFAULT_CI = 99
 
 def get_output_dat_name(xaxis, alg, rev, index, num_verts):
     """Gets the name of an output file for a particular revision of an algorithm"""
-    return DATA_PATH + '%s-%s-%u-%s-%s' % (xaxis, alg, index, rev, str(num_verts))
+    return DATA_PATH + '%s-%s-%s-%u-%s' % (xaxis, alg, str(num_verts), index, rev)
 
 def make_latest(xaxis, alg, rev, index, num_verts):
     """Updates the symlink which points to the latest data file for an algorithm"""
     o = get_output_dat_name(xaxis, alg, rev, index, num_verts)
-    linkname = DATA_PATH + 'latest/%s-%s-latest-%s' % (xaxis, alg, str(num_verts))
+    linkname = DATA_PATH + 'latest/%s-%s-%s-latest' % (xaxis, alg, str(num_verts))
     quiet_remove(linkname)
     os.symlink(o, linkname)
 
