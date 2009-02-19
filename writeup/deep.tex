@@ -1,11 +1,14 @@
 \section{Details}
 \label{sec:deep}
+This section presents in depth several aspects of the project.
+Section~\ref{sec:deep:algchoice} discusses interesting choices we made when
+devising our MST solver and a detailed review of its performance.
+Section~\ref{sec:deep:io} presents how we efficiently handle I/O.
+Section~\ref{sec:deep:graphgen} describes our approach to quickly generating
+representative graphs.  Finally, the framework in which we carried out
+experiments is briefly described in Section~\ref{sec:deep:framework}.
 
 \input{deep_algchoice}
-
-\paragraph{}
-Other things we might want to discuss here:
-\begin{itemize}
-  \item Input generation (and maybe random numbers in here too)
-  \item Framework - short paragraph or so, and only if space permits
-\end{itemize}
+\input{deep_io}
+\input{deep_graphgen}
+\input{deep_framework}
