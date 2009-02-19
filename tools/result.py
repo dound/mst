@@ -21,6 +21,7 @@ class ResultAccumulator:
         self.sdev_mean = None
         self.df = None
         self.lower99 = self.upper99 = None
+        self.defaultCI = 9995
 
     def add_data(self, v):
         self.values.append(v)
@@ -54,7 +55,7 @@ class ResultAccumulator:
             return
         self.sdev = sqrt(self.var)
         self.sdev_mean = self.sdev / sqrt(n)
-        (self.lower99, self.upper99) = self.conf(9995)
+        (self.lower99, self.upper99) = self.conf(self.defaultCI)
 
     def conf(self, percent=99):
         n = len(self.values)
