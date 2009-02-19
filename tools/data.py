@@ -331,7 +331,7 @@ class PerfResult(AbstractResult):
             return compare_float(self.time_sec, other.time_sec)
 
     def __str__(self):
-        return AbstractResult.__str__(self) + ('\t%.1f' % self.time_sec) + ('\t%.1f' % self.mst_weight)
+        return AbstractResult.__str__(self) + ('\t%.2f' % self.time_sec) + ('\t%.1f' % self.mst_weight)
 
     def header_row(self):
         return AbstractResult.header_row(self) + '\tTime(sec)\tMSTWeight'
