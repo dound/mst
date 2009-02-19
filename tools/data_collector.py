@@ -217,7 +217,7 @@ def collect_data(revs, get_results_for_rev, inputs, collect_missing_data, num_ru
             print 'working on input #%u' % on
 
             # hack to prevent us from accidentally doing a crazy prims problem
-            if rev == 'da9b46bdc0':
+            if rev == 'da9b46bdc0' or rev == 'fc05f63801':
                 if i.num_verts > 8000:
                     print 'refusing to do prims with |V| > 8000 (skip!): ' + str(i)
                     continue
