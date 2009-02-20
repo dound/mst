@@ -19,7 +19,7 @@ so it will be recomputed every time this is run.
         die("%s not found" % input_graph)
 
     # get our mst output
-    mst = get_path_to_mst_binary(make_sure_it_exists=True)
+    mst = get_path_to_mst_binary(make_sure_it_exists=False)
     mst_out = random_tmp_filename(10)
     if os.system('%s %s > %s' % (mst, input_graph, mst_out)) != 0:
         quiet_remove(mst_out)
