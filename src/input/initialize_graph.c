@@ -18,14 +18,16 @@ void initialize_adjacency_list(edge_list **el, int num_verts, int num_edges) {
 #if AL_TYPE == AL_VECTORS
     /* multiply by two because we track edges in both directions */
     int num_initial_edges = (2 * num_edges) / num_verts;
-    for(int i=1; i<=num_verts; i++) {
+    int i;
+    for(i=1; i<=num_verts; i++) {
         edge_list *e = &(*el)[i];
         e->used = 0;
         e->avail = num_initial_edges;
         e->a = malloc(e->avail * sizeof(edge_to));
     }
 #elif AL_TYPE == AL_LL
-    for(int i=1; i<=num_verts; i++)
+    int i;
+    for(i=1; i<=num_verts; i++)
         (*el)[i].head = NULL;
 #else
 #   error unknown AL_TYPE
@@ -34,6 +36,7 @@ void initialize_adjacency_list(edge_list **el, int num_verts, int num_edges) {
 
 void initialize_adjacency_matrix(foi **G, int num_verts) {
     foi *weights = *G = (foi*)malloc(num_verts * num_verts * sizeof(foi));
-    for(int i=0; i<num_verts*num_verts; i++)
+    int i;
+    for(i=0; i<num_verts*num_verts; i++)
         weights[i] = AM_NO_EDGE;
 }

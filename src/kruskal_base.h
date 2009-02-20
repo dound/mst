@@ -20,9 +20,10 @@ void runKruskals(int n, int m, edge *G)
     edge *T;
     T = (edge *)malloc((n-1)*sizeof(edge));
 
+    int i;
     int nextEdge = 0;
     mstWeight = 0;
-    for (int i = 0; i < m && nextEdge < n-1; i++)
+    for (i = 0; i < m && nextEdge < n-1; i++)
     {
         edge e;
 #ifndef PARTIAL_SORT
@@ -61,7 +62,7 @@ void runKruskals(int n, int m, edge *G)
     }
 
     printf("%f\n", FOI_TO_OUTPUT_WEIGHT(mstWeight));
-    for (int i = 0; i < n-1; i++)
+    for (i = 0; i < n-1; i++)
         printf("%d %d\n", T[i].u, T[i].v);
 }
 

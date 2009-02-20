@@ -36,12 +36,13 @@ void set_parent_explicit(int group, int parent);
 /*** union find functions ***/
 void makeUnionFind(int n)
 {
+    int i;
     exp_parents = (int *)malloc((n+1)*sizeof(int));
-    for (int i = 0; i < n+1; i++)
-    exp_parents[i] = i;
+    for (i = 0; i < n+1; i++)
+        exp_parents[i] = i;
 
     CCs = (UFSet *)malloc((n+1)*sizeof(UFSet));
-    for (int i = 0; i < n+1; i++)
+    for (i = 0; i < n+1; i++)
     {
         CCs[i].vertices = (int *)malloc(INIT_CC_CAP*sizeof(int));
         assert(CCs[i].vertices);
@@ -75,7 +76,8 @@ void set_parent_explicit(int a, int b)
     }
 
     // set new parent values
-    for (int i = 0; i < CCs[a].size; i++)
+    int i;
+    for (i = 0; i < CCs[a].size; i++)
         exp_parents[CCs[a].vertices[i]] = b;
 
     // copy over values in set

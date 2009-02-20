@@ -30,7 +30,8 @@ static inline void run_prim_dense(int sz_v, foi *weights) {
 
     /* store the best known weight to each vertex (initially infinite) */
     foi *min_w_to_v = (foi*)malloc(sz_v * sizeof(foi));
-    for(int i=0; i<sz_v; i++)
+    int i;
+    for(i=0; i<sz_v; i++)
         min_w_to_v[i] = EDGE_MAX;
 
     /* node most recently added to the MST */
@@ -46,7 +47,8 @@ static inline void run_prim_dense(int sz_v, foi *weights) {
         next_vertex = 0;
 
         /* find the minimum edge to each node (ignore vertex 0 as it starts our MST) */
-        for(int v=1; v<sz_v; v++) {
+        int v;
+        for(v=1; v<sz_v; v++) {
             if(vertex_not_done[v]) {
                 /* get cost to v from the latest vertex added to the MST */
                 /* note: if there is no such edge, w will be EDGE_MAX: this
@@ -77,8 +79,8 @@ static inline void run_prim_dense(int sz_v, foi *weights) {
 
     /* print the MST */
     printf("%f\n", FOI_TO_OUTPUT_WEIGHT(mst_weight));
-    for(int i=1; i<sz_v; i++)
-        printf("%d %d\n", i+1, mst_edges[i]+1);
+    for(i=1; i<sz_v; i++)
+        printf("%d %u\n", i+1, mst_edges[i]+1);
 
 #ifdef _DEBUG_
     /* be nice and free memory when we aren't going for performance */

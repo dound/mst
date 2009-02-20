@@ -28,7 +28,8 @@ void set_parent_implicit(int group, int parent);
 void makeUnionFind(int n)
 {
     imp_parents = (UFCCNode *)malloc((n+1)*sizeof(UFCCNode));
-    for (int i = 0; i < n+1; i++)
+    int i;
+    for (i = 0; i < n+1; i++)
     {
         imp_parents[i].parent = i;
         imp_parents[i].size = 0;
@@ -50,7 +51,8 @@ void set_parent_implicit(int a, int b)
 {
     imp_parents[a].parent = b;
     imp_parents[b].size += imp_parents[a].size;
-    for (int i = 0; i < numToUpdate; i++)
+    int i;
+    for (i = 0; i < numToUpdate; i++)
         imp_parents[toUpdate[i]].parent = b;
 }
 
