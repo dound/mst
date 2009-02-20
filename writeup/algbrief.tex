@@ -3,12 +3,14 @@
 
 \paragraph{}
 \dgu{Briefly describe our best overall algorithm here.}
-Our program chooses between a version of Kruskal's and a version of Prim's
-algorithm to find a minimum spanning tree. Our optimized Kruskal's
+Our program dynamically chooses between a version of Kruskal's and a
+version of Prim's
+algorithm to find a minimum spanning tree based on the density of the
+graph. Our optimized Kruskal's
 algorithm is faster for most graphs with the exception of extremely dense
-graphs. Prim's is implemented with an adjacency matrix so it is faster for
+ones. Prim's is implemented with an adjacency matrix so it is faster for
 graphs with an $|E|$ value of at least 80\% the maximum possible for a
-given $|V|$ ($\frac{|V|(|v| - 1)}{2}$).
+given $|V|$.
 
 We implemented Kruskal's using a Union-Find data structure similar to the
 one described in the textbook. It maintains a set of vertices in a
