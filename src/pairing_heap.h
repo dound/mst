@@ -24,21 +24,21 @@ typedef struct heap {
 } heap;
 
 /* create a new heap */
-heap *heap_new();
+heap* heap_new(int sz_v);
 
 /* free heap */
-void heap_free(heap *hp);
+void heap_free();
 
 /* get min value */
-int heap_min(heap *h);
+int heap_min();
 
 /* decrease the value of the node */
-void heap_decrease_key(heap *h, heap_node *node, foi new_weight);
+void heap_decrease_key(heap_node *node, foi new_weight);
 
 /* insert element to the heap */
-heap_node *heap_insert(heap *h, foi weight);
+heap_node *heap_insert(foi weight);
 
 /* delete min value. multi-pass */
-void heap_delete_min(heap *hp);
+void heap_delete_min();
 
 #endif /* PAIRING_HEAP */
