@@ -23,8 +23,8 @@ int main(int argc, char **argv) {
 #if ALG == BEST_ALG
     FILE *input = fopen(argv[1], "r");
     unsigned num_verts, num_edges;
-    fscanf(input, "%d", &num_verts);
-    fscanf(input, "%d", &num_edges);
+    fscanf(input, "%u", &num_verts);
+    fscanf(input, "%u", &num_edges);
     fclose(input);
 
     float pom = get_packing_percent(num_verts, num_edges);
