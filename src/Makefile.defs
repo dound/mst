@@ -5,7 +5,7 @@ MAKE = gmake --no-print-directory
 GCC_IN_PATH = gcc  # 4.1.3 on myth
 GCC_4_3_3   = /afs/ir.stanford.edu/users/d/g/dgu/bin/gcc-4.3.3/bin/gcc
 GCC_4_4     = /afs/ir.stanford.edu/users/d/g/dgu/bin/gcc-4.4/bin/gcc
-ICC         = /afs/ir.stanford.edu/users/d/g/dgu/bin/intel/Compiler/11.0/074/bin/intel64/icc
+ICC         = LANG=C && /afs/ir.stanford.edu/users/d/g/dgu/bin/intel/Compiler/11.0/074/bin/intel64/icc
 DEFAULT_CC  = $(GCC_IN_PATH)
 
 # choose compiler
