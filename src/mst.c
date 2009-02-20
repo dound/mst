@@ -50,12 +50,9 @@ int main(int argc, char **argv) {
 #elif ALG == PRIM_DENSE
     fprintf(stderr, "using prim dense\n");
     prim_dense(argv[1]);
-#elif ALG == PRIM_BHEAP
-    fprintf(stderr, "using prim bheap\n");
-#   error PRIM_BHEAP is not yet implemented
-#elif ALG == KKT
-    fprintf(stderr, "using kkt\n");
-#   error KKT is not yet implemented
+#elif ALG == PRIM_HEAP
+    fprintf(stderr, "using prim heap\n");
+    prim_heap(argv[1]);
 #else
 #   error Invalid ALG type
 #endif

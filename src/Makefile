@@ -27,7 +27,7 @@ CFLAGS = -c -Wall -std=gnu99 $(INCS) $(BUILD_TYPE_FLAGS) $(CUSTOM_DEFS)
 # project sources
 SRCS_COMMON = adj_matrix.c initialize_graph.c pq_edge.c read_graph.c
 
-SRCS_MST = mst.c kruskal.c prim_dense.c sort.c $(SRCS_COMMON)
+SRCS_MST = mst.c kruskal.c pairing_heap.c prim_dense.c prim_heap.c sort.c $(SRCS_COMMON)
 OBJS_MST = $(patsubst %.c,%.o,$(SRCS_MST))
 DEPS_MST = $(patsubst %.c,.%.d,$(SRCS_MST))
 

@@ -9,8 +9,7 @@
 #define KRUSKAL_IMPLICIT_FS 4
 #define KRUSKAL_IMPLICIT_PS 5
 #define PRIM_DENSE          6
-#define PRIM_BHEAP          7
-#define KKT                 8
+#define PRIM_HEAP           7
 
 /* use the default value for ALG if one is not specified */
 #ifndef ALG
