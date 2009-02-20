@@ -1,23 +1,47 @@
 # utility programs used by this Makefile
 MAKE = gmake --no-print-directory
 
-# debug and release modes
-BUILD_TYPE = debug
-ifeq ($(BUILD_TYPE),debug)
-BUILD_TYPE_FLAGS = -g -D_DEBUG_
-else
-MATH_OPTS = -ffast-math -fno-math-errno -ffinite-math-only -fno-trapping-math -fsingle-precision-constant
-BUILD_TYPE_FLAGS = -O3 -DNDEBUG $(MATH_OPTS)
-LINKER_CFLAGS = -fwhole-program
-HOSTNAME_WO_DIGITS = $(shell hostname | sed -re 's/[0-9]+//')
-ifeq ($(HOSTNAME_WO_DIGITS),myth)
-BUILD_TYPE_FLAGS += -march=nocona -fprefetch-loop-arrays
-endif
-endif
-
 # compiler choices
 GCC_IN_PATH = gcc  # 4.1.3 on myth
 GCC_4_3_3   = /afs/ir.stanford.edu/users/d/g/dgu/bin/gcc-4.3.3/bin/gcc
 GCC_4_4     = /afs/ir.stanford.edu/users/d/g/dgu/bin/gcc-4.4/bin/gcc
 ICC         = /afs/ir.stanford.edu/users/d/g/dgu/bin/intel/Compiler/11.0/074/bin/intel64/icc
 DEFAULT_CC  = $(GCC_IN_PATH)
+
+# choose compiler
+ifeq ($(COMPILER),icc)
+  DEFAULT_CC=$(ICC)
+else
+  ifeq ($(COMPILER),gcc44)
+    DEFAULT_CC=$(GCC_4_4)
+  else
+    ifeq ($(COMPILER),gcc433)
+      DEFAULT_CC=$(GCC_4_3_3)
+    else
+      ifeq ($(COMPILER),)
+        DEFAULT_CC=$(GCC_IN_PATH)
+      else
+        DEFAULT_CC=UNKNOWN_COMPILER
+      endif
+    endif
+  endif
+endif
+
+# debug and release modes
+BUILD_TYPE = debug
+ifeq ($(BUILD_TYPE),debug)
+  BUILD_TYPE_FLAGS = -g -D_DEBUG_
+else
+  ifeq ($(DEFAULT_CC),$(ICC))
+    BUILD_TYPE_FLAGS = -O3 -ipo -marchnocona
+  else
+    MATH_OPTS = -ffast-math -fno-math-errno -ffinite-math-only -fno-trapping-math -fsingle-precision-constant
+    BUILD_TYPE_FLAGS = -O3 -DNDEBUG $(MATH_OPTS)
+    LINKER_CFLAGS = -fwhole-program
+
+    HOSTNAME_WO_DIGITS = $(shell hostname | sed -re 's/[0-9]+//')
+    ifeq ($(HOSTNAME_WO_DIGITS),myth)
+      BUILD_TYPE_FLAGS += -march=nocona -fprefetch-loop-arrays
+    endif
+  endif
+endif
