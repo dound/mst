@@ -19,7 +19,7 @@ set format y "%.0e"
 set logscale y 2
 
 set terminal postscript eps color enhanced linewidth 3 dashed
-set output "p1-fit-prim-heap.eps"
+set output "p1-fit-kruskal.eps"
 
 set style line 1 lt 1 lc rgb "#000000" pt 1
 set style line 2 lt 2 lc rgb "#CC0000" pt 2
@@ -29,7 +29,7 @@ set style line 5 lt 2 lc rgb "#00CC00" pt 5
 set style line 6 lt 3 lc rgb "#0000CC" pt 6
 
 # data to fit
-fitdata = "../data/perf/e-all-pom-ph-None-1-97175a2fd4"
+fitdata = "../data/perf/e-all-pom-kepq-None-3-2f8dfb5239"
 
 log2(x) = log(x) / log(2)
 
@@ -48,8 +48,8 @@ exp2fit(x)     = exp2fit_m     * exp2fit_b**x               + exp2fit_c
 fit loglin2fit(x)  fitdata using 2:($5*1000):($4*1000):($6*1000) via loglin2fit_m, loglin2fit_e, loglin2fit_c
 #fit exp2fit(x)     fitdata using 2:($5*1000):($4*1000):($6*1000) via exp2fit_m, exp2fit_b, exp2fit_c
 
-plot fitdata using 2:($5*1000) title 'Prim with Pairing Heap' with linespoints, \
-      loglin2fit(x)  title '1.0 * |E|^{0.9} * log2(|E|) + -0.01: linear*log'
+plot fitdata using 2:($5*1000) title 'Kruskal with Partial Quicksort' with linespoints, \
+      loglin2fit(x)  title '1.9 * |E|^{1.0} * log2(|E|) + 0.0: linear*log'
 
 #     log2fit(x)     title sprintf('%.1f * log2(x) + %.1f: log', log2fit_m, log2fit_c)                                          ls 2, \
 #     lindlog2fit(x) title sprintf('%.1f * x^{%.1f} / log2(x) + %.1f: linear/log', lindlog2fit_m, lindlog2fit_e, lindlog2fit_c) ls 3, \
