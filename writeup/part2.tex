@@ -2,10 +2,10 @@
 \label{sec:part2}
 
 \paragraph{}
-We investigate the expected weight of the MST in random graphs. We begin
-with a discussion of the mathematical upper bound on average MST weight for graphs
-created by points in k-space. We then discuss out empirical attempts to
-estimate the expected weight.
+We investigate the expected weight of the MST in random graphs. We begin with a
+hypothesis for an upper bound on the average MST weight of graphs created from
+points randomly distributed in $k$-space. We then present and analyze our
+empirical results.
 
 % Graphs based on empirical and explanations for part 2 will be here.  We should
 % include a subsection on our mathematical analysis of the upper bound and
@@ -14,33 +14,32 @@ estimate the expected weight.
 
 \subsection{Upper bound on average MST weight}
 \paragraph{}
-For graphs created by points in a unit space we can derive an upper bound on
-MST weight. We begin by analyzing a graph in 2-D and generalize that to a
-graph in k dimensions.
+We derive an upper bound upper bound on the average MST weight of graphs created
+from points randomly distributed in k-space. We begin by analyzing a graph in
+2-D and later generalize to a graph in $k$ dimensions.
 
-A graph of n nodes will have an MST of n-1 edges. In order to produce
-the maximum weighted MST of n nodes, the n-1 edges need to be as large as
-possible. Because the MST picks the smallest n-1 edges that do not produce
-cycles, we can maximize the MST's weight by spreading the nodes out as far
-as possible. We also maximize the MST by making all edges of equal length,
-thus not allowing any tree to trade off one edge of a longer distance with
-one of a shorter distance. We do not prove this but offer it as some
-simple reasoning for our calculations.
+A graph of $|V|$ vertices will have an MST of $|V|-1$ edges. In order to produce
+the \textit{maximum} weight MST for $|V|$ vertices, the $|V|-1$ edges need to be as
+large as possible. Because the MST contains the smallest $|V|-1$ edges that do
+not produce cycles, we can maximize its weight by spreading the vertices out as far
+as possible. We also maximize the MST by making all edges of equal length which
+prevents trading off one edge of a longer distance for one of a shorter
+distance. We do not prove this but offer it as a simple hypothesis which forms
+the basis of our calculations.
 
-If n is a perfect square, then the graph that
-maximizes any MST will be a $\sqrt{n} \times \sqrt{n}$ grid with the
-points spaced evenly from 0 to 1 in both dimensions. The length of each
-edge is $\frac{1}{\sqrt{n}-1}$ so the total MST weight is
-$\frac{n-1}{\sqrt{n}-1}$. Performing polynomial long division on this
-fraction gives us $n^{\frac{1}{2}}+1$ as an alternate form for the MST
-weight.
+If $|V|$ is a perfect square, then the graph that maximizes any MST will form a
+square grid with sides of length $\sqrt{|V|}$ and with the points spaced evenly
+between its sides. The length of each edge is $\frac{1}{\sqrt{|V|}-1}$ so the
+total MST weight is $\frac{|V|-1}{\sqrt{|V|}-1}$. Performing polynomial long
+division on this fraction gives us $|V|^{\frac{1}{2}}+1$ as an alternate form
+for the MST weight.
 
-We can perform the exact same analysis on graphs in 3-D and 4-D and get
-analagous results. We omit the derivations for brevity, but generalizing
-the equation to k dimensions gives a maximum MST weight for an n node
-graph as:
-\[ n^{\frac{k-1}{k}} + n^{\frac{k-2}{k}} + \cdots + n^{\frac{1}{k}} +
-n^{\frac{0}{k}} \]
+We can perform the same analysis on higher dimensionality spaces (such as 3-D
+and 4-D) and get analogous results. We omit the derivations for brevity, but
+generalizing the equation to $k$ dimensions gives a maximum MST weight for graph
+with $|V|$ vertices as:
+\[ |V|^{\frac{k-1}{k}} + |V|^{\frac{k-2}{k}} + \cdots + |V|^{\frac{1}{k}} +
+|V|^{\frac{0}{k}} \]
 In Section~\ref{sec:part2:compare} we compare our empirical results with this
 theoretical upper bound.
 
