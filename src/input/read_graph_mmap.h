@@ -171,7 +171,7 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
             digit--;
         }
         digit = decimal+1;
-        float pwr2 = 1.0/10;
+        float pwr2 = 1.0f/10;
 #ifdef _VARIABLE_PRECISION_
         while (digit < delim)
         {
