@@ -1,8 +1,60 @@
 \subsection{Graph Generation}
 \label{sec:deep:graphgen}
-
 \paragraph{}
-Briefly discuss how we generate graphs. Touch on our various approaches
-(complete, sparse, or dense) as well as relevant optimizations and perhaps how
-we ensure the output is connected.  Definitely discuss random number generation.
-\dgu{need to write this}
+We carefully designed several algorithms to generate graphs.  Each algorithm
+generates a particular kind of input, or is better for certain kinds of target
+graphs.  In this section, we discuss those algorithms and important aspects of
+their creation (like random number generation).
+
+A crucial aspect of input generation is the quality of the random number
+generator.  To this end, we used a Mersenne Twister algorithm for generating
+random numbers.  Furthermore, we chose the random seed for this algorithm based
+on a number generated from a truly random number generator -
+\texttt{/dev/urandom}.  \texttt{/dev/urandom} is a Linux utility which ``gathers
+environmental noise from device drivers and other sources into an entropy
+pool.''  This gives us a high degree of confidence that our generated graphs are
+representative of a ``true'' random sampling.
+
+We often want to reuse inputs for various consistency reasons (debugging,
+performance testing, correctness checking, etc.).  However, with finite disk
+space you can only cache so many graphs - the $8,192$ vertex complete graphs
+used $1GB$ each!  Our solution was to build a framework which logged inputs -
+from a very small amount of information - edge count, a vertex count, and a
+random seed - we could deterministically regenerate any graph.  This turned out
+to be quite useful, especially when farming out performance testing operations
+to multiple machines.
+
+We spent a significant amount of time carefully studying how graphs could be
+efficiently generated.  The running time analysis and empirical studies on which
+ones are better in practice for particular edge densities are sadly omitted for
+lack of space.  The code is in \texttt{generate\_input.py}.
+
+\begin{description}
+  \item \textbf{Random Vertex Positions.} $O(|V|^2)$.  Simply generate
+    coordinates for each vertex and then compute and output the pairwise edge
+    weights.
+
+  \item \textbf{Complete Graph.} $O(|V|^2)$.  Simply generate uniform random
+    edge weights in the desired range for all pairs of vertices.  This is a
+    special case because it is easy and efficient to generate a complete graph
+    like this.
+
+  \item \textbf{Other, Ensure Connectivity.} $O(|V|)$.  To ensure the graph is
+    connected, we iterate over each vertex and connect it to a random vertex in
+    the group of vertices we have already iterated over.  For the remainder of
+    the edges, choose one of the following two based on the graph's density:
+
+
+  \item \textbf{Dense.}  $O(V^2 \cdot log(V^2))$.  Enumerate all edges (pairs of
+    vertices) and insert them into a heap with a \textit{random key}.  Use
+    \texttt{RemoveMin} to remove the desired number of edges and these will be
+    the edges in your graph (once an edge is picked a random weight is chosen
+    for it).
+
+  \item \textbf{Sparse.}  $O(E \cdot V^2 / (V^2 - E))$.  Use a hash-table to
+    keep track of all edges which have been added to the graph.  Pick two random
+    vertices; if the edge is not in the graph, add it.  Repeat until the desired
+    number of edges have been added to the graph.  This method is very direct
+    and has a small amount of work per iteration so in practice it often
+    outperforms dense until the graphs become very dense.
+\end{description}
