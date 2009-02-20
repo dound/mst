@@ -30,7 +30,14 @@ void run_prim_heap(int sz_v, edge_list *al) {
     heap_node **min_edge_to_vertex = (heap_node**)malloc((sz_v+1) * sizeof(heap_node*));
     memset(min_edge_to_vertex, 0, (sz_v+1) * sizeof(heap_node*));
 
+    /* start with vertex 1 in the MST */
     int v = 1;
+
+    /* since vertex 1 starts in the MST it needs no edge to get to the MST */
+    min_edge_to_vertex[1] = (heap_node*)-1;
+    mst_edges[1] = -1;
+
+    /* expand our territory one vertex per loop */
     do {
         /* see if edges from v might be useful for our MST */
         AL_EDGE_LIST_BEGIN(&al[v]);
@@ -63,7 +70,6 @@ void run_prim_heap(int sz_v, edge_list *al) {
             /* add v to our MST - use the best edge we have to it */
             mst_edges[v] = min_edge_to_vertex[v]->value.v_in_mst;
             mst_weight += min_edge_to_vertex[v]->value.weight;
-
             heap_delete_min(ph);
         }
         else
