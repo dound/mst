@@ -15,7 +15,8 @@ to get a 2.5x speedup in overall running time.
 Use mmap to map file directly into th address space and avoid an extra
 buffer copy.
 \item
-Use custom logic to parse the numbers out of the text.
+Use custom logic, including a custom strchr() function, to parse the
+numbers out of the text.
 \item
 Use fadvise() to give a hint to the kernel that the mmaped file will be
 read sequentially. That way the kernel does aggressive read ahead of the
