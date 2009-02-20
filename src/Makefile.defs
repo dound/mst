@@ -28,7 +28,7 @@ else
 endif
 
 # debug and release modes
-BUILD_TYPE = debug
+BUILD_TYPE = release
 ifeq ($(BUILD_TYPE),debug)
   BUILD_TYPE_FLAGS = -g -D_DEBUG_
 else
