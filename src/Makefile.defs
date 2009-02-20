@@ -34,6 +34,7 @@ ifeq ($(BUILD_TYPE),debug)
 else
   ifeq ($(DEFAULT_CC),$(ICC))
     BUILD_TYPE_FLAGS = -O3 -ipo -marchnocona
+    LINKER_CFLAGS = -static
   else
     MATH_OPTS = -ffast-math -fno-math-errno -ffinite-math-only -fno-trapping-math -fsingle-precision-constant
     BUILD_TYPE_FLAGS = -O3 -DNDEBUG $(MATH_OPTS)
