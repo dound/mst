@@ -44,6 +44,12 @@ theoretical upper bound.
 
 \subsection{Empirical results}
 \paragraph{}
+For these results, we generated inputs with fifteen decimal places of precision
+and recorded MST weights to three decimal places of precision.  This helped
+ensure that we considered a very wide range of the possible values within the
+unit range.  Section~\ref{sec:deep:graphgen} provides more details about how
+graphs were generated.
+
 Figure~\ref{fig:part2} shows experimentally determined average MST weights for
 four types of graphs.  These types are random unit edge weights (labeled
 ``Edge'') and edge weights based on random vertex placement in $k$-space for
@@ -98,21 +104,19 @@ exponential&:& m \cdot b^n + c
 \subfigure[Best-fit lines for random vertex positions in 4-D unit space.
   ]{\label{fig:part2-fit-loc4}\includegraphics[width=0.5\linewidth,angle=0]{figures/part2-fit-loc4}}
 }
+\caption{Comparison of best-fit lines to empirical data.}
 \label{fig:part2-fit}
 \end{figure*}
 
-\paragraph{}
-For each graph type we found that a sublinear polynomial best fit
-the data. Very close to that line were also the polynomial/log and
-polynomial*log lines. The reasoning for these other two functions being
-similar is that $\log n$ and $n^\epsilon$ both grow very slowly and look
-very similar over a significant range of values. Therefore $n^y \approx
-n^y * \frac{n^\epsilon}{\log n}$ and $n^y \approx n^y * \frac{\log
-  n}{n^\epsilon}$ over a certain range. The functions that are clearly not
-close are constant, log, and exponential.
+The fit for random edge weights was not as strong as the other fits, but the
+best candidate was a very small logarithmic function $0.004 \cdot log_2(x) + 1.1$.
 
-See Table~\ref{table:part2-comparison} for lines that best fit each
-data set.
+We found that a sublinear polynomial best fit the data. Very close to that line
+were also the polynomial$/$log and polynomial$\cdot$log lines. The reasoning for
+these other two functions being similar is that $\log n$ and $n^\epsilon$ both
+grow very slowly and look very similar over a significant range of values. The
+functions that are clearly not close are constant, log, and exponential.  See
+Table~\ref{table:part2-comparison} for lines that best fit each data set.
 
 % Describe our best guesses for how each grows (show the best best-fit equations
 % with values filled in as on the plots).  Describe why we chose that fit.  Try to
