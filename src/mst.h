@@ -13,7 +13,7 @@
 
 /* use the default value for ALG if one is not specified */
 #ifndef ALG
-#  define ALG BEST_ALG
+#  define ALG PRIM_HEAP
 #endif
 
 /** whether to use ints instead of floats wherever possible */
