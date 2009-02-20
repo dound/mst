@@ -6,6 +6,8 @@
 #include <stdlib.h> /* malloc */
 #include <string.h> /* memset */
 
+#pragma warning(disable:981) /* disable warning about operands in printf */
+
 /**
  * Uses Prim's algorithm to find the MST of the specified graph.  Prints the MST
  * to stdout.
@@ -79,7 +81,8 @@ void run_prim_heap(int sz_v, edge_list *al) {
 
     /* print the MST */
     printf("%f\n", FOI_TO_OUTPUT_WEIGHT(mst_weight));
-    for(int i=2; i<=sz_v; i++)
+    int i = 0;
+    for(i=2; i<=sz_v; i++)
         printf("%d %u\n", i, mst_edges[i]);
 
 #ifdef _DEBUG_
