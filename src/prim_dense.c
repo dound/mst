@@ -16,7 +16,7 @@
  * @param sz_v     number of vertices in the graph
  * @param weights  adjacency matrix of edge weights
  */
-void run_prim_dense(int sz_v, foi *weights) {\
+static inline void run_prim_dense(int sz_v, foi *weights) {
     /* IMPORTANT: all vertices are 0 indexed (i.e., one off from actual input #s) */
     foi_big mst_weight = 0;
 

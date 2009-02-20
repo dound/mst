@@ -2,7 +2,7 @@
 #include <mst.h>
 #include <stdio.h> /* FILE, fopen, fprintf */
 
-float get_packing_percent(int num_verts, int num_edges) {
+static inline float get_packing_percent(int num_verts, int num_edges) {
     int min_edges = num_verts - 1;
     int num_edges_scaled = num_edges - min_edges;
     int num_edge_choices = num_verts*(num_verts-1)/2 - min_edges;
