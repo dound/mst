@@ -18,9 +18,7 @@ else
     ifeq ($(COMPILER),gcc433)
       DEFAULT_CC=$(GCC_4_3_3)
     else
-      ifeq ($(COMPILER),)
-        DEFAULT_CC=$(GCC_IN_PATH)
-      else
+      ifneq ($(COMPILER),)
         DEFAULT_CC=UNKNOWN_COMPILER
       endif
     endif
