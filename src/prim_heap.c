@@ -6,8 +6,6 @@
 #include <stdlib.h> /* malloc */
 #include <string.h> /* memset */
 
-#pragma warning(disable:981) /* disable warning about operands in printf */
-
 /**
  * Uses Prim's algorithm to find the MST of the specified graph.  Prints the MST
  * to stdout.
