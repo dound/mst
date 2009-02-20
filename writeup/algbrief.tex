@@ -1,25 +1,26 @@
-\section{MST Algorithm (in brief)}
+\section{MST Algorithm-in-Brief}
 \label{sec:algbrief}
 
 \paragraph{}
-\dgu{Briefly describe our best overall algorithm here.}
-Our program dynamically chooses between a version of Kruskal's and a
-version of Prim's
-algorithm to find a minimum spanning tree based on the density of the
-graph. Our optimized Kruskal's
-algorithm is faster for most graphs with the exception of extremely dense
-ones. Prim's is implemented with an adjacency matrix so it is faster for
-graphs with an $|E|$ value of at least 80\% the maximum possible for a
-given $|V|$.
+We implemented several algorithms to find MSTs.  Our program dynamically chooses
+between implementations of Kruskal's and Prim's algorithms.  This choice is made
+based on the density of the graph.
 
-We implemented Kruskal's using a Union-Find data structure similar to the
-one described in the textbook. It maintains a set of vertices in a
-connected component and a ``parent'' value for each connected component
-for easy comparison of two connected component.
+For extremely dense graphs, a specialized version of Prim's algorithm is used.
+In particular, we use this adjacency-matrix based Prim's algorithm
+implementation whenever $|E|$ exceeds $80$\% the number of edges in a complete
+graph with $|V|$ vertices.
 
-Prim's...
+On the other hand, when the graph is not so intensely dense, we use an optimized
+Kruskal's algorithm.  It uses a Union-Find data structure similar to the one
+described in \cite{algdesign}.  It maintains a set of vertices in a connected
+component and a ``parent'' value for each connected component to facilitate an
+efficient comparison of two connected components.
 
-\paragraph{}
-We would like to submit our project to the competition. As asked for in
-the FAQ, our total running time on a graph with 20,000 nodes and 2,000,000
-edges is 0.2 seconds.
+We would like to submit our project to the competition. As requested, we
+measured the expected running time of our program on a graph with $20,000$ nodes
+and $2,000,000$ edges.  We generated ten such random graphs and ran each ten
+times.  The mean CPU execution time, as measured by the \texttt{/usr/bin/time}
+utility for each of these $100$ trials, was $0.164$ seconds.  The $99.95\%$
+confidence interval computed from these trials ranged from $0.161$ to $0.168$
+seconds.
