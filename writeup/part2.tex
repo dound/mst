@@ -109,14 +109,21 @@ exponential&:& m \cdot b^n + c
 \end{figure*}
 
 The fit for random edge weights was not as strong as the other fits, but the
-best candidate was a very small logarithmic function $0.004 \cdot log_2(x) + 1.1$.
+best candidate was a very small logarithmic function: $0.004 \cdot log_2(|V|) +
+1.1$.  The $99.95\%$ confidence interval for the data making up this result is
+also shown in Figure~\ref{fig:part2-fit-edge} because it is the only set of data
+for which the confidence interval is large enough to be visible (mostly because
+the values are quite small for this set of data).
 
-We found that a sublinear polynomial best fit the data. Very close to that line
-were also the polynomial$/$log and polynomial$\cdot$log lines. The reasoning for
-these other two functions being similar is that $\log n$ and $n^\epsilon$ both
-grow very slowly and look very similar over a significant range of values. The
-functions that are clearly not close are constant, log, and exponential.  See
-Table~\ref{table:part2-comparison} for lines that best fit each data set.
+We found that a sublinear polynomial best fits the $k$-space data.
+Figures~\ref{fig:part2-fit-loc2}, \ref{fig:part2-fit-loc3}, and
+\ref{fig:part2-fit-loc4} show the fits for the $k$-space data.  The
+polynomial$/$log and polynomial$\cdot$log fits are quite as good as the
+sublinear polynomial fit. One reason for this similarity is that $\log |V|$
+and $|V|^\epsilon$ both grow very slowly and look very similar over this range
+of values. The constant, log, and exponentials fits are poor.
+Table~\ref{table:part2-comparison} shows the values for the best-fit growth
+rates for each $k$-space data set.
 
 % Describe our best guesses for how each grows (show the best best-fit equations
 % with values filled in as on the plots).  Describe why we chose that fit.  Try to
@@ -125,18 +132,18 @@ Table~\ref{table:part2-comparison} for lines that best fit each data set.
 % almost indistinguishable on the graph but that poly is best; also not that
 % const, log, and exp are clearly bad fits.
 
-\subsection{Comparison of empirical and theoretical results}
+\subsection{Comparison with Theoretical}
 \label{sec:part2:compare}
 \paragraph{}
-We compare our empirical results for the expected MST weight with the
-mathematical upper bound we derived earlier. The intuition is that as n
-gets larger, it will more closely resemble the k-dimensional grid. With
-many points placed at random in a limited space, the distribution of
-distances between neighboring points becomes more uniform, and more points
-fill out the space to the edges. In Table~\ref{table:part2-comparison} we
-list the curve that best fits our empirical results, and next to it we
-list the derived upper bound.  This derived upper bound is plotted against the
-empirical results in Figure~\ref{fig:part2-with-theoretical}.
+We compare our empirical results with the theoretical upper bound we presented
+earlier. The intuition is that as $|V|$ gets larger it will more closely resemble
+the $k$-dimensional grid. With many points placed at random in a limited space,
+the distribution of distances between neighboring points becomes more uniform,
+and more points fill out the space to the edges. In
+Table~\ref{table:part2-comparison} we list the curve that best fits our
+empirical results, and next to it we list the derived upper bound.  This derived
+upper bound is plotted against the empirical results in
+Figure~\ref{fig:part2-with-theoretical}.
 
 \begin{table}
 \begin{tabular}{|c|c|c|}
@@ -144,19 +151,19 @@ empirical results in Figure~\ref{fig:part2-with-theoretical}.
 k&Empirical best fit&Theoretical upper bound\\
 \hline
 1&$1$&$1$\\
-2&$0.8*n^{0.5} + -0.5$&$n^{\frac{1}{2}} + 1$\\
-3&$0.8*n^{0.6} + -0.6$&$n^{\frac{2}{3}} + n^{\frac{1}{3}} + 1$\\
-4&$0.9*n^{0.7} + -0.7$&$n^{\frac{3}{4}} + n^{\frac{2}{4}} + n^{\frac{1}{4}} + 1$\\
+2&$0.8*|V|^{0.5} + -0.5$&$|V|^{\frac{1}{2}} + 1$\\
+3&$0.8*|V|^{0.6} + -0.6$&$|V|^{\frac{2}{3}} + |V|^{\frac{1}{3}} + 1$\\
+4&$0.9*|V|^{0.7} + -0.7$&$|V|^{\frac{3}{4}} + |V|^{\frac{2}{4}} + |V|^{\frac{1}{4}} + 1$\\
 \hline
 \end{tabular}
-\caption{Comparison of curve fit to data and theoretical upper MST weight
-  limit.}
+\caption{Comparison of empirically-determined best-fit growth rates to the
+  theoretical upper bound on MST weight for $k$-space data.}
 \label{table:part2-comparison}
 \end{table}
 
 We see that the best curve is lower than but follows the polynomial upper
-bound. For example, the best 4-D curve had a 0.7 degree polynomial and the
-upper bound had a 0.75 degree polynomial. These tests confirm our
+bound. For example, the best 4-D curve had a $0.7$ degree polynomial and the
+upper bound had a $0.75$ degree polynomial. These tests support our
 hypothesis.
 
 \begin{figure}[htb!]
