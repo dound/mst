@@ -10,7 +10,7 @@ empirical results.
 % Graphs based on empirical and explanations for part 2 will be here.  We should
 % include a subsection on our mathematical analysis of the upper bound and
 % (hopefully) expected MST weight (could potentially plot these alongside the
-% empircal data).
+% empirical data).
 
 \subsection{Upper bound on average MST weight}
 \paragraph{}
@@ -115,11 +115,11 @@ also shown in Figure~\ref{fig:part2-fit-edge} because it is the only set of data
 for which the confidence interval is large enough to be visible (mostly because
 the values are quite small for this set of data).
 
-We found that a sublinear polynomial best fits the $k$-space data.
+We found that a sub-linear polynomial best fits the $k$-space data.
 Figures~\ref{fig:part2-fit-loc2}, \ref{fig:part2-fit-loc3}, and
 \ref{fig:part2-fit-loc4} show the fits for the $k$-space data.  The
 polynomial$/$log and polynomial$\cdot$log fits are quite as good as the
-sublinear polynomial fit. One reason for this similarity is that $\log |V|$
+sub-linear polynomial fit. One reason for this similarity is that $\log |V|$
 and $|V|^\epsilon$ both grow very slowly and look very similar over this range
 of values. The constant, log, and exponentials fits are poor.
 Table~\ref{table:part2-comparison} shows the values for the best-fit growth
@@ -135,15 +135,15 @@ rates for each $k$-space data set.
 \subsection{Comparison with Theoretical}
 \label{sec:part2:compare}
 \paragraph{}
-We compare our empirical results with the theoretical upper bound we presented
-earlier. The intuition is that as $|V|$ gets larger it will more closely resemble
-the $k$-dimensional grid. With many points placed at random in a limited space,
-the distribution of distances between neighboring points becomes more uniform,
-and more points fill out the space to the edges. In
-Table~\ref{table:part2-comparison} we list the curve that best fits our
-empirical results, and next to it we list the derived upper bound.  This derived
-upper bound is plotted against the empirical results in
-Figure~\ref{fig:part2-with-theoretical}.
+In this section we compare our empirical results with the theoretical upper
+bound presented earlier. The intuition is that as $|V|$ grows, it will more
+closely resemble the $k$-dimensional grid as many vertices are placed in a
+uniform random manner.  Table~\ref{table:part2-comparison} compares the
+empirically-determined best-fit growth rates to the theoretical upper bound on
+MST weight for $k$-space data.  This derived upper bound is plotted against the
+empirical results in Figure~\ref{fig:part2-with-theoretical}.  These show that
+the best-fit growth rate is reasonably bounded the polynomial upper bound and
+thus these tests support our hypothesis.
 
 \begin{table}
 \begin{tabular}{|c|c|c|}
@@ -160,11 +160,6 @@ k&Empirical best fit&Theoretical upper bound\\
   theoretical upper bound on MST weight for $k$-space data.}
 \label{table:part2-comparison}
 \end{table}
-
-We see that the best curve is lower than but follows the polynomial upper
-bound. For example, the best 4-D curve had a $0.7$ degree polynomial and the
-upper bound had a $0.75$ degree polynomial. These tests support our
-hypothesis.
 
 \begin{figure}[htb!]
 \centering
