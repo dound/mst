@@ -59,15 +59,25 @@ stored edges in one direction.
 
 We found that a best-fit growth rate analysis on empirical data for ``PH''
 roughly matched the theoretical estimate: the best-fit was a polynomial $\cdot$
-log function $1.0 * |E|^0.9 * log2(|E|) + -0.010$.
-Figure~\ref{fig:p1-fit-prim-heap} shows the average runtime for ``PH'' and this
-best-fit line.
+log function $1.0 * |E|^{0.9} * log_2(|E|) + -0.010$.  Stability issues in the
+Marquardt-Levenberg algorithm and our data for ``PD'' forced us to find a
+reasonable fit by hand.  The best-fit for ``PD'' also roughly matched the
+theoretical estimate: $0.0002 \cdot |V|^2$ nicely fits the data.  The empirical
+data and best-fit lines for these are shown in
+Figures~\ref{fig:p1-fit-prim-heap} and ~\ref{fig:p1-fit-prim-dense}.
 
 \begin{figure}[htb]
 \centering
 \includegraphics[width=0.50\textwidth]{figures/p1-fit-prim-heap.pdf}
-\caption{Empirical data and best-fit line for Prim.}
+\caption{Empirical data and best-fit line for Prim Heap.}
 \label{fig:p1-fit-prim-heap}
+\end{figure}
+
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.50\textwidth]{figures/p1-fit-prim-dense.pdf}
+\caption{Empirical data and best-fit line for Prim Dense.}
+\label{fig:p1-fit-prim-dense}
 \end{figure}
 
 \subsubsection{Kruskal's Algorithm}
@@ -105,6 +115,11 @@ you have to keep track of the sorted portion, and sort more if you move
 past it. We found a good solution was to sort differing percentages of the
 edge array based on the density of the graph. The optimal values found are
 listed in Table \ref{table:kruskal-sort-percent}.
+
+We found that a best-fit growth rate analysis on empirical data for ``KPS''
+roughly matched the theoretical estimate: the best-fit was a polynomial $\cdot$
+log function $1.9 * |E|^{1.0} * log_2(|E|) + -0.0$.  The empirical data and
+best-fit line is shown in Figures~\ref{fig:p1-fit-kruskal}.
 
 \begin{table}
 \begin{tabular}{|c|c|}
