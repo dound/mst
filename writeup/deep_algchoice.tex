@@ -82,39 +82,43 @@ Figures~\ref{fig:p1-fit-prim-heap} and ~\ref{fig:p1-fit-prim-dense}.
 
 \subsubsection{Kruskal's Algorithm}
 \paragraph{}
-We implemented multiple versions of Kruskal's and had surprising
-results. One major difference is in the Union-Find data structure that
-provides the fundamental abilities to find the connected component of a
-given vertex and to combine the connected components of two vertices. The
-textbook describes one implementation that maintains an explicit set of
-vertices in a connected component. When Kruskal's algorithm adds an edge,
-unioning the sets requires copying the members in the smaller connected
-component into the larger connected component's set. A second version
-maintains an implicit set through a chain of ``parent
-pointers''. One optimization on this second approach collapses this chain
-each time it is traversed by updating vertices' parent pointers.
+We implemented multiple versions of Kruskal's algorithm. One major difference is
+in the Union-Find data structure that provides the fundamental abilities to find
+the connected component of a given vertex and to combine the connected
+components of two vertices. The textbook describes one implementation that
+maintains an explicit set of vertices in a connected component. When Kruskal's
+algorithm adds an edge, unioning the sets requires copying the members in the
+smaller connected component into the larger connected component's set. A second
+version maintains an implicit set through a chain of ``parent pointers''. One
+optimization on this second approach collapses this chain each time it is
+traversed by updating vertices' parent pointers.
 
-Surprisingly, the explicitly maintained set performed faster than the
-implicit version, which differs from the theoretical results in the
-book. The reason appeared to
-be that the explicit set had much better cache performance on large
-graphs. The find operation of the
-implicit set required following a chain of parent pointers that jumped
-all around the array of nodes. The explicit set did not require this
-hopping around through memory. Even with multiple optimizations of the
-second approach, the explicitly maintained set was faster.
+Surprisingly, the explicitly maintained set performed faster than the implicit
+version, which differs from the theoretical results in the book. The reason
+appeared to be that the explicit set had much better cache performance on large
+graphs. The find operation of the implicit set required following a chain of
+parent pointers that jumped all around the array of nodes. The explicit set did
+not require this hopping around through memory. Even with multiple optimizations
+of the second approach, the explicitly maintained set was faster.
 
-The other major tradeoff in Kruskal's we found was how much of the list of
-edges we sorted at a time. Because Kruskal's walks through edges in sorted
-order, and ends when all nodes are connected, there is no need to sort any
-edges not included in the final MST. Because sorting the edges is the
-largest expenditure of time in Kruskal's, it is a big win to eliminate
-unnecessary sorting. However, this is tricky to do because you can only
-guess at the beginning how much of the array will need to be sorted. Then
-you have to keep track of the sorted portion, and sort more if you move
-past it. We found a good solution was to sort differing percentages of the
-edge array based on the density of the graph. The optimal values found are
-listed in Table \ref{table:kruskal-sort-percent}.
+Sorting the edges is the most expensive part of Kruskal's algorithm so we
+investigated quick sorting methods.  We settled on a special inline quicksort
+implementation from~\cite{qsort}.  However, we later found that we could do even
+better - since Kruskal's algorithm walks through edges in sorted order, and ends
+when all nodes are connected, there is no need to sort any edges not included in
+the final MST.  Sorting the edges is the most expensive part of Kruskal's
+algorithm, so this ``partial sort'' approach a big win to eliminate unnecessary
+sorting.  We had two approaches to partial sorting.  First, we inserted all of
+the edges into a heap and then pulled them out one at a time - thus we sorted
+only exactly the part we needed.  However, the extra overhead from the heap
+operations led us to try a second approach: implementing a special interruptible
+quicksort.  This implementation sped the algorithm up significantly so it was a
+big win.  However, it was tricky to implement because you do not know a priori
+how much of the array you need to be sort.  This requires you to keep track of
+the sorted portion, and sort more if you move past it. An effective solution was
+to sort differing percentages of the edge array based on the density of the
+graph. The optimal values found are listed in Table
+\ref{table:kruskal-sort-percent}.
 
 We found that a best-fit growth rate analysis on empirical data for ``KPS''
 roughly matched the theoretical estimate: the best-fit was a polynomial $\cdot$
