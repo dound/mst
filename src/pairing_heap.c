@@ -2,6 +2,8 @@
 #include <pairing_heap.h>
 #include <stdlib.h>
 
+heap* hp;
+
 /***********************************************
  * PRIVATE FUNCTIONS
  ***********************************************/
@@ -76,38 +78,38 @@ static void heap_node_free(heap_node *h) {
  ***********************************************/
 
 /* free heap */
-void heap_free(heap *hp) {
+void heap_free() {
     heap_node_free(hp->root);
     free(hp);
 }
 
 /* get min value */
-int heap_min(heap *h) {
-    return h->root->value.v_not_in_mst;
+int heap_min() {
+    return hp->root->value.v_not_in_mst;
 }
 
 /* decrease the value of the node */
-void heap_decrease_key(heap *h, heap_node *node, foi new_weight) {
+void heap_decrease_key(heap_node *node, foi new_weight) {
     node->value.weight = new_weight;
     /* if the node is not at the root of the tree, remove it and
        merge it with the root */
-    if (node!=h->root) {
+    if (node!=hp->root) {
         /* remove the node tree from the siblings and parents*/
         heap_node_isolate(node);
         /* merge with root*/
-        h->root = heap_node_meld(h->root,node);
+        hp->root = heap_node_meld(hp->root,node);
     }
 }
 
 /* insert element to the heap */
-heap_node * heap_insert(heap *h, foi weight) {
+heap_node * heap_insert(foi weight) {
     heap_node *node = heap_node_new(weight);
-    h->root = heap_node_meld(h->root,node);
+    hp->root = heap_node_meld(hp->root,node);
     return node;
 }
 
 /* delete min value. multi-pass */
-void heap_delete_min(heap *hp) {
+void heap_delete_min() {
     heap_node *a,*b,*next_tmp,*new_root=NULL;
 
     heap_node * h = hp->root;
@@ -142,11 +144,10 @@ void heap_delete_min(heap *hp) {
 }
 
 /* create a new heap */
-heap * heap_new() {
-    heap *h;
-    h = (heap*)malloc(sizeof(heap));
-    h->root = NULL;
-    return h;
+heap* heap_new() {
+    hp = (heap*)malloc(sizeof(heap));
+    hp->root = NULL;
+    return hp;
 }
 
 #ifdef _PH_TEST_

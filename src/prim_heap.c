@@ -48,7 +48,7 @@ void run_prim_heap(int sz_v, edge_list *al) {
             heap_node *min_edge = min_edge_to_vertex[e->other];
             if(!min_edge) {
                 /* first edge to e->other! */
-                min_edge_to_vertex[e->other] = heap_insert(ph, e->weight);
+                min_edge_to_vertex[e->other] = heap_insert(e->weight);
                 min_edge_to_vertex[e->other]->value.v_not_in_mst = e->other;
                 min_edge_to_vertex[e->other]->value.v_in_mst = v;
             }
@@ -57,7 +57,7 @@ void run_prim_heap(int sz_v, edge_list *al) {
                 /* is this one better? */
                 if(min_edge->value.weight > e->weight) {
                     /* replace the edge with this better edge */
-                    heap_decrease_key(ph, min_edge, e->weight);
+                    heap_decrease_key(min_edge, e->weight);
                     min_edge->value.v_in_mst = v;
                 }
             }
@@ -67,12 +67,12 @@ void run_prim_heap(int sz_v, edge_list *al) {
 
         /* get the next vertex to process, if any */
         if(ph->root) {
-            v = heap_min(ph); /* gets v_not_in_mst */
+            v = heap_min(); /* gets v_not_in_mst */
 
             /* add v to our MST - use the best edge we have to it */
             mst_edges[v] = min_edge_to_vertex[v]->value.v_in_mst;
             mst_weight += min_edge_to_vertex[v]->value.weight;
-            heap_delete_min(ph);
+            heap_delete_min();
         }
         else
             break; /* loop until the heap is empty */
@@ -87,7 +87,7 @@ void run_prim_heap(int sz_v, edge_list *al) {
 
 #ifdef _DEBUG_
     /* be nice and free memory when we aren't going for performance */
-    heap_free(ph);
+    heap_free();
     free(mst_edges);
     free(min_edge_to_vertex);
 #endif
