@@ -20,7 +20,7 @@ from points randomly distributed in k-space. We begin by analyzing a graph in
 
 The MST of a graph with $|V|$ vertices will have $|V|-1$ edges. In order to
 produce the \textit{maximum} weight MST for $|V|$ vertices, the $|V|-1$ edges
-need to be as large as possible. We can maximize the MST's weight by spreading
+need to be as large as possible. We can maximize the MST weight by spreading
 the vertices out as far as possible. We also maximize the MST by making all
 edges the same length; this prevents trading off one edge of a longer distance
 for one of a shorter distance. We do not prove this but offer it as a simple
@@ -44,35 +44,35 @@ theoretical upper bound.
 
 \subsection{Empirical results}
 \paragraph{}
-Figure~\ref{fig:part2} shows empirical MST weight data. For each type of
-graph and for all values of $|V|$
-between $2$ and $8192$ (inclusive) which are powers of $1.5$ or $2$ it
-plots the average MST weight.  For each type of graph, the
-weights for each of these 34 $|V|$ values is determined by
-an average of at least 50 random graphs with that value of $|V|$.  In
-total, over $10,000$ graphs
-were generated and analyzed to produce this plot; more details about how
-these graphs were generated is available in
-Section~\ref{sec:deep:graphgen}. We
-also computed $99.95\%$ confidence intervals of these averages but omit
-them from the figure because they are so small.  The tiny size of these
-ranges allows us to say with high confidence that our results here are
-statistically significant.
+Figure~\ref{fig:part2} shows experimentally determined average MST weights for
+four types of graphs.  These types are random unit edge weights (labeled
+``Edge'') and edge weights based on random vertex placement in $k$-space for
+$k=2$, $k=3$, and $k=4$.  The average weights for each of these four dataset was
+sampled at a variety of vertex quantities.  In particular, results are shown for
+all $|V|$ between $2$ and $8192$ (inclusive) which are powers of $1.5$ or $2$.
+Furthermore, for each dataset, the weights for \textit{each} of these $34$
+distinct $|V|$ values is determined by an average of at least $50$ random
+graphs.  In total, over $10,000$ graphs were generated and analyzed to produce
+this plot; more details about how these graphs were generated is available in
+Section~\ref{sec:deep:graphgen}. We also computed $99.95\%$ confidence intervals
+of these averages but omit them from the figure because they are so small.  The
+tiny size of these ranges allows us to say with high confidence that our
+measurements are statistically significant.
 
-\begin{figure}[htb!]
+\begin{figure}[t!]
 \centering
 \includegraphics[width=0.50\textwidth]{figures/part2.pdf}
-\caption{Empirical data showing how the average MST weight increase with $|V|$
+\caption{Empirical data showing how average MST weight increases with $|V|$
   for complete graphs.}
 \label{fig:part2}
 \end{figure}
 
-\paragraph{}
-We compared several curves to the MST data for each graph type. We used the
-Marquardt-Levenberg algorithm to fit a range of growth rates, from constant
-to exponential, to each set of data.
-Figure~\ref{fig:part2-fit} shows how each of these fits performs for each case.
-The equations we fit are ($n = |V|$):
+In order to accurately characterize how these MSTs grow as a function of $n$, we
+used the Marquardt-Levenberg algorithm to fit a range of growth rate functions
+to each dataset.  We covered a broad range of function classes from constant to
+exponential.  Figure~\ref{fig:part2-fit} shows how well each of these growth
+rates performs for each dataset.  These candidate growth rates we fit are ($n =
+|V|$):
 \begin{eqnarray*}
 constant&:& c \\
 log&:& m \cdot log_2(n) + c \\
