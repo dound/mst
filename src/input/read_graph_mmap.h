@@ -101,7 +101,10 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
         pwr = 0;
         digit = delim-1;
         digits = delim-input;
-#if GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
+#if GRAPH_TYPE == ADJACENCY_LIST
+        u = diffs[digits];
+        w = 0.0f;
+#elif GRAPH_TYPE == ADJACENCY_MATRIX
         u = diffs[digits];
         w = 0.0f;
 #elif   GRAPH_TYPE == EDGE_LIST || GRAPH_TYPE == HEAPIFIED_EDGE_LIST
@@ -112,7 +115,7 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
 #if   GRAPH_TYPE == EDGE_LIST || GRAPH_TYPE == HEAPIFIED_EDGE_LIST
             nextEdge->u += pwrs[pwr]*(*digit);
 #elif GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
-            u += pwr*((*digit));
+            u += pwrs[pwr]*((*digit));
 #endif
             pwr++;
             digit--;
@@ -123,7 +126,9 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
         pwr = 0;
         digit = delim-1;
         digits = delim-input;
-#if GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
+#if GRAPH_TYPE == ADJACENCY_LIST
+        v = diffs[digits];
+#elif GRAPH_TYPE == ADJACENCY_MATRIX
         v = diffs[digits];
 #elif   GRAPH_TYPE == EDGE_LIST || GRAPH_TYPE == HEAPIFIED_EDGE_LIST
         nextEdge->v = diffs[digits];
@@ -133,7 +138,7 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
 #if   GRAPH_TYPE == EDGE_LIST || GRAPH_TYPE == HEAPIFIED_EDGE_LIST
             nextEdge->v += pwrs[pwr]*((*digit));
 #elif GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
-            v += pwr*((*digit));
+            v += pwrs[pwr]*((*digit));
 #endif
             pwr++;
             digit--;
@@ -160,7 +165,7 @@ int read_graph_to_adjacency_matrix_mmap(char *filename, int *n, int *m, foi **we
 #if   GRAPH_TYPE == EDGE_LIST || GRAPH_TYPE == HEAPIFIED_EDGE_LIST
             nextEdge->weight += pwrs[pwr]*((*digit)-'0');
 #elif GRAPH_TYPE == ADJACENCY_LIST || GRAPH_TYPE == ADJACENCY_MATRIX
-            w += pwr*((*digit)-'0');
+            w += pwrs[pwr]*((*digit)-'0');
 #endif
             pwr++;
             digit--;
