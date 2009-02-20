@@ -44,4 +44,7 @@ void kruskal_implicit_set_with_ps(char* fn);
 /** run a version of Prim's algorithm optimized for dense-graphs */
 void prim_dense(char* fn);
 
+/** run a version of Prim's algorithm which uses a heap */
+void prim_heap(char* fn);
+
 #endif
