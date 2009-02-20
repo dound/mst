@@ -3,6 +3,8 @@
 #include <stdlib.h>
 
 heap* hp;
+heap_node* hnodes;
+int hnode_on;
 
 /***********************************************
  * PRIVATE FUNCTIONS
@@ -53,7 +55,7 @@ static void heap_node_isolate(heap_node *node) {
 static heap_node* heap_node_new(foi weight) {
     heap_node *h;
 
-    h = (heap_node*)malloc(sizeof(heap_node));
+    h = &hnodes[hnode_on++];
     /* if you want speed, use memset instead */
     h->parent = NULL;
     h->previous_sibling = NULL;
@@ -64,23 +66,14 @@ static heap_node* heap_node_new(foi weight) {
     return h;
 }
 
-/* free node tree */
-static void heap_node_free(heap_node *h) {
-    if (!h)
-        return;
-    heap_node_free(h->next_sibling);
-    heap_node_free(h->first_child);
-    free(h);
-}
-
 /***********************************************
  * PUBLIC FUNCTIONS
  ***********************************************/
 
 /* free heap */
 void heap_free() {
-    heap_node_free(hp->root);
     free(hp);
+    free(hnodes);
 }
 
 /* get min value */
@@ -139,14 +132,15 @@ void heap_delete_min() {
         h->first_child->parent=NULL;
     }
 
-    free(h);
     hp->root = new_root;
 }
 
 /* create a new heap */
-heap* heap_new() {
+heap* heap_new(int sz_v) {
     hp = (heap*)malloc(sizeof(heap));
     hp->root = NULL;
+    hnodes = (heap_node*)malloc(sz_v * sizeof(heap_node));
+    hnode_on = 0;
     return hp;
 }
 

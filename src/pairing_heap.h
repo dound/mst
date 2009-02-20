@@ -24,7 +24,7 @@ typedef struct heap {
 } heap;
 
 /* create a new heap */
-heap* heap_new();
+heap* heap_new(int sz_v);
 
 /* free heap */
 void heap_free();

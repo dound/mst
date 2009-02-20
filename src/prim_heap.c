@@ -21,7 +21,7 @@ void run_prim_heap(int sz_v, edge_list *al) {
     foi_big mst_weight = 0;
 
     /* a heap to remember the next shortest edge to a vertex not on the MST */
-    heap *ph = heap_new();
+    heap *ph = heap_new(sz_v);
 
     /* Value at offset u specifies v.  v is the other endpoint of the edge
      * which connects u to the MST.  Offset 0 and 1 are not used. */
