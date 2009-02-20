@@ -1,20 +1,69 @@
 \subsection{Algorithm Choice}
 \label{sec:deep:algchoice}
-\paragraph{}
-Discuss the algorithms we tried, our experience with each, and the tweaks we
-made (both successful and not).  Provide empircal data (graphs) which compare
-these algorithms and to strengthen our discussion of the tweaks we made and
-their relative performance.
+This section discusses algorithms we implemented, effective tweaks, and
+theoretical versus empirical growth rates.  All versions of all algorithms
+discussed here and the results presented here are based on data from a battery
+of $71$ $|V|$ and $|E|$ pairs which cover $|E|:|V|$ ratios of $5, 50, 150, and
+1500$.  The magnitude of edges spanned from $100,000$ to $10,000,000$.  Five
+different graphs with each of those $71$ $|V|$ and $|E|$ pairs was generated for
+a total of $355$ inputs.  For each version of the algorithm, we ran in five
+times on each of these inputs for a total of $1,755$ trials each.  The $25$
+results for each $|V|$ and $|E|$ pair were statistically significant - though
+not shown, the $99.95\%$ confidence intervals for all these results are quite
+close to the mean runtimes.
 
-\paragraph{}
-We should probably consider one algorithm at a time, then compare the best
-version of each in a final subsubsection.  Include a little discussion as
-whether these algorithms running times mtch their asymptotic complexity.
+%Discuss the algorithms we tried, our experience with each, and the tweaks we
+%made (both successful and not).  Provide empirical data (graphs) which compare
+%these algorithms and to strengthen our discussion of the tweaks we made and
+%their relative performance.
+%\paragraph{}
+%We should probably consider one algorithm at a time, then compare the best
+%version of each in a final subsubsection.  Include a little discussion as
+%whether these algorithms running times match their asymptotic complexity.
 
-\subsubsection{Prim's}
+\subsubsection{Prim's Algorithm}
 \paragraph{}
+We implemented two versions of Prim's algorithm.  One version, ``PH'' was a
+heap-based version of Prim's.  The heap was used to quickly determine which
+``frontier'' edge had the minimum weight.  The \texttt{decreaseKey} method needs
+to be efficient for this algorithm to work well - edges on the frontier are
+often updated.  Fibonacci heaps are a complicated data structure which promise
+to use only constant amortized time for this operation, but in practice it tends
+to be a complicated data structure with high constant costs.  Thus we chose to
+use a pairing heaps data structure which is likely to offer similar guarantees
+with much less complexity - some studies\cite{moret} have shown they work well
+in practice too.  The theoretical complexity of this algorithm is $O(|E| \cdot
+log(|V|))$.
 
-\subsubsection{Kruskal's}
+The other version, ``PD'', of Prim's algorithm at first seems too primitive, but
+turns out to be very applicable on very dense graphs.  It is implemented with an
+adjacency matrix which allows it to check edge cost or existence very cheaply.
+The algorithm considers the edges attached to each vertex when the vertex is
+added to the MST - i.e., it looks at what new vertices it might be able to get
+to which are not in the MST already.  This must be done for each vertex, so this
+leads to an algorithm whose theoretical complexity is $O(|V|^2)$ - thus for
+dense graphs it is actually a linear algorithm in terms of $|E|$!
+
+There were a few implementation tricks which led to significant speedups.  For
+``PH'', we modified a multi-pass pairing heap from \cite{rui} to eliminate
+pointer passing (essentially making it a static class) and crucially
+preallocating memory for all of the nodes it would need rather than continuously
+allocating and deallocating them.  In retrospect, we should have used a more
+recent incarnation of the pairing heap data structure which gives limits
+\texttt{decreaseKey}'s cost to $O(log(log(n)))$\cite{elmasry}.  We also
+discovered a simple trick for improving ``PD'': at a cost of allocating twice as
+much memory, we store all edges both in the forwards $(u, v)$ and reverse $(v,
+u)$ direction.  This makes lookups faster since it avoids expensive branches to
+ensure the appropriate vertex is used as $u$ in the original scheme which only
+stored edges in one direction.
+
+We found that a best-fit growth rate analysis on empirical data for ``PH''
+roughly matched the theoretical estimate: the best-fit was a polynomial $\cdot$
+log function $1.0 * |E|^0.9 * log2(|E|) + -0.010$.
+Figure~\ref{fig:p1-fit-prim-heap} shows the average runtime for ``PH'' and this
+best-fit line.
+
+\subsubsection{Kruskal's Algorithm}
 \paragraph{}
 We implemented multiple versions of Kruskal's and had surprising
 results. One major difference is in the Union-Find data structure that
