@@ -15,3 +15,7 @@ It also provides fast methods for reading graphs from an ASCII-based text file
 To maximize compiler optimization opportunities, some choices can only be
 specified by compile-define macros.  These macros are documented in
 src/doc/macro-defines.txt.
+
+This library depends only on the standard C library.  It includes about 2100
+lines of C code.  It also includes an extensive test suite, written in about
+3000 lines of Python code, which we used to help guide our optimization efforts.
