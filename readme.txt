@@ -1,6 +1,6 @@
 An optimized library of minimum spanning tree algorithms.  Includes various
 implementations of Kruskal's and Prim's algorithms in the C programming
-language.  This implementation outperformed the boost library's implementation on
+language.  This implementation outperforms the boost library's implementation on
 a variety of graph sizes and types.
 
 This work was done by David Underhill and Derrick Isaacson for Tim Roughgarden's
